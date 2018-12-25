@@ -17,28 +17,6 @@ app.prepare().then(() => {
 		})
 	})
 
-	/*
-	server.get('/player/:gameKey', (req, res) => {
-		return app.render(req, res, '/player', {
-			gameKey: req.params.gameKey,
-			...req.query
-		})
-	})
-	
-	server.get('/host/:gameKey', (req, res) => {
-		return app.render(req, res, '/host', {
-			gameKey: req.params.gameKey,
-			...req.query
-		})
-	})
-
-	server.get('/game/:gameKey', (req, res) => {
-		return app.render(req, res, '/game', {
-			gameKey: req.params.gameKey,
-			...req.query
-		})
-	})
-	*/
 	server.get('*', (req, res) => {
 		return handle(req, res)
 	})
