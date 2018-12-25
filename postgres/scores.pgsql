@@ -1,0 +1,1 @@
+CREATE TABLE scores (gameid uuid REFERENCES games(gameid), questionid uuid REFERENCES questions(questionid), userid uuid REFERENCES users(userid), answer varchar(50), reaction int, correct bool, score integer, winner bool);

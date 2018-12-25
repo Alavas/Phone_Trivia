@@ -1,0 +1,1 @@
+CREATE TABLE users (userid uuid PRIMARY KEY, username varchar(50), score int);
