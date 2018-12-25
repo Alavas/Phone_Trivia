@@ -1,0 +1,19 @@
+{
+	"name": "gameshow",
+	"version": "1.0.0",
+	"description": "Web based game with phone based controls.",
+	"main": "server.js",
+	"scripts": {
+		"dev": "node server.js",
+		"build": "next build",
+		"start": "NODE_ENV=production node server.js"
+	},
+	"author": "Justin Savala",
+	"license": "MIT",
+	"dependencies": {
+		"express": "^4.16.4",
+		"next": "7.0.2",
+		"react": "16.7.0",
+		"react-dom": "16.7.0"
+	}
+}
