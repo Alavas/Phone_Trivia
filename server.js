@@ -1,5 +1,13 @@
 const express = require('express')
 const next = require('next')
+const { Pool } = require('pg')
+
+const postgres = new Pool({
+	connectionString:
+		process.env.DATABASE_URL ||
+		'postgresql://postgres:H@ck3r$@localhost:5432/gameshow',
+	ssl: process.env.SSL_STATE || false
+})
 
 const port = parseInt(process.env.PORT, 10) || 3000
 const dev = process.env.NODE_ENV !== 'production'
