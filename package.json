@@ -12,10 +12,12 @@
 	"license": "MIT",
 	"dependencies": {
 		"express": "^4.16.4",
+		"isomorphic-unfetch": "^3.0.0",
 		"lodash": "^4.17.11",
 		"next": "7.0.2",
 		"pg": "^7.7.1",
 		"react": "16.7.0",
-		"react-dom": "16.7.0"
+		"react-dom": "16.7.0",
+		"uuid-by-string": "^2.0.1"
 	}
 }
