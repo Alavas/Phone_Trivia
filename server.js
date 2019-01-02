@@ -1,4 +1,5 @@
 const express = require('express')
+const cors = require('cors')
 const bodyParser = require('body-parser')
 const _ = require('lodash')
 const next = require('next')
@@ -18,6 +19,7 @@ const handle = app.getRequestHandler()
 
 app.prepare().then(() => {
 	const server = express()
+	server.use(cors())
 	server.use(bodyParser.json())
 
 	server.get('/:route/:gameKey', (req, res) => {

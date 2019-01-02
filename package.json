@@ -19,5 +19,8 @@
 		"react": "16.7.0",
 		"react-dom": "16.7.0",
 		"uuid-by-string": "^2.0.1"
+	},
+	"devDependencies": {
+		"cors": "^2.8.5"
 	}
 }
