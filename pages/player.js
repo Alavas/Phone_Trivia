@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { getCookie, updateCookie, generateUUID } from '../utilities'
+import { getCookie, updateCookie, generateUUID, loginUser } from '../utilities'
 import Nav from '../components/nav'
 
 class Player extends Component {
@@ -14,22 +14,14 @@ class Player extends Component {
 
 	componentDidMount() {
 		let userid = getCookie('gs_userid')
-		if (userid === '') {
+		if (userid === '' || userid === 'undefined') {
 			userid = generateUUID(window.navigator.userAgent)
 		}
 		this.userLogin(userid)
 	}
 
 	async userLogin(userID) {
-		let data = JSON.stringify({ userID })
-		const userDetails = await fetch('http://192.168.1.88:3000/api/user', {
-			method: 'POST',
-			headers: {
-				Accept: 'application/json, text/plain, */*',
-				'Content-Type': 'application/json'
-			},
-			body: data
-		}).then(res => res.json())
+		const userDetails = await loginUser(userID)
 		updateCookie(userDetails.userid)
 		this.setState({ ...userDetails, loggedIn: true })
 	}

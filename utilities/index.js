@@ -26,3 +26,20 @@ export const generateUUID = UA => {
 	const time = Date.now()
 	return getUuid(`${ua} + ${time}`)
 }
+
+//Login to the game backend.
+export const loginUser = async userID => {
+	let data = JSON.stringify({ userID })
+	const userDetails = await fetch(
+		`${process.env.GAMESHOW_ENDPOINT}/api/user`,
+		{
+			method: 'POST',
+			headers: {
+				Accept: 'application/json, text/plain, */*',
+				'Content-Type': 'application/json'
+			},
+			body: data
+		}
+	).then(res => res.json())
+	return userDetails
+}

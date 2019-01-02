@@ -11,6 +11,7 @@
 	"author": "Justin Savala",
 	"license": "MIT",
 	"dependencies": {
+		"dotenv": "^6.2.0",
 		"express": "^4.16.4",
 		"isomorphic-unfetch": "^3.0.0",
 		"lodash": "^4.17.11",

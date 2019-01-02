@@ -1,10 +1,13 @@
-module.exports = {
-  webpack: config => {
-    // Fixes npm packages that depend on `fs` module
-    config.node = {
-      fs: 'empty'
-    }
+require('dotenv').config()
+const webpack = require('webpack')
 
-    return config
-  }
+module.exports = {
+	webpack: config => {
+		config.plugins.push(new webpack.EnvironmentPlugin(process.env))
+		// Fixes npm packages that depend on `fs` module
+		config.node = {
+			fs: 'empty'
+		}
+		return config
+	}
 }
