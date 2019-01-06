@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import Head from '../components/head'
 import Nav from '../components/nav'
 
 class Game extends Component {
@@ -10,6 +11,7 @@ class Game extends Component {
 		console.log(this.props.game)
 		return (
 			<div>
+				<Head title="Gameshow" />
 				<Nav />
 				<div className="title">
 					<h1>Game Controller</h1>
