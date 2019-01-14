@@ -1,1 +1,1 @@
-CREATE TABLE games (gameid uuid PRIMARY KEY, userid uuid REFERENCES users(userid), created timestamptz, ended timestamptz, complete bool);
+CREATE TABLE games (gameid uuid PRIMARY KEY, userid uuid REFERENCES users(userid), created timestamptz, ended timestamptz, gamestate int);
