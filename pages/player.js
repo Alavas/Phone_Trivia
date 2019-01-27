@@ -33,17 +33,15 @@ class Player extends Component {
 			<div>
 				<Head title="Gameshow" />
 				<Nav />
-				<div>
-					<div className="row">
+				<div className="row">
+					<a className="card">
+						<h3>JOIN A GAME</h3>
+					</a>
+					<Link href="/host">
 						<a className="card">
-							<h3>JOIN A GAME</h3>
+							<h3>START A GAME</h3>
 						</a>
-						<Link href="/host">
-							<a className="card">
-								<h3>START A GAME</h3>
-							</a>
-						</Link>
-					</div>
+					</Link>
 				</div>
 				<style jsx>{`
 					.row {

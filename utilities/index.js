@@ -43,3 +43,58 @@ export const loginUser = async userID => {
 	).then(res => res.json())
 	return userDetails
 }
+
+//Request to create a new game.
+export const createGame = async gameSettings => {
+	let data = JSON.stringify({ gameSettings })
+	const game = await fetch(`${process.env.GAMESHOW_ENDPOINT}/api/newgame`, {
+		method: 'POST',
+		headers: {
+			Accept: 'application/json, text/plain, */*',
+			'Content-Type': 'application/json'
+		},
+		body: data
+	}).then(res => res.json())
+	return game.gameid
+}
+
+export const gameCategories = [
+	{ value: 'any', display: 'Any Category' },
+	{ value: 9, display: 'General Knowledge' },
+	{ value: 16, display: 'Entertainment: Board Games' },
+	{ value: 10, display: 'Entertainment: Books' },
+	{ value: 32, display: 'Entertainment: Cartoon & Animations' },
+	{ value: 29, display: 'Entertainment: Comics' },
+	{ value: 11, display: 'Entertainment: Film' },
+	{ value: 31, display: 'Entertainment: Japanese Anime & Manga' },
+	{ value: 12, display: 'Entertainment: Music' },
+	{ value: 13, display: 'Entertainment: Musicals & Theatres' },
+	{ value: 14, display: 'Entertainment: Television' },
+	{ value: 15, display: 'Entertainment: Video Games' },
+	{ value: 17, display: 'Science &amp; Nature' },
+	{ value: 18, display: 'Science: Computers' },
+	{ value: 19, display: 'Science: Mathematics' },
+	{ value: 20, display: 'Mythology' },
+	{ value: 21, display: 'Sports' },
+	{ value: 22, display: 'Geography' },
+	{ value: 23, display: 'History' },
+	{ value: 24, display: 'Politics' },
+	{ value: 25, display: 'Art' },
+	{ value: 27, display: 'Animals' },
+	{ value: 26, display: 'Celebrities' },
+	{ value: 28, display: 'Vehicles' },
+	{ value: 30, display: 'Science: Gadgets' }
+]
+
+export const gameDifficulties = [
+	{ value: 'any', display: 'Any Difficulty' },
+	{ value: 'easy', display: 'Easy' },
+	{ value: 'medium', display: 'Medium' },
+	{ value: 'hard', display: 'Hard' }
+]
+
+export const questionType = [
+	{ value: 'any', display: 'Any Type' },
+	{ value: 'multiple', display: 'Multiple Choice' },
+	{ value: 'boolean', display: 'True / False' }
+]

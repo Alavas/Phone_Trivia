@@ -2,6 +2,7 @@ const express = require('express')
 const cors = require('cors')
 const bodyParser = require('body-parser')
 const _ = require('lodash')
+const fetch = require('node-fetch')
 const next = require('next')
 const { Pool } = require('pg')
 
@@ -30,6 +31,45 @@ app.prepare().then(() => {
 		})
 	})
 
+	server.post('/api/newgame', async (req, res) => {
+		const game = req.body.gameSettings
+		// prettier-ignore
+		let URL = `https://opentdb.com/api.php?amount=${game.amount}&category=${game.category}&difficulty=${game.difficulty}&type=${game.type}`
+		//If value is 'any' then remove that parameter.
+		URL = URL.replace(/(&.{1,10}=any)/g, '')
+		const gameQuestions = await fetch(
+			`https://1b976eed-0a7d-4d14-b3b4-9ab759dbdedf.mock.pstmn.io/api.php?amount=10&type=multiple`
+		).then(res => res.json())
+		if (gameQuestions.response_code === 0) {
+			const gameid = await newGame(game)
+			let questions = gameQuestions.results.map((q, index) => {
+				let answers = q.incorrect_answers
+				answers.push(q.correct_answer)
+				answers.sort(() => Math.random() - 0.5)
+				let correct = answers.indexOf(q.correct_answer)
+				correct = ['A', 'B', 'C', 'D'][correct]
+				let question = {
+					gameid,
+					number: index + 1,
+					question: q.question,
+					a: answers[0],
+					b: answers[1],
+					c: answers[2],
+					d: answers[3],
+					correct
+				}
+				return question
+			})
+			for (const question of questions) {
+				let result = await newQuestion(question)
+			}
+			res.send({ gameid })
+			res.end
+		} else {
+			//handle error...
+		}
+	})
+
 	server.post('/api/user', async (req, res) => {
 		const userID = req.body.userID
 		if (_.isUndefined(userID)) {
@@ -51,6 +91,42 @@ app.prepare().then(() => {
 		console.log(`> Ready on http://localhost:${port}`)
 	})
 })
+
+async function newGame(game) {
+	try {
+		// prettier-ignore
+		const query = `INSERT INTO games (gameid, userid, created, ended, gamestate) VALUES (uuid_generate_v4(), '${game.host}', NOW()::timestamp, null, 0) RETURNING gameid;`
+		const client = await postgres.connect()
+		const result = await client.query(query)
+		if (result.rowCount > 0) {
+			client.release()
+			return result.rows[0].gameid
+		} else {
+			client.release()
+			return { error: 'unable to insert' }
+		}
+	} catch (err) {
+		return err
+	}
+}
+
+async function newQuestion(question) {
+	try {
+		// prettier-ignore
+		const query = `INSERT INTO questions (questionid, gameid, number, question, a, b, c, d, correct) VALUES (uuid_generate_v4(), '${question.gameid}', ${question.number}, '${question.question}', '${question.a}', '${question.b}', '${question.c}', '${question.d}', '${question.correct}');`
+		const client = await postgres.connect()
+		const result = await client.query(query)
+		if (result.rowCount > 0) {
+			client.release()
+			return
+		} else {
+			client.release()
+			return { error: 'unable to insert' }
+		}
+	} catch (err) {
+		return err
+	}
+}
 
 async function userCheck(userID) {
 	try {
