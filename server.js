@@ -35,11 +35,10 @@ app.prepare().then(() => {
 		const game = req.body.gameSettings
 		// prettier-ignore
 		let URL = `https://opentdb.com/api.php?amount=${game.amount}&category=${game.category}&difficulty=${game.difficulty}&type=${game.type}`
+		let testURL = `https://1b976eed-0a7d-4d14-b3b4-9ab759dbdedf.mock.pstmn.io/api.php?amount=10&type=multiple`
 		//If value is 'any' then remove that parameter.
 		URL = URL.replace(/(&.{1,10}=any)/g, '')
-		const gameQuestions = await fetch(
-			`https://1b976eed-0a7d-4d14-b3b4-9ab759dbdedf.mock.pstmn.io/api.php?amount=10&type=multiple`
-		).then(res => res.json())
+		const gameQuestions = await fetch(URL).then(res => res.json())
 		if (gameQuestions.response_code === 0) {
 			const gameid = await newGame(game)
 			let questions = gameQuestions.results.map((q, index) => {
