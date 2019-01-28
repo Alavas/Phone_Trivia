@@ -1,7 +1,9 @@
 const express = require('express')
+const https = require('https')
 const cors = require('cors')
 const bodyParser = require('body-parser')
 const _ = require('lodash')
+const fs = require('fs')
 const fetch = require('node-fetch')
 const next = require('next')
 const { Pool } = require('pg')
@@ -12,6 +14,11 @@ const postgres = new Pool({
 		'postgresql://postgres:H@ck3r$@localhost:5432/gameshow',
 	ssl: process.env.SSL_STATE || false
 })
+
+const credentials = {
+	key: fs.readFileSync('certificate/server.key'),
+	cert: fs.readFileSync('certificate/server.cert')
+}
 
 const port = parseInt(process.env.PORT, 10) || 3000
 const dev = process.env.NODE_ENV !== 'production'
@@ -85,9 +92,10 @@ app.prepare().then(() => {
 		return handle(req, res)
 	})
 
-	server.listen(port, err => {
-		if (err) throw err
-		console.log(`> Ready on http://localhost:${port}`)
+	https.createServer(credentials, server).listen(port, function() {
+		console.log(
+			`Example app listening on port ${port}! Go to https://localhost:${port}/`
+		)
 	})
 })
 
