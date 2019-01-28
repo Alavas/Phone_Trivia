@@ -21,7 +21,7 @@ class Host extends Component {
 			userid: '',
 			gameid: '',
 			loggedIn: false,
-			gameState: 0,
+			hostState: 0,
 			numQuestions: 10,
 			category: 'any_category',
 			difficulty: 'easy',
@@ -56,7 +56,7 @@ class Host extends Component {
 			host: this.state.userid
 		}
 		const gameid = await createGame(gameSettings)
-		this.setState({ gameid, gameState: 2 })
+		this.setState({ gameid, hostState: 2 })
 	}
 
 	async userLogin(userID) {
@@ -71,13 +71,13 @@ class Host extends Component {
 				<Head title="Gameshow" />
 				<Nav />
 				{(() => {
-					switch (this.state.gameState) {
+					switch (this.state.hostState) {
 						case 0:
 							return (
 								<div className="row">
 									<a
 										className="card"
-										onClick={() => this.setState({ gameState: 1 })}
+										onClick={() => this.setState({ hostState: 1 })}
 									>
 										<h3>START A GAME</h3>
 									</a>
