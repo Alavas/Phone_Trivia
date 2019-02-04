@@ -1,6 +1,9 @@
+if (typeof window != 'undefined') {
+	var QrReader = require('react-qr-reader')
+}
+
 import React, { Component } from 'react'
 import Link from 'next/link'
-import QrReader from 'react-qr-reader'
 import { getCookie, updateCookie, generateUUID, loginUser } from '../utilities'
 import Head from '../components/head'
 import Nav from '../components/nav'
@@ -46,6 +49,8 @@ class Player extends Component {
 					result: data,
 					validGame: true
 				})
+				//Redirect to the game URL.
+				window.location = data
 			} else {
 				this.setState({ validGame: false })
 			}
