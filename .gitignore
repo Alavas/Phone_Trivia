@@ -8,6 +8,7 @@
 
 # dev
 /sandbox
+/certificate
 
 # production
 /build

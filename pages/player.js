@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import Link from 'next/link'
+import QrReader from 'react-qr-reader'
 import { getCookie, updateCookie, generateUUID, loginUser } from '../utilities'
 import Head from '../components/head'
 import Nav from '../components/nav'
@@ -7,7 +8,13 @@ import Nav from '../components/nav'
 class Player extends Component {
 	constructor() {
 		super()
-		this.state = { userid: '', loggedIn: false }
+		this.state = {
+			userid: '',
+			loggedIn: false,
+			result: 'No Result',
+			validGame: false,
+			playerState: 0
+		}
 	}
 
 	static getInitialProps({ query }) {
@@ -28,21 +35,69 @@ class Player extends Component {
 		this.setState({ ...userDetails, loggedIn: true })
 	}
 
+	handleScan = data => {
+		const regex = RegExp(
+			'(.*/player/)([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})'
+		)
+		if (data) {
+			//Regex to confirm that the link is valid.
+			if (regex.test(data)) {
+				this.setState({
+					result: data,
+					validGame: true
+				})
+			} else {
+				this.setState({ validGame: false })
+			}
+		}
+	}
+
+	handleError = err => {
+		console.error(err)
+	}
+
 	render() {
 		return (
 			<div>
 				<Head title="Gameshow" />
 				<Nav />
-				<div className="row">
-					<a className="card">
-						<h3>JOIN A GAME</h3>
-					</a>
-					<Link href="/host">
-						<a className="card">
-							<h3>START A GAME</h3>
-						</a>
-					</Link>
-				</div>
+				{(() => {
+					switch (this.state.playerState) {
+						case 0:
+							return (
+								<div className="row">
+									<a
+										className="card"
+										onClick={() => this.setState({ playerState: 1 })}
+									>
+										<h3>JOIN A GAME</h3>
+									</a>
+									<Link href="/host">
+										<a className="card">
+											<h3>START A GAME</h3>
+										</a>
+									</Link>
+								</div>
+							)
+						case 1:
+							return (
+								<div className="row">
+									<QrReader
+										delay={300}
+										onError={this.handleError}
+										onScan={this.handleScan}
+										style={{ width: '100%' }}
+									/>
+									{this.state.validGame ? (
+										<p>JOIN</p>
+									) : (
+										<p>Scan a game QR code.</p>
+									)}
+								</div>
+							)
+					}
+				})()}
+
 				<style jsx>{`
 					.row {
 						max-width: 60%;
