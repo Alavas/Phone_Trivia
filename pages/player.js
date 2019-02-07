@@ -4,7 +4,13 @@ if (typeof window != 'undefined') {
 
 import React, { Component } from 'react'
 import Link from 'next/link'
-import { getCookie, updateCookie, generateUUID, loginUser } from '../utilities'
+import {
+	getCookie,
+	updateCookie,
+	generateUUID,
+	loginUser,
+	joinGame
+} from '../utilities'
 import Head from '../components/head'
 import Nav from '../components/nav'
 
@@ -12,8 +18,7 @@ class Player extends Component {
 	constructor() {
 		super()
 		this.state = {
-			userid: '',
-			loggedIn: false,
+			userID: '',
 			result: 'No Result',
 			validGame: false,
 			playerState: 0
@@ -21,21 +26,33 @@ class Player extends Component {
 	}
 
 	static getInitialProps({ query }) {
-		return { game: query }
+		return { gameID: query.gameKey }
 	}
 
 	componentDidMount() {
-		let userid = getCookie('gs_userid')
-		if (userid === '' || userid === 'undefined') {
-			userid = generateUUID(window.navigator.userAgent)
+		this.handlePageOpened()
+	}
+
+	async handlePageOpened() {
+		let userID = getCookie('gs_userid')
+		if (userID === '' || userID === 'undefined') {
+			userID = generateUUID(window.navigator.userAgent)
 		}
-		this.userLogin(userid)
+		const loggedIn = await this.userLogin(userID)
+		if (loggedIn && this.props.gameID != null) {
+			const gameID = this.props.gameID
+			const joined = await joinGame({ userID, gameID })
+			if (joined) {
+				this.setState({ playerState: 3 })
+			}
+		}
 	}
 
 	async userLogin(userID) {
 		const userDetails = await loginUser(userID)
 		updateCookie(userDetails.userid)
-		this.setState({ ...userDetails, loggedIn: true })
+		this.setState({ ...userDetails })
+		return true
 	}
 
 	handleScan = data => {

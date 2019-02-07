@@ -58,6 +58,19 @@ export const createGame = async gameSettings => {
 	return game.gameid
 }
 
+export const joinGame = async ({ userID, gameID }) => {
+	let data = JSON.stringify({ userID, gameID })
+	const joined = await fetch(`${process.env.GAMESHOW_ENDPOINT}/api/joingame`, {
+		method: 'POST',
+		headers: {
+			Accept: 'application/json, text/plain, */*',
+			'Content-Type': 'application/json'
+		},
+		body: data
+	}).then(res => res.json())
+	return joined
+}
+
 export const gameCategories = [
 	{ value: 'any', display: 'Any Category' },
 	{ value: 9, display: 'General Knowledge' },

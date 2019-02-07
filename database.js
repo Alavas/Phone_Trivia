@@ -72,4 +72,22 @@ async function userCheck(userID) {
 	}
 }
 
-module.exports = { newGame, newQuestion, userCheck }
+async function joinGame({ userID, gameID }) {
+	try {
+		// prettier-ignore
+		const query = `INSERT INTO players (gameid, userid) VALUES ('${gameID}', '${userID}') ON CONFLICT (userid) DO UPDATE SET gameid = '${gameID}';`
+		const client = await postgres.connect()
+		const result = await client.query(query)
+		if (result.rowCount > 0) {
+			client.release()
+			return true
+		} else {
+			client.release()
+			return true
+		}
+	} catch (err) {
+		return false
+	}
+}
+
+module.exports = { newGame, newQuestion, userCheck, joinGame }

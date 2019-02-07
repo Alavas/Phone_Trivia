@@ -7,7 +7,7 @@ const fs = require('fs')
 const fetch = require('node-fetch')
 const next = require('next')
 //Database functions.
-const { newGame, newQuestion, userCheck } = require('./database')
+const { newGame, newQuestion, userCheck, joinGame } = require('./database')
 
 const credentials = {
 	key: fs.readFileSync('certificate/server.key'),
@@ -78,6 +78,19 @@ app.prepare().then(() => {
 		} else {
 			const user = await userCheck(userID)
 			res.send(user)
+			res.end
+		}
+	})
+
+	server.post('/api/joingame', async (req, res) => {
+		const userID = req.body.userID
+		const gameID = req.body.gameID
+		if (_.isUndefined(userID) || _.isUndefined(gameID)) {
+			res.sendStatus(400)
+			res.end
+		} else {
+			const joined = await joinGame({ userID, gameID })
+			res.send(joined)
 			res.end
 		}
 	})
