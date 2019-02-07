@@ -4,6 +4,7 @@ if (typeof window != 'undefined') {
 
 import React, { Component } from 'react'
 import Link from 'next/link'
+import QRCode from 'qrcode.react'
 import {
 	getCookie,
 	updateCookie,
@@ -43,7 +44,7 @@ class Player extends Component {
 			const gameID = this.props.gameID
 			const joined = await joinGame({ userID, gameID })
 			if (joined) {
-				this.setState({ playerState: 3 })
+				this.setState({ playerState: 2 })
 			}
 		}
 	}
@@ -117,6 +118,30 @@ class Player extends Component {
 									)}
 								</div>
 							)
+						case 2:
+							return (
+								<div className="row">
+									<a className="card">
+										<h3>WAITING TO BEGIN...</h3>
+									</a>
+									<div className="qr">
+										<QRCode
+											value={`${
+												process.env.GAMESHOW_ENDPOINT
+											}/player/${this.props.gameID}`}
+											size={225}
+											bgColor={'#ffffff'}
+											fgColor={'#000000'}
+											level={'L'}
+											includeMargin={false}
+											renderAs={'svg'}
+										/>
+									</div>
+									<a className="card">
+										<h3>LEAVE GAME</h3>
+									</a>
+								</div>
+							)
 					}
 				})()}
 
@@ -128,6 +153,10 @@ class Player extends Component {
 						margin-top: 100px;
 						display: flex;
 						flex-direction: column;
+					}
+					.qr {
+						margin-bottom: 25px;
+						text-align: center;
 					}
 					.card {
 						padding: 18px 18px 24px;
