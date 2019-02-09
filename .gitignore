@@ -9,6 +9,8 @@
 # dev
 /sandbox
 /certificate
+/design
+avatar-test.js
 
 # production
 /build
