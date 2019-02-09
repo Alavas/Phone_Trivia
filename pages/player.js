@@ -110,6 +110,7 @@ class Player extends Component {
 										onError={this.handleError}
 										onScan={this.handleScan}
 										style={{ width: '100%' }}
+										className="card"
 									/>
 									{this.state.validGame ? (
 										<p>JOIN</p>
@@ -150,9 +151,10 @@ class Player extends Component {
 						max-width: 60%;
 						margin-left: auto;
 						margin-right: auto;
-						margin-top: 100px;
 						display: flex;
 						flex-direction: column;
+						justify-content: center;
+						height: calc(100vh - 68.3px);
 					}
 					.qr {
 						margin-bottom: 25px;

@@ -171,9 +171,10 @@ class Host extends Component {
 						max-width: 60%;
 						margin-left: auto;
 						margin-right: auto;
-						margin-top: 100px;
 						display: flex;
 						flex-direction: column;
+						justify-content: center;
+						height: calc(100vh - 68.3px);
 					}
 					.card {
 						padding: 18px 18px 24px;
