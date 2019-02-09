@@ -47,7 +47,7 @@ export const loginUser = async userID => {
 //Request to create a new game.
 export const createGame = async gameSettings => {
 	let data = JSON.stringify({ gameSettings })
-	const game = await fetch(`${process.env.GAMESHOW_ENDPOINT}/api/newgame`, {
+	const game = await fetch(`${process.env.GAMESHOW_ENDPOINT}/api/game`, {
 		method: 'POST',
 		headers: {
 			Accept: 'application/json, text/plain, */*',
@@ -58,9 +58,23 @@ export const createGame = async gameSettings => {
 	return game.gameid
 }
 
+export const updateGame = async ({ state, gameID }) => {
+	let data = JSON.stringify({ state, gameID })
+	console.log(data)
+	const game = await fetch(`${process.env.GAMESHOW_ENDPOINT}/api/game`, {
+		method: 'PUT',
+		headers: {
+			Accept: 'application/json, text/plain, */*',
+			'Content-Type': 'application/json'
+		},
+		body: data
+	}).then(res => res.json())
+	return game.gamestate
+}
+
 export const joinGame = async ({ userID, gameID }) => {
 	let data = JSON.stringify({ userID, gameID })
-	const joined = await fetch(`${process.env.GAMESHOW_ENDPOINT}/api/joingame`, {
+	const joined = await fetch(`${process.env.GAMESHOW_ENDPOINT}/api/player`, {
 		method: 'POST',
 		headers: {
 			Accept: 'application/json, text/plain, */*',

@@ -25,6 +25,24 @@ async function newGame(game) {
 	}
 }
 
+async function updateGame({ state, gameID }) {
+	try {
+		// prettier-ignore
+		const query = `UPDATE games SET gamestate = ${state} WHERE gameid = '${gameID}' RETURNING gamestate;`
+		const client = await postgres.connect()
+		const result = await client.query(query)
+		if (result.rowCount > 0) {
+			client.release()
+			return result.rows[0].gamestate
+		} else {
+			client.release()
+			return { error: 'unable to insert' }
+		}
+	} catch (err) {
+		return err
+	}
+}
+
 async function newQuestion(question) {
 	try {
 		// prettier-ignore
@@ -90,4 +108,4 @@ async function joinGame({ userID, gameID }) {
 	}
 }
 
-module.exports = { newGame, newQuestion, userCheck, joinGame }
+module.exports = { newGame, updateGame, newQuestion, userCheck, joinGame }

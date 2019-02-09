@@ -9,7 +9,8 @@ import {
 	gameCategories,
 	gameDifficulties,
 	questionType,
-	createGame
+	createGame,
+	updateGame
 } from '../utilities'
 import Head from '../components/head'
 import Nav from '../components/nav'
@@ -19,7 +20,7 @@ class Host extends Component {
 		super()
 		this.state = {
 			userid: '',
-			gameid: '',
+			gameID: '',
 			loggedIn: false,
 			hostState: 0,
 			numQuestions: 10,
@@ -55,14 +56,21 @@ class Host extends Component {
 			type: this.type.current.value,
 			host: this.state.userid
 		}
-		const gameid = await createGame(gameSettings)
-		this.setState({ gameid, hostState: 2 })
+		const gameID = await createGame(gameSettings)
+		this.setState({ gameID, hostState: 2 })
 	}
 
 	async userLogin(userID) {
 		const userDetails = await loginUser(userID)
 		updateCookie(userDetails.userid)
 		this.setState({ ...userDetails, loggedIn: true })
+	}
+
+	async updateGame(state) {
+		const gameID = this.state.gameID
+		const gamestate = await updateGame({ state, gameID })
+		this.setState({ hostState: gamestate + 2 })
+		console.log(gamestate)
 	}
 
 	render() {
@@ -140,14 +148,17 @@ class Host extends Component {
 						case 2:
 							return (
 								<div className="row">
-									<a className="card">
+									<a
+										className="card"
+										onClick={() => this.updateGame(1)}
+									>
 										<h3>BEGIN GAME</h3>
 									</a>
 									<div className="qr">
 										<QRCode
 											value={`${
 												process.env.GAMESHOW_ENDPOINT
-											}/player/${this.state.gameid}`}
+											}/player/${this.state.gameID}`}
 											size={225}
 											bgColor={'#ffffff'}
 											fgColor={'#000000'}
@@ -158,6 +169,14 @@ class Host extends Component {
 									</div>
 									<a className="card">
 										<h3>ABANDON GAME</h3>
+									</a>
+								</div>
+							)
+						case 3:
+							return (
+								<div className="row">
+									<a className="card">
+										<h3>Started...</h3>
 									</a>
 								</div>
 							)
