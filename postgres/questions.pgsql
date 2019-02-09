@@ -1,1 +1,1 @@
-CREATE TABLE questions (questionid uuid PRIMARY KEY, gameid uuid REFERENCES games(gameid), number int, question varchar(500), a varchar(255), b varchar(255), c varchar(255), d varchar(255), correct varchar(1));
+CREATE TABLE questions (questionid uuid PRIMARY KEY, gameid uuid REFERENCES games(gameid), number int, question varchar(500), answertype varchar(50), a varchar(255), b varchar(255), c varchar(255), d varchar(255), correct varchar(1));
