@@ -83,7 +83,9 @@ class Player extends Component {
 	}
 
 	handleData(data) {
-		console.log(data)
+		let game = JSON.parse(data)
+		this.setState({ playerState: game.gamestate + 2 })
+		console.log(game)
 	}
 
 	render() {
@@ -154,6 +156,14 @@ class Player extends Component {
 									</div>
 									<a className="card">
 										<h3>LEAVE GAME</h3>
+									</a>
+								</div>
+							)
+						case 3:
+							return (
+								<div className="row">
+									<a className="card">
+										<h3>Waiting for a question...</h3>
 									</a>
 								</div>
 							)
