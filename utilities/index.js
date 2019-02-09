@@ -58,9 +58,8 @@ export const createGame = async gameSettings => {
 	return game.gameid
 }
 
-export const updateGame = async ({ state, gameID }) => {
-	let data = JSON.stringify({ state, gameID })
-	console.log(data)
+export const updateGame = async ({ state, gameID, qNumber }) => {
+	let data = JSON.stringify({ state, gameID, qNumber })
 	const game = await fetch(`${process.env.GAMESHOW_ENDPOINT}/api/game`, {
 		method: 'PUT',
 		headers: {
@@ -69,7 +68,7 @@ export const updateGame = async ({ state, gameID }) => {
 		},
 		body: data
 	}).then(res => res.json())
-	return game.gamestate
+	return game
 }
 
 export const joinGame = async ({ userID, gameID }) => {

@@ -32,7 +32,7 @@ app.prepare().then(() => {
 	server.use(bodyParser.json())
 	const httpsServer = https.createServer(credentials, server)
 	const wss = new ws.Server({ server: httpsServer })
-	var players = []
+	var clients = []
 
 	server.get('/:route/:gameKey', (req, res) => {
 		let route = req.params.route
@@ -63,6 +63,7 @@ app.prepare().then(() => {
 					gameid,
 					number: index + 1,
 					question: q.question,
+					answertype: q.type,
 					a: answers[0],
 					b: answers[1],
 					c: answers[2],
@@ -84,12 +85,26 @@ app.prepare().then(() => {
 	server.put('/api/game', async (req, res) => {
 		const state = req.body.state
 		const gameID = req.body.gameID
+		const qNumber = req.body.qNumber || 0
 		if (_.isUndefined(gameID)) {
 			res.sendStatus(400)
 			res.end
 		} else {
-			const gamestate = await updateGame({ state, gameID })
-			res.send({ gamestate })
+			const game = await updateGame({ state, gameID, qNumber })
+			if (game.gamestate > 0) {
+				var players = clients.reduce((players, player) => {
+					if (Object.keys(player)[0] === game.gameID) {
+						players.push(player[game.gameID])
+					}
+					return players
+				}, [])
+				players.forEach(player => {
+					if (player.readyState === ws.OPEN) {
+						player.send(JSON.stringify(game))
+					}
+				})
+			}
+			res.send(game)
 			res.end
 		}
 	})
@@ -130,8 +145,8 @@ app.prepare().then(() => {
 	})
 
 	wss.on('connection', function open(ws) {
-		players.push({ [ws.protocol]: ws })
-		console.log(players)
+		clients.push({ [ws.protocol]: ws })
+		console.log(clients)
 	})
 
 	wss.on('close', function close() {

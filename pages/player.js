@@ -5,6 +5,7 @@ if (typeof window != 'undefined') {
 import React, { Component } from 'react'
 import Link from 'next/link'
 import QRCode from 'qrcode.react'
+import Websocket from 'react-websocket'
 import {
 	getCookie,
 	updateCookie,
@@ -22,7 +23,8 @@ class Player extends Component {
 			userID: '',
 			result: 'No Result',
 			validGame: false,
-			playerState: 0
+			playerState: 0,
+			joined: false
 		}
 	}
 
@@ -44,8 +46,8 @@ class Player extends Component {
 			const gameID = this.props.gameID
 			const joined = await joinGame({ userID, gameID })
 			if (joined) {
-				const ws = new WebSocket('wss://192.168.1.88:3000', gameID)
-				this.setState({ playerState: 2 })
+				//const ws = new WebSocket('wss://192.168.1.88:3000', gameID)
+				this.setState({ joined: true, playerState: 2 })
 			}
 		}
 	}
@@ -80,11 +82,22 @@ class Player extends Component {
 		console.error(err)
 	}
 
+	handleData(data) {
+		console.log(data)
+	}
+
 	render() {
 		return (
 			<div>
 				<Head title="Gameshow" />
 				<Nav />
+				{this.state.joined ? (
+					<Websocket
+						url="wss://192.168.1.88:3000"
+						protocol={this.props.gameID}
+						onMessage={this.handleData.bind(this)}
+					/>
+				) : null}
 				{(() => {
 					switch (this.state.playerState) {
 						case 0:

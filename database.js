@@ -25,15 +25,36 @@ async function newGame(game) {
 	}
 }
 
-async function updateGame({ state, gameID }) {
+async function updateGame({ state, gameID, qNumber }) {
 	try {
 		// prettier-ignore
 		const query = `UPDATE games SET gamestate = ${state} WHERE gameid = '${gameID}' RETURNING gamestate;`
 		const client = await postgres.connect()
 		const result = await client.query(query)
 		if (result.rowCount > 0) {
+			const query = `SELECT * FROM questions WHERE gameid = '${gameID}' AND number = ${qNumber};`
+			const client = await postgres.connect()
+			const result = await client.query(query)
+			var game = {}
+			if (result.rowCount > 0) {
+				game = {
+					gameID,
+					gamestate: state,
+					qNumber,
+					questionID: result.rows[0].questionid || '',
+					answertype: result.rows[0].answertype || ''
+				}
+			} else {
+				game = {
+					gameID,
+					gamestate: state,
+					qNumber,
+					questionID: '',
+					answertype: ''
+				}
+			}
 			client.release()
-			return result.rows[0].gamestate
+			return game
 		} else {
 			client.release()
 			return { error: 'unable to insert' }
@@ -43,10 +64,10 @@ async function updateGame({ state, gameID }) {
 	}
 }
 
-async function newQuestion(question) {
+async function newQuestion(q) {
 	try {
 		// prettier-ignore
-		const query = `INSERT INTO questions (questionid, gameid, number, question, a, b, c, d, correct) VALUES (uuid_generate_v4(), '${question.gameid}', ${question.number}, '${question.question}', '${question.a}', '${question.b}', '${question.c}', '${question.d}', '${question.correct}');`
+		const query = `INSERT INTO questions (questionid, gameid, number, question, answertype, a, b, c, d, correct) VALUES (uuid_generate_v4(), '${q.gameid}', ${q.number}, '${q.question}', '${q.answertype}', '${q.a}', '${q.b}', '${q.c}', '${q.d}', '${q.correct}');`
 		const client = await postgres.connect()
 		const result = await client.query(query)
 		if (result.rowCount > 0) {

@@ -24,6 +24,7 @@
 		"react-avatar-edit": "^0.7.1",
 		"react-dom": "16.7.0",
 		"react-qr-reader": "^2.1.2",
+		"react-websocket": "^2.0.1",
 		"uuid-by-string": "^2.0.1",
 		"ws": "^6.1.3"
 	},

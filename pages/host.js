@@ -23,6 +23,7 @@ class Host extends Component {
 			gameID: '',
 			loggedIn: false,
 			hostState: 0,
+			qNumber: 0,
 			numQuestions: 10,
 			category: 'any_category',
 			difficulty: 'easy',
@@ -68,9 +69,10 @@ class Host extends Component {
 
 	async updateGame(state) {
 		const gameID = this.state.gameID
-		const gamestate = await updateGame({ state, gameID })
-		this.setState({ hostState: gamestate + 2 })
-		console.log(gamestate)
+		const qNumber = this.state.qNumber
+		const game = await updateGame({ state, gameID, qNumber })
+		this.setState({ hostState: game.gamestate + 2 })
+		console.log(game)
 	}
 
 	render() {
