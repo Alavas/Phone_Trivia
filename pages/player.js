@@ -44,6 +44,7 @@ class Player extends Component {
 			const gameID = this.props.gameID
 			const joined = await joinGame({ userID, gameID })
 			if (joined) {
+				const ws = new WebSocket('wss://192.168.1.88:3000', gameID)
 				this.setState({ playerState: 2 })
 			}
 		}

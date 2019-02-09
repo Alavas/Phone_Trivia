@@ -2,6 +2,7 @@ const express = require('express')
 const https = require('https')
 const cors = require('cors')
 const bodyParser = require('body-parser')
+const ws = require('ws')
 const _ = require('lodash')
 const fs = require('fs')
 const fetch = require('node-fetch')
@@ -23,6 +24,9 @@ app.prepare().then(() => {
 	const server = express()
 	server.use(cors())
 	server.use(bodyParser.json())
+	const httpsServer = https.createServer(credentials, server)
+	const wss = new ws.Server({ server: httpsServer })
+	var players = []
 
 	server.get('/:route/:gameKey', (req, res) => {
 		let route = req.params.route
@@ -36,7 +40,6 @@ app.prepare().then(() => {
 		const game = req.body.gameSettings
 		// prettier-ignore
 		let URL = `https://opentdb.com/api.php?amount=${game.amount}&category=${game.category}&difficulty=${game.difficulty}&type=${game.type}`
-		let testURL = `https://1b976eed-0a7d-4d14-b3b4-9ab759dbdedf.mock.pstmn.io/api.php?amount=10&type=multiple`
 		//If value is 'any' then remove that parameter.
 		URL = URL.replace(/(&.{1,10}=any)/g, '')
 		const gameQuestions = await fetch(URL).then(res => res.json())
@@ -99,9 +102,18 @@ app.prepare().then(() => {
 		return handle(req, res)
 	})
 
-	https.createServer(credentials, server).listen(port, function() {
+	httpsServer.listen(port, function() {
 		console.log(
 			`Example app listening on port ${port}! Go to https://localhost:${port}/`
 		)
+	})
+
+	wss.on('connection', function open(ws) {
+		players.push({ [ws.protocol]: ws })
+		console.log(players)
+	})
+
+	wss.on('close', function close() {
+		console.log('disconnected')
 	})
 })
