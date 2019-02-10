@@ -9,7 +9,8 @@ import {
 	gameDifficulties,
 	questionType,
 	createGame,
-	updateGame
+	updateGame,
+	deleteGame
 } from '../utilities'
 import Head from '../components/head'
 import Nav from '../components/nav'
@@ -29,7 +30,7 @@ class Host extends Component {
 			userid: '',
 			gameID: '',
 			loggedIn: false,
-			hostState: 0,
+			gamestate: 0,
 			qNumber: 0,
 			players: 0,
 			questionID: '',
@@ -40,6 +41,7 @@ class Host extends Component {
 			type: 'any_type'
 		}
 		this.submit = this.submit.bind(this)
+		this.updateGame = this.updateGame.bind(this)
 		this.amount = React.createRef()
 		this.category = React.createRef()
 		this.difficulty = React.createRef()
@@ -70,10 +72,10 @@ class Host extends Component {
 		const gameID = await createGame(gameSettings)
 		this.setState({
 			gameID,
-			numQuestions: gameSettings.amount,
+			numQuestions: parseInt(gameSettings.amount),
 			difficulty: gameSettings.difficulty,
 			category: gameSettings.type,
-			hostState: 1
+			gamestate: 1
 		})
 	}
 
@@ -83,10 +85,10 @@ class Host extends Component {
 		this.setState({ ...userDetails, loggedIn: true })
 	}
 
-	nextQuestion() {
+	async nextQuestion() {
 		const nextQ = this.state.qNumber + 1
 		if (nextQ > this.state.numQuestions) {
-			console.log('Too many questions!')
+			this.updateGame(4)
 		} else {
 			this.setState({ qNumber: nextQ }, () => this.updateGame(3))
 		}
@@ -97,20 +99,31 @@ class Host extends Component {
 		const qNumber = this.state.qNumber
 		const game = await updateGame({ state, gameID, qNumber })
 		this.setState({
-			hostState: game.gamestate,
+			gamestate: game.gamestate,
 			qNumber: game.qNumber,
 			questionID: game.questionID,
 			answertype: game.answertype
 		})
 	}
 
+	async endGame() {
+		const gameID = this.state.gameID
+		const deleted = await deleteGame(gameID)
+		if (deleted) {
+			window.location = process.env.GAMESHOW_ENDPOINT
+		} else {
+			//TODO: Add error handling here for a failed deletion.
+			console.log('Something went wrong??')
+		}
+	}
+
 	render() {
 		return (
 			<div>
 				<Head title="Gameshow" />
-				<Nav />
+				{this.state.gamestate !== 4 ? <Nav /> : null}
 				{(() => {
-					switch (this.state.hostState) {
+					switch (this.state.gamestate) {
 						case 0:
 							return (
 								<div className="row">
@@ -197,7 +210,7 @@ class Host extends Component {
 									>
 										<h3>Start the questions...</h3>
 									</a>
-									<a className="card">
+									<a className="info">
 										There are {this.state.players} players waiting.
 									</a>
 								</div>
@@ -211,14 +224,25 @@ class Host extends Component {
 									>
 										<h3>Next Question</h3>
 									</a>
-									<a className="card">
+									<a className="info">
 										<h4>{this.state.qNumber}</h4>
 									</a>
-									<a className="card">
+									<a className="info">
 										<h4>{this.state.questionID}</h4>
 									</a>
-									<a className="card">
+									<a className="info">
 										<h4>{this.state.answertype}</h4>
+									</a>
+								</div>
+							)
+						case 4:
+							return (
+								<div className="row">
+									<a className="info">
+										<h1>GAME OVER</h1>
+									</a>
+									<a className="card" onClick={() => this.endGame()}>
+										<h3>EXIT GAME</h3>
 									</a>
 								</div>
 							)
@@ -236,6 +260,13 @@ class Host extends Component {
 						flex-direction: column;
 						justify-content: center;
 						height: calc(100vh - 68.3px);
+					}
+					.info {
+						padding: 18px 18px 24px;
+						margin-bottom: 25px;
+						text-decoration: none;
+						text-align: center;
+						color: #067df7;
 					}
 					.card {
 						padding: 18px 18px 24px;

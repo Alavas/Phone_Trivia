@@ -13,11 +13,10 @@ async function newGame(game) {
 		const query = `INSERT INTO games (gameid, userid, created, ended, gamestate) VALUES (uuid_generate_v4(), '${game.host}', NOW()::timestamp, null, 0) RETURNING gameid;`
 		const client = await postgres.connect()
 		const result = await client.query(query)
+		client.release()
 		if (result.rowCount > 0) {
-			client.release()
 			return result.rows[0].gameid
 		} else {
-			client.release()
 			return { error: 'unable to insert' }
 		}
 	} catch (err) {
@@ -31,18 +30,20 @@ async function updateGame({ state, gameID, qNumber }) {
 		const query = `UPDATE games SET gamestate = ${state} WHERE gameid = '${gameID}' RETURNING gamestate;`
 		const client = await postgres.connect()
 		const result = await client.query(query)
+		client.release()
 		if (result.rowCount > 0) {
 			const query = `SELECT * FROM questions WHERE gameid = '${gameID}' AND number = ${qNumber};`
 			const client = await postgres.connect()
 			const result = await client.query(query)
+			client.release()
 			var game = {}
 			if (result.rowCount > 0) {
 				game = {
 					gameID,
 					gamestate: state,
 					qNumber,
-					questionID: result.rows[0].questionid || '',
-					answertype: result.rows[0].answertype || ''
+					questionID: result.rows[0].questionid,
+					answertype: result.rows[0].answertype
 				}
 			} else {
 				game = {
@@ -53,11 +54,26 @@ async function updateGame({ state, gameID, qNumber }) {
 					answertype: ''
 				}
 			}
-			client.release()
 			return game
 		} else {
-			client.release()
 			return { error: 'unable to insert' }
+		}
+	} catch (err) {
+		return err
+	}
+}
+
+async function deleteGame(gameid) {
+	try {
+		// prettier-ignore
+		const query = `DELETE FROM games WHERE gameid = '${gameid}';`
+		const client = await postgres.connect()
+		const result = await client.query(query)
+		client.release()
+		if (result.rowCount > 0) {
+			return true
+		} else {
+			return false
 		}
 	} catch (err) {
 		return err
@@ -70,11 +86,10 @@ async function newQuestion(q) {
 		const query = `INSERT INTO questions (questionid, gameid, number, question, answertype, a, b, c, d, correct) VALUES (uuid_generate_v4(), '${q.gameid}', ${q.number}, '${q.question}', '${q.answertype}', '${q.a}', '${q.b}', '${q.c}', '${q.d}', '${q.correct}');`
 		const client = await postgres.connect()
 		const result = await client.query(query)
+		client.release()
 		if (result.rowCount > 0) {
-			client.release()
 			return
 		} else {
-			client.release()
 			return { error: 'unable to insert' }
 		}
 	} catch (err) {
@@ -88,11 +103,11 @@ async function userCheck(userID) {
 		const client = await postgres.connect()
 		const result = await client.query(query)
 		if (result.rowCount > 0) {
-			const results = result.rows[0]
 			client.release()
+			const results = result.rows[0]
 			return results
 		} else {
-			const Query = `INSERT INTO users (userid, username, score) VALUES ('${userID}', '', 0);`
+			const Query = `INSERT INTO users (userid, score) VALUES ('${userID}', 0);`
 			const result = await client.query(Query)
 			if (result.rowCount > 0) {
 				client.release()
@@ -129,4 +144,11 @@ async function joinGame({ userID, gameID }) {
 	}
 }
 
-module.exports = { newGame, updateGame, newQuestion, userCheck, joinGame }
+module.exports = {
+	newGame,
+	updateGame,
+	deleteGame,
+	newQuestion,
+	userCheck,
+	joinGame
+}

@@ -11,6 +11,7 @@ const next = require('next')
 const {
 	newGame,
 	updateGame,
+	deleteGame,
 	newQuestion,
 	userCheck,
 	joinGame
@@ -105,6 +106,18 @@ app.prepare().then(() => {
 				})
 			}
 			res.send(game)
+			res.end
+		}
+	})
+
+	server.delete('/api/game', async (req, res) => {
+		const gameID = req.body.gameID
+		if (_.isUndefined(gameID)) {
+			res.sendStatus(400)
+			res.end
+		} else {
+			const deleted = await deleteGame(gameID)
+			res.send(deleted)
 			res.end
 		}
 	})

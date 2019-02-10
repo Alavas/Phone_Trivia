@@ -71,6 +71,19 @@ export const updateGame = async ({ state, gameID, qNumber }) => {
 	return game
 }
 
+export const deleteGame = async gameID => {
+	let data = JSON.stringify({ gameID })
+	const deleted = await fetch(`${process.env.GAMESHOW_ENDPOINT}/api/game`, {
+		method: 'DELETE',
+		headers: {
+			Accept: 'application/json, text/plain, */*',
+			'Content-Type': 'application/json'
+		},
+		body: data
+	}).then(res => res.json())
+	return deleted
+}
+
 export const joinGame = async ({ userID, gameID }) => {
 	let data = JSON.stringify({ userID, gameID })
 	const joined = await fetch(`${process.env.GAMESHOW_ENDPOINT}/api/player`, {
