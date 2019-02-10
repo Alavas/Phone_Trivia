@@ -15,6 +15,8 @@ import {
 import Head from '../components/head'
 import Nav from '../components/nav'
 
+/*{gameID: "b467a78b-ec9d-45e7-a595-d6903c9ddc22", gamestate: 3, qNumber: 1, questionID: "f006b954-1d86-4a48-8752-05e150430418", answertype: "multiple"} */
+
 class Player extends Component {
 	constructor() {
 		super()
@@ -22,7 +24,11 @@ class Player extends Component {
 			userID: '',
 			result: 'No Result',
 			validGame: false,
-			playerState: null,
+			gamestate: null,
+			gameID: '',
+			qNumber: 0,
+			questionID: '',
+			answertype: '',
 			joined: false
 		}
 	}
@@ -45,11 +51,10 @@ class Player extends Component {
 			const gameID = this.props.gameID
 			const joined = await joinGame({ userID, gameID })
 			if (joined) {
-				//const ws = new WebSocket('wss://192.168.1.88:3000', gameID)
-				this.setState({ joined: true, playerState: 1 })
+				this.setState({ joined: true, gamestate: 1 })
 			}
 		} else {
-			this.setState({ playerState: 0 })
+			this.setState({ gamestate: 0 })
 		}
 	}
 
@@ -85,7 +90,7 @@ class Player extends Component {
 
 	handleData(data) {
 		let game = JSON.parse(data)
-		this.setState({ playerState: game.gamestate })
+		this.setState({ ...game })
 		console.log(game)
 	}
 
@@ -93,16 +98,16 @@ class Player extends Component {
 		return (
 			<div>
 				<Head title="Gameshow" />
-				<Nav />
+				{this.state.gamestate !== 4 ? <Nav /> : null}
 				{this.state.joined ? (
 					<Websocket
-						url="wss://192.168.1.88:3000"
+						url={process.env.GAMESHOW_ENDPOINT}
 						protocol={this.props.gameID}
 						onMessage={this.handleData.bind(this)}
 					/>
 				) : null}
 				{(() => {
-					switch (this.state.playerState) {
+					switch (this.state.gamestate) {
 						case 0:
 							return (
 								<div className="row">
@@ -154,6 +159,47 @@ class Player extends Component {
 									</a>
 								</div>
 							)
+						case 3:
+							return (
+								<div className="row">
+									<h3>Question Number {this.state.qNumber}</h3>
+									{this.state.answertype === 'boolean' ? (
+										<React.Fragment>
+											<a className="card">
+												<h3>TRUE</h3>
+											</a>
+											<a className="card">
+												<h3>FALSE</h3>
+											</a>
+										</React.Fragment>
+									) : (
+										<React.Fragment>
+											<a className="card">
+												<h3>A</h3>
+											</a>
+											<a className="card">
+												<h3>B</h3>
+											</a>
+											<a className="card">
+												<h3>C</h3>
+											</a>
+											<a className="card">
+												<h3>D</h3>
+											</a>
+										</React.Fragment>
+									)}
+								</div>
+							)
+						case 4:
+							return (
+								<div className="row">
+									<a className="card">
+										<h1>GAME OVER</h1>
+									</a>
+								</div>
+							)
+						default:
+							return null
 					}
 				})()}
 
