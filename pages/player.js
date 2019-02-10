@@ -3,7 +3,6 @@ if (typeof window != 'undefined') {
 }
 
 import React, { Component } from 'react'
-import Link from 'next/link'
 import QRCode from 'qrcode.react'
 import Websocket from 'react-websocket'
 import {
@@ -23,7 +22,7 @@ class Player extends Component {
 			userID: '',
 			result: 'No Result',
 			validGame: false,
-			playerState: 0,
+			playerState: null,
 			joined: false
 		}
 	}
@@ -47,8 +46,10 @@ class Player extends Component {
 			const joined = await joinGame({ userID, gameID })
 			if (joined) {
 				//const ws = new WebSocket('wss://192.168.1.88:3000', gameID)
-				this.setState({ joined: true, playerState: 2 })
+				this.setState({ joined: true, playerState: 1 })
 			}
+		} else {
+			this.setState({ playerState: 0 })
 		}
 	}
 
@@ -84,7 +85,7 @@ class Player extends Component {
 
 	handleData(data) {
 		let game = JSON.parse(data)
-		this.setState({ playerState: game.gamestate + 2 })
+		this.setState({ playerState: game.gamestate })
 		console.log(game)
 	}
 
@@ -105,29 +106,15 @@ class Player extends Component {
 						case 0:
 							return (
 								<div className="row">
-									<a
-										className="card"
-										onClick={() => this.setState({ playerState: 1 })}
-									>
-										<h3>JOIN A GAME</h3>
-									</a>
-									<Link href="/host">
-										<a className="card">
-											<h3>START A GAME</h3>
-										</a>
-									</Link>
-								</div>
-							)
-						case 1:
-							return (
-								<div className="row">
-									<QrReader
-										delay={300}
-										onError={this.handleError}
-										onScan={this.handleScan}
-										style={{ width: '100%' }}
-										className="card"
-									/>
+									{QrReader ? (
+										<QrReader
+											delay={300}
+											onError={this.handleError}
+											onScan={this.handleScan}
+											style={{ width: '100%' }}
+											className="card"
+										/>
+									) : null}
 									{this.state.validGame ? (
 										<p>JOIN</p>
 									) : (
@@ -135,7 +122,7 @@ class Player extends Component {
 									)}
 								</div>
 							)
-						case 2:
+						case 1:
 							return (
 								<div className="row">
 									<a className="card">
@@ -159,7 +146,7 @@ class Player extends Component {
 									</a>
 								</div>
 							)
-						case 3:
+						case 2:
 							return (
 								<div className="row">
 									<a className="card">

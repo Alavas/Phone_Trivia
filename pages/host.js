@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import Link from 'next/link'
 import QRCode from 'qrcode.react'
 import {
 	getCookie,
@@ -14,6 +13,14 @@ import {
 } from '../utilities'
 import Head from '../components/head'
 import Nav from '../components/nav'
+
+/*
+0: Not Started
+1: Created
+2: Started
+3: Questions
+4: Ended
+*/
 
 class Host extends Component {
 	constructor() {
@@ -58,7 +65,7 @@ class Host extends Component {
 			host: this.state.userid
 		}
 		const gameID = await createGame(gameSettings)
-		this.setState({ gameID, hostState: 2 })
+		this.setState({ gameID, hostState: 1 })
 	}
 
 	async userLogin(userID) {
@@ -71,7 +78,7 @@ class Host extends Component {
 		const gameID = this.state.gameID
 		const qNumber = this.state.qNumber
 		const game = await updateGame({ state, gameID, qNumber })
-		this.setState({ hostState: game.gamestate + 2 })
+		this.setState({ hostState: game.gamestate })
 		console.log(game)
 	}
 
@@ -83,22 +90,6 @@ class Host extends Component {
 				{(() => {
 					switch (this.state.hostState) {
 						case 0:
-							return (
-								<div className="row">
-									<a
-										className="card"
-										onClick={() => this.setState({ hostState: 1 })}
-									>
-										<h3>START A GAME</h3>
-									</a>
-									<Link href="/player">
-										<a className="card">
-											<h3>JOIN A GAME</h3>
-										</a>
-									</Link>
-								</div>
-							)
-						case 1:
 							return (
 								<div className="row">
 									<form onSubmit={this.submit}>
@@ -147,12 +138,12 @@ class Host extends Component {
 									</form>
 								</div>
 							)
-						case 2:
+						case 1:
 							return (
 								<div className="row">
 									<a
 										className="card"
-										onClick={() => this.updateGame(1)}
+										onClick={() => this.updateGame(2)}
 									>
 										<h3>BEGIN GAME</h3>
 									</a>
@@ -174,7 +165,7 @@ class Host extends Component {
 									</a>
 								</div>
 							)
-						case 3:
+						case 2:
 							return (
 								<div className="row">
 									<a className="card">
