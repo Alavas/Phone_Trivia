@@ -31,6 +31,9 @@ class Host extends Component {
 			loggedIn: false,
 			hostState: 0,
 			qNumber: 0,
+			players: 0,
+			questionID: '',
+			answertype: '',
 			numQuestions: 10,
 			category: 'any_category',
 			difficulty: 'easy',
@@ -65,7 +68,13 @@ class Host extends Component {
 			host: this.state.userid
 		}
 		const gameID = await createGame(gameSettings)
-		this.setState({ gameID, hostState: 1 })
+		this.setState({
+			gameID,
+			numQuestions: gameSettings.amount,
+			difficulty: gameSettings.difficulty,
+			category: gameSettings.type,
+			hostState: 1
+		})
 	}
 
 	async userLogin(userID) {
@@ -74,12 +83,25 @@ class Host extends Component {
 		this.setState({ ...userDetails, loggedIn: true })
 	}
 
+	nextQuestion() {
+		const nextQ = this.state.qNumber + 1
+		if (nextQ > this.state.numQuestions) {
+			console.log('Too many questions!')
+		} else {
+			this.setState({ qNumber: nextQ }, () => this.updateGame(3))
+		}
+	}
+
 	async updateGame(state) {
 		const gameID = this.state.gameID
 		const qNumber = this.state.qNumber
 		const game = await updateGame({ state, gameID, qNumber })
-		this.setState({ hostState: game.gamestate })
-		console.log(game)
+		this.setState({
+			hostState: game.gamestate,
+			qNumber: game.qNumber,
+			questionID: game.questionID,
+			answertype: game.answertype
+		})
 	}
 
 	render() {
@@ -92,6 +114,7 @@ class Host extends Component {
 						case 0:
 							return (
 								<div className="row">
+									<h3>SELECT GAME OPTIONS</h3>
 									<form onSubmit={this.submit}>
 										<h5>How many questions?</h5>
 										<input
@@ -102,7 +125,7 @@ class Host extends Component {
 											defaultValue="10"
 											ref={this.amount}
 										/>
-										<h5>What category?</h5>
+										<h5>Category?</h5>
 										<select name="category" ref={this.category}>
 											{gameCategories.map((choice, index) => {
 												return (
@@ -168,8 +191,34 @@ class Host extends Component {
 						case 2:
 							return (
 								<div className="row">
+									<a
+										className="card"
+										onClick={() => this.nextQuestion()}
+									>
+										<h3>Start the questions...</h3>
+									</a>
 									<a className="card">
-										<h3>Started...</h3>
+										There are {this.state.players} players waiting.
+									</a>
+								</div>
+							)
+						case 3:
+							return (
+								<div className="row">
+									<a
+										className="card"
+										onClick={() => this.nextQuestion()}
+									>
+										<h3>Next Question</h3>
+									</a>
+									<a className="card">
+										<h4>{this.state.qNumber}</h4>
+									</a>
+									<a className="card">
+										<h4>{this.state.questionID}</h4>
+									</a>
+									<a className="card">
+										<h4>{this.state.answertype}</h4>
 									</a>
 								</div>
 							)
