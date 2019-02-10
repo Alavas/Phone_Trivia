@@ -120,7 +120,7 @@ export const gameDifficulties = [
 ]
 
 export const questionType = [
-	{ value: 'any', display: 'Any Type' },
 	{ value: 'multiple', display: 'Multiple Choice' },
-	{ value: 'boolean', display: 'True / False' }
+	{ value: 'boolean', display: 'True / False' },
+	{ value: 'any', display: 'Mixed' }
 ]
