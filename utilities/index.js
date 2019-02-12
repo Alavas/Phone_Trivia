@@ -58,6 +58,7 @@ export const createGame = async gameSettings => {
 	return game.gameid
 }
 
+//Update gamestate and question number to display.
 export const updateGame = async ({ state, gameID, qNumber }) => {
 	let data = JSON.stringify({ state, gameID, qNumber })
 	const game = await fetch(`${process.env.GAMESHOW_ENDPOINT}/api/game`, {
@@ -71,6 +72,7 @@ export const updateGame = async ({ state, gameID, qNumber }) => {
 	return game
 }
 
+//Delete a completed game.
 export const deleteGame = async gameID => {
 	let data = JSON.stringify({ gameID })
 	const deleted = await fetch(`${process.env.GAMESHOW_ENDPOINT}/api/game`, {
@@ -84,6 +86,7 @@ export const deleteGame = async gameID => {
 	return deleted
 }
 
+//Join a game from QR code.
 export const joinGame = async ({ userID, gameID }) => {
 	let data = JSON.stringify({ userID, gameID })
 	const joined = await fetch(`${process.env.GAMESHOW_ENDPOINT}/api/player`, {
@@ -97,6 +100,21 @@ export const joinGame = async ({ userID, gameID }) => {
 	return joined
 }
 
+//Submit answer to the current game.
+export const submitAnswer = async answer => {
+	let data = JSON.stringify({ answer })
+	const result = await fetch(`${process.env.GAMESHOW_ENDPOINT}/api/score`, {
+		method: 'POST',
+		headers: {
+			Accept: 'application/json, text/plain, */*',
+			'Content-Type': 'application/json'
+		},
+		body: data
+	})
+	return result
+}
+
+//Possible question categories.
 export const gameCategories = [
 	{ value: 'any', display: 'Any Category' },
 	{ value: 9, display: 'General Knowledge' },
@@ -125,6 +143,7 @@ export const gameCategories = [
 	{ value: 30, display: 'Science: Gadgets' }
 ]
 
+//Game difficulty levels.
 export const gameDifficulties = [
 	{ value: 'any', display: 'Any Difficulty' },
 	{ value: 'easy', display: 'Easy' },
@@ -132,6 +151,7 @@ export const gameDifficulties = [
 	{ value: 'hard', display: 'Hard' }
 ]
 
+//Possible question types.
 export const questionType = [
 	{ value: 'multiple', display: 'Multiple Choice' },
 	{ value: 'boolean', display: 'True / False' },

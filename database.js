@@ -144,11 +144,30 @@ async function joinGame({ userID, gameID }) {
 	}
 }
 
+async function newScore(a) {
+	try {
+		// prettier-ignore
+		const query = `SELECT newscore(v_gameid := '${a.gameID}', v_questionid := '${a.questionID}', v_userid := '${a.userID}', v_answer := '${a.answer}', v_reaction := ${a.reaction}, v_score := ${a.score});`
+		const client = await postgres.connect()
+		const result = await client.query(query)
+		if (result.rowCount > 0) {
+			client.release()
+			return true
+		} else {
+			client.release()
+			return false
+		}
+	} catch (err) {
+		return false
+	}
+}
+
 module.exports = {
 	newGame,
 	updateGame,
 	deleteGame,
 	newQuestion,
 	userCheck,
-	joinGame
+	joinGame,
+	newScore
 }

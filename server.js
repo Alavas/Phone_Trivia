@@ -14,7 +14,8 @@ const {
 	deleteGame,
 	newQuestion,
 	userCheck,
-	joinGame
+	joinGame,
+	newScore
 } = require('./database')
 
 const credentials = {
@@ -51,7 +52,7 @@ app.prepare().then(() => {
 			'https://1b976eed-0a7d-4d14-b3b4-9ab759dbdedf.mock.pstmn.io/api.php?amount=10&type=multiple'
 		//If value is 'any' then remove that parameter.
 		URL = URL.replace(/(&.{1,10}=any)/g, '')
-		const gameQuestions = await fetch(URL).then(res => res.json())
+		const gameQuestions = await fetch(testURL).then(res => res.json())
 		if (gameQuestions.response_code === 0) {
 			const gameid = await newGame(game)
 			let questions = gameQuestions.results.map((q, index) => {
@@ -99,6 +100,8 @@ app.prepare().then(() => {
 					}
 					return players
 				}, [])
+				//Timestamp for scoring.
+				game.qStart = Date.now()
 				players.forEach(player => {
 					if (player.readyState === ws.OPEN) {
 						player.send(JSON.stringify(game))
@@ -143,6 +146,18 @@ app.prepare().then(() => {
 		} else {
 			const joined = await joinGame({ userID, gameID })
 			res.send(joined)
+			res.end
+		}
+	})
+
+	server.post('/api/score', async (req, res) => {
+		const answer = req.body.answer
+		if (_.isUndefined(answer.questionID)) {
+			res.sendStatus(400)
+			res.end
+		} else {
+			const result = await newScore(answer)
+			res.send(result)
 			res.end
 		}
 	})

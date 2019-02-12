@@ -10,7 +10,8 @@ import {
 	updateCookie,
 	generateUUID,
 	loginUser,
-	joinGame
+	joinGame,
+	submitAnswer
 } from '../utilities'
 import Head from '../components/head'
 import Nav from '../components/nav'
@@ -26,7 +27,9 @@ class Player extends Component {
 			validGame: false,
 			gamestate: null,
 			gameID: '',
+			answer: null,
 			qNumber: 0,
+			qStart: 0,
 			questionID: '',
 			answertype: '',
 			joined: false
@@ -61,8 +64,31 @@ class Player extends Component {
 	async userLogin(userID) {
 		const userDetails = await loginUser(userID)
 		updateCookie(userDetails.userid)
-		this.setState({ ...userDetails })
+		this.setState({
+			userID: userDetails.userid,
+			avatar: userDetails.avatar,
+			score: userDetails.score
+		})
 		return true
+	}
+
+	async sendAnswer(answer) {
+		let reaction = Date.now() - this.state.qStart
+		reaction = Math.max(reaction, 1000)
+		let score = Math.round(25 * (10000 / (reaction - 500)))
+		score = Math.min(Math.max(score, 0), 250)
+		const submission = {
+			gameID: this.state.gameID,
+			questionID: this.state.questionID,
+			userID: this.state.userID,
+			answer,
+			reaction,
+			score
+		}
+		const result = submitAnswer(submission)
+		if (result) {
+			this.setState({ answer })
+		}
 	}
 
 	handleScan = data => {
@@ -90,7 +116,7 @@ class Player extends Component {
 
 	handleData(data) {
 		let game = JSON.parse(data)
-		this.setState({ ...game })
+		this.setState({ ...game, answer: null })
 		console.log(game)
 	}
 
@@ -101,7 +127,7 @@ class Player extends Component {
 				{this.state.gamestate !== 4 ? <Nav /> : null}
 				{this.state.joined ? (
 					<Websocket
-						url={process.env.GAMESHOW_ENDPOINT}
+						url="wss:192.168.1.88:3000"
 						protocol={this.props.gameID}
 						onMessage={this.handleData.bind(this)}
 					/>
@@ -165,25 +191,79 @@ class Player extends Component {
 									<h3>Question Number {this.state.qNumber}</h3>
 									{this.state.answertype === 'boolean' ? (
 										<React.Fragment>
-											<a className="card">
+											<a
+												className={
+													this.state.answer === null
+														? 'card'
+														: this.state.answer === 'A'
+														? 'card answer'
+														: 'card disabled'
+												}
+												onClick={() => this.sendAnswer('A')}
+											>
 												<h3>TRUE</h3>
 											</a>
-											<a className="card">
+											<a
+												className={
+													this.state.answer === null
+														? 'card'
+														: this.state.answer === 'B'
+														? 'card answer'
+														: 'card disabled'
+												}
+												onClick={() => this.sendAnswer('B')}
+											>
 												<h3>FALSE</h3>
 											</a>
 										</React.Fragment>
 									) : (
 										<React.Fragment>
-											<a className="card">
+											<a
+												className={
+													this.state.answer === null
+														? 'card'
+														: this.state.answer === 'A'
+														? 'card answer'
+														: 'card disabled'
+												}
+												onClick={() => this.sendAnswer('A')}
+											>
 												<h3>A</h3>
 											</a>
-											<a className="card">
+											<a
+												className={
+													this.state.answer === null
+														? 'card'
+														: this.state.answer === 'B'
+														? 'card answer'
+														: 'card disabled'
+												}
+												onClick={() => this.sendAnswer('B')}
+											>
 												<h3>B</h3>
 											</a>
-											<a className="card">
+											<a
+												className={
+													this.state.answer === null
+														? 'card'
+														: this.state.answer === 'C'
+														? 'card answer'
+														: 'card disabled'
+												}
+												onClick={() => this.sendAnswer('C')}
+											>
 												<h3>C</h3>
 											</a>
-											<a className="card">
+											<a
+												className={
+													this.state.answer === null
+														? 'card'
+														: this.state.answer === 'D'
+														? 'card answer'
+														: 'card disabled'
+												}
+												onClick={() => this.sendAnswer('D')}
+											>
 												<h3>D</h3>
 											</a>
 										</React.Fragment>
@@ -233,6 +313,20 @@ class Player extends Component {
 						padding: 12px 0 0;
 						font-size: 13px;
 						color: #333;
+					}
+					.disabled {
+						pointer-events: none;
+						cursor: not-allowed;
+						opacity: 0.25;
+						filter: alpha(opacity=25);
+						-webkit-box-shadow: none;
+						box-shadow: none;
+					}
+					.answer {
+						pointer-events: none;
+						cursor: not-allowed;
+						box-shadow: none;
+						border: 3px solid #9b9b9b;
 					}
 				`}</style>
 			</div>
