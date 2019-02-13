@@ -192,6 +192,7 @@ class Player extends Component {
 									{this.state.answertype === 'boolean' ? (
 										<React.Fragment>
 											<a
+												style={{ backgroundColor: '#FFF0000' }}
 												className={
 													this.state.answer === null
 														? 'card'
@@ -204,6 +205,7 @@ class Player extends Component {
 												<h3>TRUE</h3>
 											</a>
 											<a
+												style={{ backgroundColor: '#0000FF' }}
 												className={
 													this.state.answer === null
 														? 'card'
@@ -219,6 +221,7 @@ class Player extends Component {
 									) : (
 										<React.Fragment>
 											<a
+												style={{ backgroundColor: '#FF0000' }}
 												className={
 													this.state.answer === null
 														? 'card'
@@ -231,6 +234,7 @@ class Player extends Component {
 												<h3>A</h3>
 											</a>
 											<a
+												style={{ backgroundColor: '#FFFF00' }}
 												className={
 													this.state.answer === null
 														? 'card'
@@ -243,6 +247,7 @@ class Player extends Component {
 												<h3>B</h3>
 											</a>
 											<a
+												style={{ backgroundColor: '#008000' }}
 												className={
 													this.state.answer === null
 														? 'card'
@@ -255,6 +260,7 @@ class Player extends Component {
 												<h3>C</h3>
 											</a>
 											<a
+												style={{ backgroundColor: '#0000FF' }}
 												className={
 													this.state.answer === null
 														? 'card'
@@ -302,7 +308,7 @@ class Player extends Component {
 						margin-bottom: 25px;
 						text-decoration: none;
 						text-align: center;
-						color: #067df7;
+						color: #000000;
 						border: 1px solid #9b9b9b;
 					}
 					.card:hover {
@@ -312,7 +318,7 @@ class Player extends Component {
 						margin: 0;
 						padding: 12px 0 0;
 						font-size: 13px;
-						color: #333;
+						color: #000000;
 					}
 					.disabled {
 						pointer-events: none;
