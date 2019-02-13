@@ -115,9 +115,9 @@ class Player extends Component {
 	}
 
 	handleData(data) {
-		let game = JSON.parse(data)
-		this.setState({ ...game, answer: null })
-		console.log(game)
+		data = JSON.parse(data)
+		this.setState({ ...data, answer: null })
+		console.log(data)
 	}
 
 	render() {

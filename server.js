@@ -100,8 +100,19 @@ app.prepare().then(() => {
 				var players = clients.filter(
 					client => client.protocol === game.gameID
 				)
+				var gameboards = clients.filter(
+					client => client.protocol === c`gb_${game.gameID}`
+				)
 				//Timestamp for scoring.
 				game.qStart = Date.now()
+				gameboards.forEach(board => {
+					if (board.readyState === ws.OPEN) {
+						board.send(JSON.stringify(game))
+					}
+				})
+				delete game.question
+				delete game.answers
+				delete game.correctAnswer
 				players.forEach(player => {
 					if (player.readyState === ws.OPEN) {
 						player.send(JSON.stringify(game))

@@ -60,7 +60,15 @@ async function putGames({ state, gameID, qNumber }) {
 					gamestate: state,
 					qNumber,
 					questionID: result.rows[0].questionid,
-					answertype: result.rows[0].answertype
+					answertype: result.rows[0].answertype,
+					question: result.rows[0].question,
+					answers: [
+						result.rows[0].a,
+						result.rows[0].b,
+						result.rows[0].c,
+						result.rows[0].d
+					],
+					correctAnswer: result.rows[0].correct
 				}
 			} else {
 				game = {
@@ -68,7 +76,9 @@ async function putGames({ state, gameID, qNumber }) {
 					gamestate: state,
 					qNumber,
 					questionID: '',
-					answertype: ''
+					answertype: '',
+					question: '',
+					answers: []
 				}
 			}
 			return game
