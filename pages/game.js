@@ -1,10 +1,20 @@
 import React, { Component } from 'react'
+import _ from 'lodash'
 import Head from '../components/head'
 import Nav from '../components/nav'
+import { getGames } from '../utilities'
 
 class Game extends Component {
 	static getInitialProps({ query }) {
 		return { game: query }
+	}
+
+	componentDidMount() {
+		this.listGames()
+	}
+
+	async listGames() {
+		const games = getGames()
 	}
 
 	render() {
@@ -14,8 +24,7 @@ class Game extends Component {
 				<Head title="Gameshow" />
 				<Nav />
 				<div className="title">
-					<h1>Game Controller</h1>
-					<h3>{this.props.game.gameKey}</h3>
+					<h3>Game Controller</h3>
 				</div>
 				<style jsx>{`
 					.title {

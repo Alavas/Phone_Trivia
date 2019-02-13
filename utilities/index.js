@@ -44,6 +44,18 @@ export const loginUser = async userID => {
 	return userDetails
 }
 
+export const getGames = async () => {
+	const games = await fetch(`${process.env.GAMESHOW_ENDPOINT}/api/game`, {
+		method: 'GET',
+		headers: {
+			Accept: 'application/json, text/plain, */*',
+			'Content-Type': 'application/json'
+		}
+	}).then(res => res.json())
+	console.log(games)
+	return games
+}
+
 //Request to create a new game.
 export const createGame = async gameSettings => {
 	let data = JSON.stringify({ gameSettings })

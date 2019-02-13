@@ -9,13 +9,14 @@ const fetch = require('node-fetch')
 const next = require('next')
 //Database functions.
 const {
-	newGame,
-	updateGame,
-	deleteGame,
-	newQuestion,
-	userCheck,
-	joinGame,
-	newScore
+	getGames,
+	postGames,
+	putGames,
+	deleteGames,
+	postQuestions,
+	postUsers,
+	postPlayers,
+	postScores
 } = require('./database')
 
 const credentials = {
@@ -36,12 +37,10 @@ app.prepare().then(() => {
 	const wss = new ws.Server({ server: httpsServer })
 	var clients = []
 
-	server.get('/:route/:gameKey', (req, res) => {
-		let route = req.params.route
-		return app.render(req, res, `/${route}`, {
-			gameKey: req.params.gameKey,
-			...req.query
-		})
+	server.get('/api/game', async (req, res) => {
+		const games = await getGames()
+		res.send(games)
+		res.end
 	})
 
 	server.post('/api/game', async (req, res) => {
@@ -49,16 +48,20 @@ app.prepare().then(() => {
 		// prettier-ignore
 		let URL = `https://opentdb.com/api.php?amount=${game.amount}&category=${game.category}&difficulty=${game.difficulty}&type=${game.type}`
 		let testURL =
-			'https://1b976eed-0a7d-4d14-b3b4-9ab759dbdedf.mock.pstmn.io/api.php?amount=10&type=multiple'
+			'https://f9c1f452-5f7d-43ab-adef-4093241aaae5.mock.pstmn.io/api.php?amount=10&type=multiple=multiple'
 		//If value is 'any' then remove that parameter.
 		URL = URL.replace(/(&.{1,10}=any)/g, '')
 		const gameQuestions = await fetch(testURL).then(res => res.json())
 		if (gameQuestions.response_code === 0) {
-			const gameid = await newGame(game)
+			const gameid = await postGames(game)
 			let questions = gameQuestions.results.map((q, index) => {
 				let answers = q.incorrect_answers
 				answers.push(q.correct_answer)
-				answers.sort(() => Math.random() - 0.5)
+				if (answers.length === 2) {
+					answers = ['True', 'False']
+				} else {
+					answers.sort(() => Math.random() - 0.5)
+				}
 				let correct = answers.indexOf(q.correct_answer)
 				correct = ['A', 'B', 'C', 'D'][correct]
 				let question = {
@@ -75,7 +78,7 @@ app.prepare().then(() => {
 				return question
 			})
 			for (const question of questions) {
-				newQuestion(question)
+				postQuestions(question)
 			}
 			res.send({ gameid })
 			res.end
@@ -92,14 +95,11 @@ app.prepare().then(() => {
 			res.sendStatus(400)
 			res.end
 		} else {
-			const game = await updateGame({ state, gameID, qNumber })
+			const game = await putGames({ state, gameID, qNumber })
 			if (game.gamestate > 0) {
-				var players = clients.reduce((players, player) => {
-					if (Object.keys(player)[0] === game.gameID) {
-						players.push(player[game.gameID])
-					}
-					return players
-				}, [])
+				var players = clients.filter(
+					client => client.protocol === game.gameID
+				)
 				//Timestamp for scoring.
 				game.qStart = Date.now()
 				players.forEach(player => {
@@ -119,7 +119,7 @@ app.prepare().then(() => {
 			res.sendStatus(400)
 			res.end
 		} else {
-			const deleted = await deleteGame(gameID)
+			const deleted = await deleteGames(gameID)
 			res.send(deleted)
 			res.end
 		}
@@ -131,7 +131,7 @@ app.prepare().then(() => {
 			res.sendStatus(400)
 			res.end
 		} else {
-			const user = await userCheck(userID)
+			const user = await postUsers(userID)
 			res.send(user)
 			res.end
 		}
@@ -144,7 +144,7 @@ app.prepare().then(() => {
 			res.sendStatus(400)
 			res.end
 		} else {
-			const joined = await joinGame({ userID, gameID })
+			const joined = await postPlayers({ userID, gameID })
 			res.send(joined)
 			res.end
 		}
@@ -156,10 +156,18 @@ app.prepare().then(() => {
 			res.sendStatus(400)
 			res.end
 		} else {
-			const result = await newScore(answer)
+			const result = await postScores(answer)
 			res.send(result)
 			res.end
 		}
+	})
+
+	server.get('/:route/:gameKey', (req, res) => {
+		let route = req.params.route
+		return app.render(req, res, `/${route}`, {
+			gameKey: req.params.gameKey,
+			...req.query
+		})
 	})
 
 	server.get('*', (req, res) => {
@@ -173,7 +181,7 @@ app.prepare().then(() => {
 	})
 
 	wss.on('connection', function open(ws) {
-		clients.push({ [ws.protocol]: ws })
+		clients.push(ws)
 		console.log(clients)
 	})
 

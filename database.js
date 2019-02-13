@@ -7,7 +7,24 @@ const postgres = new Pool({
 	ssl: process.env.SSL_STATE || false
 })
 
-async function newGame(game) {
+async function getGames() {
+	try {
+		// prettier-ignore
+		const query = `SELECT gameid FROM games;`
+		const client = await postgres.connect()
+		const result = await client.query(query)
+		client.release()
+		if (result.rowCount > 0) {
+			return result.rows
+		} else {
+			return { error: 'no games found' }
+		}
+	} catch (err) {
+		return err
+	}
+}
+
+async function postGames(game) {
 	try {
 		// prettier-ignore
 		const query = `INSERT INTO games (gameid, userid, created, ended, gamestate) VALUES (uuid_generate_v4(), '${game.host}', NOW()::timestamp, null, 0) RETURNING gameid;`
@@ -24,7 +41,7 @@ async function newGame(game) {
 	}
 }
 
-async function updateGame({ state, gameID, qNumber }) {
+async function putGames({ state, gameID, qNumber }) {
 	try {
 		// prettier-ignore
 		const query = `UPDATE games SET gamestate = ${state} WHERE gameid = '${gameID}' RETURNING gamestate;`
@@ -63,7 +80,7 @@ async function updateGame({ state, gameID, qNumber }) {
 	}
 }
 
-async function deleteGame(gameid) {
+async function deleteGames(gameid) {
 	try {
 		// prettier-ignore
 		const query = `DELETE FROM games WHERE gameid = '${gameid}';`
@@ -80,7 +97,7 @@ async function deleteGame(gameid) {
 	}
 }
 
-async function newQuestion(q) {
+async function postQuestions(q) {
 	try {
 		// prettier-ignore
 		const query = `INSERT INTO questions (questionid, gameid, number, question, answertype, a, b, c, d, correct) VALUES (uuid_generate_v4(), '${q.gameid}', ${q.number}, '${q.question}', '${q.answertype}', '${q.a}', '${q.b}', '${q.c}', '${q.d}', '${q.correct}');`
@@ -97,7 +114,7 @@ async function newQuestion(q) {
 	}
 }
 
-async function userCheck(userID) {
+async function postUsers(userID) {
 	try {
 		const query = `SELECT * FROM users WHERE userid = '${userID}';`
 		const client = await postgres.connect()
@@ -126,7 +143,7 @@ async function userCheck(userID) {
 	}
 }
 
-async function joinGame({ userID, gameID }) {
+async function postPlayers({ userID, gameID }) {
 	try {
 		// prettier-ignore
 		const query = `INSERT INTO players (gameid, userid) VALUES ('${gameID}', '${userID}') ON CONFLICT (userid) DO UPDATE SET gameid = '${gameID}';`
@@ -144,7 +161,7 @@ async function joinGame({ userID, gameID }) {
 	}
 }
 
-async function newScore(a) {
+async function postScores(a) {
 	try {
 		// prettier-ignore
 		const query = `SELECT newscore(v_gameid := '${a.gameID}', v_questionid := '${a.questionID}', v_userid := '${a.userID}', v_answer := '${a.answer}', v_reaction := ${a.reaction}, v_score := ${a.score});`
@@ -163,11 +180,12 @@ async function newScore(a) {
 }
 
 module.exports = {
-	newGame,
-	updateGame,
-	deleteGame,
-	newQuestion,
-	userCheck,
-	joinGame,
-	newScore
+	getGames,
+	postGames,
+	putGames,
+	deleteGames,
+	postQuestions,
+	postUsers,
+	postPlayers,
+	postScores
 }
