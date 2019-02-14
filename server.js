@@ -15,6 +15,7 @@ const {
 	deleteGames,
 	postQuestions,
 	postUsers,
+	getPlayers,
 	postPlayers,
 	postScores
 } = require('./database')
@@ -28,6 +29,8 @@ const port = parseInt(process.env.PORT, 10) || 3000
 const dev = process.env.NODE_ENV !== 'production'
 const app = next({ dev })
 const handle = app.getRequestHandler()
+//Global variable to store.
+var clients = []
 
 app.prepare().then(() => {
 	const server = express()
@@ -35,9 +38,9 @@ app.prepare().then(() => {
 	server.use(bodyParser.json())
 	const httpsServer = https.createServer(credentials, server)
 	const wss = new ws.Server({ server: httpsServer })
-	var clients = []
 
 	server.get('/api/game', async (req, res) => {
+		wsPlayers('100b9d06-5f12-4156-a878-7e528b9bb739')
 		const games = await getGames()
 		res.send(games)
 		res.end
@@ -97,28 +100,7 @@ app.prepare().then(() => {
 		} else {
 			const game = await putGames({ state, gameID, qNumber })
 			if (game.gamestate > 0) {
-				var players = clients.filter(
-					client => client.protocol === game.gameID
-				)
-				var gameboards = clients.filter(
-					client => client.protocol === `gb_${game.gameID}`
-				)
-				//Timestamp for scoring.
-				game.qStart = Date.now()
-				gameboards.forEach(board => {
-					if (board.readyState === ws.OPEN) {
-						board.send(JSON.stringify(game))
-					}
-				})
-				let p_game = game
-				delete p_game.question
-				delete p_game.answers
-				delete p_game.correctAnswer
-				players.forEach(player => {
-					if (player.readyState === ws.OPEN) {
-						player.send(JSON.stringify(p_game))
-					}
-				})
+				wsGame(game)
 			}
 			res.send(game)
 			res.end
@@ -149,6 +131,18 @@ app.prepare().then(() => {
 		}
 	})
 
+	server.get('/api/player', async (req, res) => {
+		const gameID = req.query.gameID
+		if (_.isUndefined(gameID)) {
+			res.sendStatus(400)
+			res.end
+		} else {
+			const players = await getPlayers(gameID)
+			res.send(players)
+			res.end
+		}
+	})
+
 	server.post('/api/player', async (req, res) => {
 		const userID = req.body.userID
 		const gameID = req.body.gameID
@@ -157,14 +151,7 @@ app.prepare().then(() => {
 			res.end
 		} else {
 			const joined = await postPlayers({ userID, gameID })
-			var gameboards = clients.filter(
-				client => client.protocol === `gb_${game.gameID}`
-			)
-			gameboards.forEach(board => {
-				if (board.readyState === ws.OPEN) {
-					board.send(JSON.stringify(game))
-				}
-			})
+			wsPlayers(gameID)
 			res.send(joined)
 			res.end
 		}
@@ -209,3 +196,37 @@ app.prepare().then(() => {
 		console.log('disconnected')
 	})
 })
+
+/* **WebSocket functions.** */
+
+async function wsPlayers(gameID) {
+	let players = await getPlayers(gameID)
+	let gameboards = clients.filter(client => client.protocol === `gb_${gameID}`)
+	gameboards.forEach(board => {
+		if (board.readyState === ws.OPEN) {
+			board.send(JSON.stringify(players))
+		}
+	})
+}
+
+async function wsGame(game) {
+	let players = clients.filter(client => client.protocol === game.gameID)
+	let gameboards = clients.filter(
+		client => client.protocol === `gb_${game.gameID}`
+	)
+	//Timestamp for scoring.
+	game.qStart = Date.now()
+	gameboards.forEach(board => {
+		if (board.readyState === ws.OPEN) {
+			board.send(JSON.stringify(game))
+		}
+	})
+	delete game.question
+	delete game.answers
+	delete game.correctAnswer
+	players.forEach(player => {
+		if (player.readyState === ws.OPEN) {
+			player.send(JSON.stringify(game))
+		}
+	})
+}

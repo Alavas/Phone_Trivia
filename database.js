@@ -153,6 +153,25 @@ async function postUsers(userID) {
 	}
 }
 
+async function getPlayers(gameID) {
+	try {
+		// prettier-ignore
+		const query = `SELECT userid FROM players WHERE gameid = '${gameID}';`
+		const client = await postgres.connect()
+		const result = await client.query(query)
+		if (result.rowCount > 0) {
+			client.release()
+			let players = result.rows.map(x => x.userid)
+			return players
+		} else {
+			client.release()
+			return []
+		}
+	} catch (err) {
+		return []
+	}
+}
+
 async function postPlayers({ userID, gameID }) {
 	try {
 		// prettier-ignore
@@ -196,6 +215,7 @@ module.exports = {
 	deleteGames,
 	postQuestions,
 	postUsers,
+	getPlayers,
 	postPlayers,
 	postScores
 }
