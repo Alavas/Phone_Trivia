@@ -101,7 +101,7 @@ app.prepare().then(() => {
 					client => client.protocol === game.gameID
 				)
 				var gameboards = clients.filter(
-					client => client.protocol === c`gb_${game.gameID}`
+					client => client.protocol === `gb_${game.gameID}`
 				)
 				//Timestamp for scoring.
 				game.qStart = Date.now()
@@ -110,12 +110,13 @@ app.prepare().then(() => {
 						board.send(JSON.stringify(game))
 					}
 				})
-				delete game.question
-				delete game.answers
-				delete game.correctAnswer
+				let p_game = game
+				delete p_game.question
+				delete p_game.answers
+				delete p_game.correctAnswer
 				players.forEach(player => {
 					if (player.readyState === ws.OPEN) {
-						player.send(JSON.stringify(game))
+						player.send(JSON.stringify(p_game))
 					}
 				})
 			}
@@ -156,6 +157,14 @@ app.prepare().then(() => {
 			res.end
 		} else {
 			const joined = await postPlayers({ userID, gameID })
+			var gameboards = clients.filter(
+				client => client.protocol === `gb_${game.gameID}`
+			)
+			gameboards.forEach(board => {
+				if (board.readyState === ws.OPEN) {
+					board.send(JSON.stringify(game))
+				}
+			})
 			res.send(joined)
 			res.end
 		}
