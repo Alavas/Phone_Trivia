@@ -1,15 +1,9 @@
 import React from 'react'
 import Link from 'next/link'
-
-const links = [{ href: 'https://github.com/alavas', label: 'PHONETRIVIA' }].map(
-	link => {
-		link.key = `nav-link-${link.href}-${link.label}`
-		return link
-	}
-)
+import 'bootstrap/dist/css/bootstrap.min.css'
 
 const Nav = () => (
-	<nav>
+	<nav className="fixed-bottom">
 		<ul>
 			<li>
 				<Link prefetch href="/">
@@ -17,13 +11,11 @@ const Nav = () => (
 				</Link>
 			</li>
 			<ul>
-				{links.map(({ key, href, label }) => (
-					<li key={key}>
-						<Link href={href}>
-							<a>{label}</a>
-						</Link>
-					</li>
-				))}
+				<li>
+					<Link href="https://github.com/alavas">
+						<a className="align-middle">PHONETRIVIA</a>
+					</Link>
+				</li>
 			</ul>
 		</ul>
 
@@ -34,13 +26,13 @@ const Nav = () => (
 					Helvetica, sans-serif;
 			}
 			nav {
-				position: absolute;
-				bottom: 0px;
 				z-index: 999;
 				text-align: center;
 				width: 100%;
 				border-style: solid;
 				border-width: 1px 0px 0px 0px;
+				background-color: white !important;
+				height: 65px !important;
 			}
 			ul {
 				display: flex;
@@ -52,12 +44,14 @@ const Nav = () => (
 			}
 			li {
 				display: flex;
+				margin-top: 5px;
 				padding: 6px 8px;
 			}
 			a {
-				color: #067df7;
+				color: #212529;
 				text-decoration: none;
-				font-size: 13px;
+				font-size: 1.5em;
+				padding-right: 15px;
 			}
 		`}</style>
 	</nav>

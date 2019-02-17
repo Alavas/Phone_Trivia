@@ -7,7 +7,7 @@ const Home = () => (
 		<Head title="Gameshow" />
 
 		<div className="hero">
-			<h1 className="title">Welcome to the Game Show!</h1>
+			<h1 className="title">Welcome to Phone Trivia!</h1>
 			<p className="description">
 				You can either join an existing game, display a scoreboard, or start
 				a new game.
@@ -16,7 +16,7 @@ const Home = () => (
 			<div className="row">
 				<Link href="/player">
 					<a className="card">
-						<h3>Join a game &rarr;</h3>
+						<h3>Join a Game</h3>
 						<p>
 							You'll need access to the game QR code or the unique game
 							ID.
@@ -25,13 +25,13 @@ const Home = () => (
 				</Link>
 				<Link href="/game">
 					<a className="card">
-						<h3>Display a scoreboard &rarr;</h3>
+						<h3>Display a gameboard</h3>
 						<p>You'll need the unique game board ID.</p>
 					</a>
 				</Link>
 				<Link href="/host">
 					<a className="card">
-						<h3>Start a game &rarr;</h3>
+						<h3>Start a Game</h3>
 						<p>Create you own game, you'll be the host!</p>
 					</a>
 				</Link>
