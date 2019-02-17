@@ -10,7 +10,13 @@ import {
 import QRCode from 'qrcode.react'
 import Head from '../components/head'
 import Nav from '../components/nav'
-import { getCookie, updateCookie, generateUUID, loginUser } from '../utilities'
+import {
+	getCookie,
+	updateCookie,
+	generateUUID,
+	loginUser,
+	gameStates
+} from '../utilities'
 
 class Game extends Component {
 	constructor() {
@@ -19,6 +25,7 @@ class Game extends Component {
 			userID: '',
 			games: [],
 			gameID: '',
+			gamestate: 0,
 			question:
 				'What is the name of the ship which was only a few miles away from the RMS Titanic when it struck an iceberg on April 14, 1912?',
 			answertype: 'multiple',
@@ -60,111 +67,137 @@ class Game extends Component {
 			<div>
 				<Head title="Gameshow" />
 				<Nav />
-				{this.state.gameID === '' ? (
-					<div className="qr-container">
-						<div className="qr">
-							<Card style={{ backgroundColor: '#212529' }}>
-								<QRCode
-									value={`${this.state.userID}`}
-									size={400}
-									bgColor={'#ffffff'}
-									fgColor={'#000000'}
-									level={'L'}
-									includeMargin={true}
-									renderAs={'svg'}
-								/>
-								<CardBody>
-									<CardTitle>
-										<h1 className="text-white display-5 fluid">
-											To connect to this gameboard the host must scan
-											the QR code.
+				{(() => {
+					switch (this.state.gamestate) {
+						case gameStates.NOTSTARTED:
+							return (
+								<div className="qr-container">
+									<div className="qr">
+										<Card style={{ backgroundColor: '#212529' }}>
+											<QRCode
+												value={`${this.state.userID}`}
+												size={400}
+												bgColor={'#ffffff'}
+												fgColor={'#000000'}
+												level={'L'}
+												includeMargin={true}
+												renderAs={'svg'}
+											/>
+											<CardBody>
+												<CardTitle>
+													<h1 className="text-white display-5 fluid">
+														To connect to this gameboard the host
+														must scan the QR code.
+													</h1>
+												</CardTitle>
+											</CardBody>
+										</Card>
+									</div>
+								</div>
+							)
+						case gameStates.QUESTIONS:
+							return (
+								<div className="grid-container">
+									<div className="title">
+										<i
+											style={{ marginTop: '20px' }}
+											className="fas fa-mobile-alt text-white float-right"
+										/>
+										<h1 className="display-1 text-white">
+											Phone Trivia
 										</h1>
-									</CardTitle>
-								</CardBody>
-							</Card>
-						</div>
-					</div>
-				) : (
-					<div className="grid-container">
-						<div className="title">
-							<i
-								style={{ marginTop: '20px' }}
-								className="fas fa-mobile-alt text-white float-right"
-							/>
-							<h1 className="display-1 text-white">Phone Trivia</h1>
-						</div>
-						<div className="question">
-							<h1 className="display-3 fluid">{this.state.question}</h1>
-						</div>
-						{this.state.answertype === 'multiple' ? (
-							<React.Fragment>
-								<div className="answer1 border border-white rounded">
-									<img src="../static/A.png" className="a-letter" />
-									<h1 className="display-3">
-										{this.state.answers[0]}
-									</h1>
+									</div>
+									<div className="question">
+										<h1 className="display-3 fluid">
+											{this.state.question}
+										</h1>
+									</div>
+									{this.state.answertype === 'multiple' ? (
+										<React.Fragment>
+											<div className="answer1 border border-white rounded">
+												<img
+													src="../static/A.png"
+													className="a-letter"
+												/>
+												<h1 className="display-3">
+													{this.state.answers[0]}
+												</h1>
+											</div>
+											<div className="answer2 border border-white rounded">
+												<img
+													src="../static/B.png"
+													className="a-letter"
+												/>
+												<h1 className="display-3">
+													{this.state.answers[1]}
+												</h1>
+											</div>
+											<div className="answer3 border border-white rounded">
+												<img
+													src="../static/C.png"
+													className="a-letter"
+												/>
+												<h1 className="display-3">
+													{this.state.answers[2]}
+												</h1>
+											</div>
+											<div className="answer4 border border-white rounded">
+												<img
+													src="../static/D.png"
+													className="a-letter"
+												/>
+												<h1 className="display-3">
+													{this.state.answers[3]}
+												</h1>
+											</div>
+										</React.Fragment>
+									) : (
+										<React.Fragment>
+											<div className="boolean-true">
+												<Alert
+													color="success"
+													className="display-3 text-center"
+												>
+													TRUE
+												</Alert>
+											</div>
+											<div className="boolean-false">
+												<Alert
+													color="danger"
+													className="display-3 text-center"
+												>
+													FALSE
+												</Alert>
+											</div>
+										</React.Fragment>
+									)}
+									<div className="scores">
+										<h1
+											className="display-4 text-white"
+											style={{ textAlign: 'center' }}
+										>
+											Scores
+										</h1>
+										<ListGroup>
+											{this.state.players.map((player, index) => {
+												return (
+													<ListGroupItem key={index}>
+														<img
+															src={player.avatar}
+															className="avatar"
+														/>
+														<h1 className="display-5 score">
+															{player.score}
+														</h1>
+													</ListGroupItem>
+												)
+											})}
+										</ListGroup>
+									</div>
 								</div>
-								<div className="answer2 border border-white rounded">
-									<img src="../static/B.png" className="a-letter" />
-									<h1 className="display-3">
-										{this.state.answers[1]}
-									</h1>
-								</div>
-								<div className="answer3 border border-white rounded">
-									<img src="../static/C.png" className="a-letter" />
-									<h1 className="display-3">
-										{this.state.answers[2]}
-									</h1>
-								</div>
-								<div className="answer4 border border-white rounded">
-									<img src="../static/D.png" className="a-letter" />
-									<h1 className="display-3">
-										{this.state.answers[3]}
-									</h1>
-								</div>
-							</React.Fragment>
-						) : (
-							<React.Fragment>
-								<div className="boolean-true">
-									<Alert
-										color="success"
-										className="display-3 text-center"
-									>
-										TRUE
-									</Alert>
-								</div>
-								<div className="boolean-false">
-									<Alert
-										color="danger"
-										className="display-3 text-center"
-									>
-										FALSE
-									</Alert>
-								</div>
-							</React.Fragment>
-						)}
-						<div className="scores">
-							<h1
-								className="display-4 text-white"
-								style={{ textAlign: 'center' }}
-							>
-								Scores
-							</h1>
-							<ListGroup>
-								{this.state.players.map((player, index) => {
-									return (
-										<ListGroupItem key={index}>
-											<img src={player.avatar} className="avatar" />
-											<h1 className="display-5 score">
-												{player.score}
-											</h1>
-										</ListGroupItem>
-									)
-								})}
-							</ListGroup>
-						</div>
-					</div>
-				)}
+							)
+					}
+				})()}
 				<style jsx>{`
 					:global(html) {
 						width: 100vw;

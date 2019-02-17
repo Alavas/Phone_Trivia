@@ -11,7 +11,8 @@ import {
 	generateUUID,
 	loginUser,
 	joinGame,
-	submitAnswer
+	submitAnswer,
+	gameStates
 } from '../utilities'
 import Head from '../components/head'
 import Nav from '../components/nav'
@@ -124,7 +125,7 @@ class Player extends Component {
 		return (
 			<div>
 				<Head title="Gameshow" />
-				{this.state.gamestate !== 4 ? <Nav /> : null}
+				{this.state.gamestate !== gameStates.ENDED ? <Nav /> : null}
 				{this.state.joined ? (
 					<Websocket
 						url="wss:192.168.1.88:3000"
@@ -134,7 +135,7 @@ class Player extends Component {
 				) : null}
 				{(() => {
 					switch (this.state.gamestate) {
-						case 0:
+						case gameStates.NOTSTARTED:
 							return (
 								<div className="row">
 									{QrReader ? (
@@ -153,7 +154,7 @@ class Player extends Component {
 									)}
 								</div>
 							)
-						case 1:
+						case gameStates.CREATED:
 							return (
 								<div className="row">
 									<a className="card">
@@ -177,7 +178,7 @@ class Player extends Component {
 									</a>
 								</div>
 							)
-						case 2:
+						case gameStates.STARTED:
 							return (
 								<div className="row">
 									<a className="card">
@@ -185,7 +186,7 @@ class Player extends Component {
 									</a>
 								</div>
 							)
-						case 3:
+						case gameStates.QUESTIONS:
 							return (
 								<div className="row">
 									<h3>Question Number {this.state.qNumber}</h3>
@@ -276,7 +277,7 @@ class Player extends Component {
 									)}
 								</div>
 							)
-						case 4:
+						case gameStates.ENDED:
 							return (
 								<div className="row">
 									<a className="card">

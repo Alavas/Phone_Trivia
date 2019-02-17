@@ -169,3 +169,11 @@ export const questionType = [
 	{ value: 'boolean', display: 'True / False' },
 	{ value: 'any', display: 'Mixed' }
 ]
+
+export const gameStates = {
+	NOTSTARTED: 0,
+	CREATED: 1,
+	STARTED: 2,
+	QUESTIONS: 3,
+	ENDED: 4
+}

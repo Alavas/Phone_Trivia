@@ -10,7 +10,8 @@ import {
 	questionType,
 	createGame,
 	updateGame,
-	deleteGame
+	deleteGame,
+	gameStates
 } from '../utilities'
 import Head from '../components/head'
 import Nav from '../components/nav'
@@ -75,7 +76,7 @@ class Host extends Component {
 			numQuestions: parseInt(gameSettings.amount),
 			difficulty: gameSettings.difficulty,
 			category: gameSettings.type,
-			gamestate: 1
+			gamestate: gameStates.CREATED
 		})
 	}
 
@@ -88,9 +89,11 @@ class Host extends Component {
 	async nextQuestion() {
 		const nextQ = this.state.qNumber + 1
 		if (nextQ > this.state.numQuestions) {
-			this.updateGame(4)
+			this.updateGame(gameStates.ENDED)
 		} else {
-			this.setState({ qNumber: nextQ }, () => this.updateGame(3))
+			this.setState({ qNumber: nextQ }, () =>
+				this.updateGame(gameStates.QUESTIONS)
+			)
 		}
 	}
 
@@ -121,10 +124,10 @@ class Host extends Component {
 		return (
 			<div>
 				<Head title="Gameshow" />
-				{this.state.gamestate !== 4 ? <Nav /> : null}
+				{this.state.gamestate !== gameStates.ENDED ? <Nav /> : null}
 				{(() => {
 					switch (this.state.gamestate) {
-						case 0:
+						case gameStates.NOTSTARTED:
 							return (
 								<div className="row">
 									<h3>SELECT GAME OPTIONS</h3>
@@ -174,12 +177,14 @@ class Host extends Component {
 									</form>
 								</div>
 							)
-						case 1:
+						case gameStates.CREATED:
 							return (
 								<div className="row">
 									<a
 										className="card"
-										onClick={() => this.updateGame(2)}
+										onClick={() =>
+											this.updateGame(gameStates.STARTED)
+										}
 									>
 										<h3>BEGIN GAME</h3>
 									</a>
@@ -201,7 +206,7 @@ class Host extends Component {
 									</a>
 								</div>
 							)
-						case 2:
+						case gameStates.STARTED:
 							return (
 								<div className="row">
 									<a
@@ -215,7 +220,7 @@ class Host extends Component {
 									</a>
 								</div>
 							)
-						case 3:
+						case gameStates.QUESTIONS:
 							return (
 								<div className="row">
 									<a
@@ -235,7 +240,7 @@ class Host extends Component {
 									</a>
 								</div>
 							)
-						case 4:
+						case gameStates.ENDED:
 							return (
 								<div className="row">
 									<a className="info">
