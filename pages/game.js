@@ -1,5 +1,13 @@
 import React, { Component } from 'react'
-import { Alert, ListGroup, ListGroupItem } from 'reactstrap'
+import {
+	Alert,
+	Card,
+	CardBody,
+	CardTitle,
+	ListGroup,
+	ListGroupItem
+} from 'reactstrap'
+import QRCode from 'qrcode.react'
 import Head from '../components/head'
 import Nav from '../components/nav'
 import { getCookie, updateCookie, generateUUID, loginUser } from '../utilities'
@@ -52,74 +60,111 @@ class Game extends Component {
 			<div>
 				<Head title="Gameshow" />
 				<Nav />
-				<div className="grid-container">
-					<div className="title">
-						<i
-							style={{ marginTop: '20px' }}
-							className="fas fa-mobile-alt text-white float-right"
-						/>
-						<h1 className="display-1 text-white">Phone Trivia</h1>
-					</div>
-					<div className="question">
-						<h1 className="display-3 fluid">{this.state.question}</h1>
-					</div>
-					{this.state.answertype === 'multiple' ? (
-						<React.Fragment>
-							<div className="answer1 border border-white rounded">
-								<img src="../static/A.png" className="a-letter" />
-								<h1 className="display-3">{this.state.answers[0]}</h1>
-							</div>
-							<div className="answer2 border border-white rounded">
-								<img src="../static/B.png" className="a-letter" />
-								<h1 className="display-3">{this.state.answers[1]}</h1>
-							</div>
-							<div className="answer3 border border-white rounded">
-								<img src="../static/C.png" className="a-letter" />
-								<h1 className="display-3">{this.state.answers[2]}</h1>
-							</div>
-							<div className="answer4 border border-white rounded">
-								<img src="../static/D.png" className="a-letter" />
-								<h1 className="display-3">{this.state.answers[3]}</h1>
-							</div>
-						</React.Fragment>
-					) : (
-						<React.Fragment>
-							<div className="boolean-true">
-								<Alert
-									color="success"
-									className="display-3 text-center"
-								>
-									TRUE
-								</Alert>
-							</div>
-							<div className="boolean-false">
-								<Alert color="danger" className="display-3 text-center">
-									FALSE
-								</Alert>
-							</div>
-						</React.Fragment>
-					)}
-					<div className="scores">
-						<h1
-							className="display-4 text-white"
-							style={{ textAlign: 'center' }}
-						>
-							Scores
-						</h1>
-						<ListGroup>
-							{this.state.players.map((player, index) => {
-								return (
-									<ListGroupItem key={index}>
-										<img src={player.avatar} className="avatar" />
-										<h1 className="display-5 score">
-											{player.score}
+				{this.state.gameID === '' ? (
+					<div className="qr-container">
+						<div className="qr">
+							<Card style={{ backgroundColor: '#212529' }}>
+								<QRCode
+									value={`${this.state.userID}`}
+									size={400}
+									bgColor={'#ffffff'}
+									fgColor={'#000000'}
+									level={'L'}
+									includeMargin={true}
+									renderAs={'svg'}
+								/>
+								<CardBody>
+									<CardTitle>
+										<h1 className="text-white display-5 fluid">
+											To connect to this gameboard the host must scan
+											the QR code.
 										</h1>
-									</ListGroupItem>
-								)
-							})}
-						</ListGroup>
+									</CardTitle>
+								</CardBody>
+							</Card>
+						</div>
 					</div>
-				</div>
+				) : (
+					<div className="grid-container">
+						<div className="title">
+							<i
+								style={{ marginTop: '20px' }}
+								className="fas fa-mobile-alt text-white float-right"
+							/>
+							<h1 className="display-1 text-white">Phone Trivia</h1>
+						</div>
+						<div className="question">
+							<h1 className="display-3 fluid">{this.state.question}</h1>
+						</div>
+						{this.state.answertype === 'multiple' ? (
+							<React.Fragment>
+								<div className="answer1 border border-white rounded">
+									<img src="../static/A.png" className="a-letter" />
+									<h1 className="display-3">
+										{this.state.answers[0]}
+									</h1>
+								</div>
+								<div className="answer2 border border-white rounded">
+									<img src="../static/B.png" className="a-letter" />
+									<h1 className="display-3">
+										{this.state.answers[1]}
+									</h1>
+								</div>
+								<div className="answer3 border border-white rounded">
+									<img src="../static/C.png" className="a-letter" />
+									<h1 className="display-3">
+										{this.state.answers[2]}
+									</h1>
+								</div>
+								<div className="answer4 border border-white rounded">
+									<img src="../static/D.png" className="a-letter" />
+									<h1 className="display-3">
+										{this.state.answers[3]}
+									</h1>
+								</div>
+							</React.Fragment>
+						) : (
+							<React.Fragment>
+								<div className="boolean-true">
+									<Alert
+										color="success"
+										className="display-3 text-center"
+									>
+										TRUE
+									</Alert>
+								</div>
+								<div className="boolean-false">
+									<Alert
+										color="danger"
+										className="display-3 text-center"
+									>
+										FALSE
+									</Alert>
+								</div>
+							</React.Fragment>
+						)}
+						<div className="scores">
+							<h1
+								className="display-4 text-white"
+								style={{ textAlign: 'center' }}
+							>
+								Scores
+							</h1>
+							<ListGroup>
+								{this.state.players.map((player, index) => {
+									return (
+										<ListGroupItem key={index}>
+											<img src={player.avatar} className="avatar" />
+											<h1 className="display-5 score">
+												{player.score}
+											</h1>
+										</ListGroupItem>
+									)
+								})}
+							</ListGroup>
+						</div>
+					</div>
+				)}
 				<style jsx>{`
 					:global(html) {
 						width: 100vw;
@@ -130,6 +175,19 @@ class Game extends Component {
 						width: 100vw;
 						height: 100vh;
 						min-width: 1400px;
+					}
+					.qr-container {
+						font-family: 'Dosis', sans-serif;
+						background-color: #212529;
+						width: 100vw;
+						height: calc(100vh - 65px);
+						display: grid;
+						grid-template-columns: 1fr 400px 1fr;
+						grid-template-rows: 1fr 500px 1fr;
+					}
+					.qr {
+						text-align: center;
+						grid-area: 2 / 2 / 3 / 3;
 					}
 					.grid-container {
 						font-family: 'Dosis', sans-serif;
