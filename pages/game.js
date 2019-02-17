@@ -2,12 +2,13 @@ import React, { Component } from 'react'
 import { Alert, ListGroup, ListGroupItem } from 'reactstrap'
 import Head from '../components/head'
 import Nav from '../components/nav'
-import { getGames } from '../utilities'
+import { getCookie, updateCookie, generateUUID, loginUser } from '../utilities'
 
 class Game extends Component {
 	constructor() {
 		super()
 		this.state = {
+			userID: '',
 			games: [],
 			gameID: '',
 			question:
@@ -29,16 +30,24 @@ class Game extends Component {
 	}
 
 	componentDidMount() {
-		this.listGames()
+		this.userLogin()
 	}
 
-	async listGames() {
-		const games = await getGames()
-		this.setState({ games })
+	async userLogin() {
+		let userID = getCookie('gs_userid')
+		if (userID === '' || userID === 'undefined') {
+			userID = generateUUID(window.navigator.userAgent)
+		}
+		const userDetails = await loginUser(userID)
+		updateCookie(userDetails.userid)
+		this.setState({
+			userID: userDetails.userid,
+			avatar: userDetails.avatar,
+			score: userDetails.score
+		})
 	}
 
 	render() {
-		console.log(this.props.game)
 		return (
 			<div>
 				<Head title="Gameshow" />
