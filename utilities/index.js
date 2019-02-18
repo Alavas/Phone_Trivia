@@ -126,6 +126,20 @@ export const submitAnswer = async answer => {
 	return result
 }
 
+//Connect gameboard to game.
+export const connectGameboard = async gameboard => {
+	let data = JSON.stringify({ gameboard })
+	const board = await fetch(`${process.env.GAMESHOW_ENDPOINT}/api/gameboard`, {
+		method: 'POST',
+		headers: {
+			Accept: 'application/json, text/plain, */*',
+			'Content-Type': 'application/json'
+		},
+		body: data
+	}).then(res => res.json())
+	return board
+}
+
 //Possible question categories.
 export const gameCategories = [
 	{ value: 'any', display: 'Any Category' },

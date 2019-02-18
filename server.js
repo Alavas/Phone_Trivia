@@ -169,6 +169,14 @@ app.prepare().then(() => {
 		}
 	})
 
+	server.post('/api/gameboard', (req, res) => {
+		const userID = req.body.userID
+		const gameID = req.body.gameID
+		wsGameboard({ userID, gameID })
+		res.sendStatus(201)
+		res.end
+	})
+
 	server.get('/:route/:gameKey', (req, res) => {
 		let route = req.params.route
 		return app.render(req, res, `/${route}`, {
@@ -182,14 +190,12 @@ app.prepare().then(() => {
 	})
 
 	httpsServer.listen(port, function() {
-		console.log(
-			`Example app listening on port ${port}! Go to https://localhost:${port}/`
-		)
+		console.log(`Listening on port ${port}!`)
 	})
 
 	wss.on('connection', function open(ws) {
 		clients.push(ws)
-		console.log(clients)
+		clients.map(client => console.log('Client:', client.protocol))
 	})
 
 	wss.on('close', function close() {
@@ -198,6 +204,19 @@ app.prepare().then(() => {
 })
 
 /* **WebSocket functions.** */
+
+function wsGameboard(gameboard) {
+	let gameboards = clients.filter(
+		client => client.protocol === `${gameboard.userID}`
+	)
+	gameboards.forEach(board => {
+		if (board.readyState === ws.OPEN) {
+			board.send(JSON.stringify(gameboard))
+		}
+	})
+	//Remove the userID of the gameboard from the client list.
+	clients = clients.filter(client => client.protocol !== `${gameboard.userID}`)
+}
 
 async function wsPlayers(gameID) {
 	let players = await getPlayers(gameID)
