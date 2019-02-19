@@ -27,10 +27,9 @@ class Game extends Component {
 			userID: '',
 			gameID: '',
 			gamestate: 0,
-			question:
-				'What is the name of the ship which was only a few miles away from the RMS Titanic when it struck an iceberg on April 14, 1912?',
-			answertype: 'multiple',
-			answers: ['Californian', 'Commerce', 'Carpathia', 'Cristol'],
+			question: '',
+			answertype: '',
+			answers: [],
 			players: [
 				{ userid: '', avatar: '../static/avatar1.png', score: '950' },
 				{ userid: '', avatar: '../static/avatar2.png', score: '830' },
@@ -66,14 +65,8 @@ class Game extends Component {
 	//TODO: Validate data coming in here.
 	handleData(data) {
 		data = JSON.parse(data)
-		if (this.state.gameID === '') {
-			this.setState({
-				gameID: data.gameID,
-				gamestate: gameStates.CREATED
-			})
-		} else {
-			console.log(data)
-		}
+
+		this.setState({ ...data })
 	}
 
 	render() {

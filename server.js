@@ -172,7 +172,7 @@ app.prepare().then(() => {
 	server.post('/api/gameboard', (req, res) => {
 		const userID = req.body.userID
 		const gameID = req.body.gameID
-		wsGameboard({ userID, gameID })
+		wsGameboard({ userID, gameID, gamestate: 1 })
 		res.sendStatus(201)
 		res.end
 	})
