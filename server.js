@@ -214,8 +214,13 @@ function wsGameboard(gameboard) {
 			board.send(JSON.stringify(gameboard))
 		}
 	})
-	//Remove the userID of the gameboard from the client list.
-	clients = clients.filter(client => client.protocol !== `${gameboard.userID}`)
+	//Update the protocol of the gameboard client to be gb_{gameID}.
+	clients = clients.map(client => {
+		if (client.protocol === gameboard.userID) {
+			client.protocol = `gb_${gameboard.gameID}`
+		}
+		return client
+	})
 }
 
 async function wsPlayers(gameID) {

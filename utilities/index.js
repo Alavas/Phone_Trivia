@@ -52,7 +52,6 @@ export const getGames = async () => {
 			'Content-Type': 'application/json'
 		}
 	}).then(res => res.json())
-	console.log(games)
 	return games
 }
 
@@ -128,7 +127,7 @@ export const submitAnswer = async answer => {
 
 //Connect gameboard to game.
 export const connectGameboard = async gameboard => {
-	let data = JSON.stringify({ gameboard })
+	let data = JSON.stringify(gameboard)
 	const board = await fetch(`${process.env.GAMESHOW_ENDPOINT}/api/gameboard`, {
 		method: 'POST',
 		headers: {
@@ -136,7 +135,7 @@ export const connectGameboard = async gameboard => {
 			'Content-Type': 'application/json'
 		},
 		body: data
-	}).then(res => res.json())
+	})
 	return board
 }
 

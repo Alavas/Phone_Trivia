@@ -1,5 +1,9 @@
+if (typeof window != 'undefined') {
+	var QrReader = require('react-qr-reader')
+}
 import React, { Component } from 'react'
 import QRCode from 'qrcode.react'
+import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
 import {
 	getCookie,
 	updateCookie,
@@ -11,23 +15,17 @@ import {
 	createGame,
 	updateGame,
 	deleteGame,
+	connectGameboard,
 	gameStates
 } from '../utilities'
 import Head from '../components/head'
 import Nav from '../components/nav'
 
-/*
-0: Not Started
-1: Created
-2: Started
-3: Questions
-4: Ended
-*/
-
 class Host extends Component {
 	constructor() {
 		super()
 		this.state = {
+			modal: false,
 			userid: '',
 			gameID: '',
 			loggedIn: false,
@@ -47,6 +45,8 @@ class Host extends Component {
 		this.category = React.createRef()
 		this.difficulty = React.createRef()
 		this.type = React.createRef()
+		this.toggleModal = this.toggleModal.bind(this)
+		this.handleScan = this.handleScan.bind(this)
 	}
 
 	static getInitialProps({ query }) {
@@ -120,6 +120,30 @@ class Host extends Component {
 		}
 	}
 
+	handleScan(data) {
+		const regex = RegExp(
+			'[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}'
+		)
+		if (data) {
+			//Regex to confirm that the link is valid.
+			if (regex.test(data)) {
+				const gameID = this.state.gameID
+				connectGameboard({ userID: data, gameID })
+				this.setState({ modal: false })
+			}
+		}
+	}
+
+	handleError(err) {
+		console.error(err)
+	}
+
+	toggleModal() {
+		this.setState(prevState => ({
+			modal: !prevState.modal
+		}))
+	}
+
 	render() {
 		return (
 			<div>
@@ -129,8 +153,8 @@ class Host extends Component {
 					switch (this.state.gamestate) {
 						case gameStates.NOTSTARTED:
 							return (
-								<div className="row">
-									<h3>SELECT GAME OPTIONS</h3>
+								<div className="row" style={{ width: '200px' }}>
+									<h4>Select Game Options</h4>
 									<form onSubmit={this.submit}>
 										<h5>How many questions?</h5>
 										<input
@@ -186,7 +210,7 @@ class Host extends Component {
 											this.updateGame(gameStates.STARTED)
 										}
 									>
-										<h3>BEGIN GAME</h3>
+										<h4>Begin Game</h4>
 									</a>
 									<div className="qr">
 										<QRCode
@@ -201,9 +225,37 @@ class Host extends Component {
 											renderAs={'svg'}
 										/>
 									</div>
-									<a className="card">
-										<h3>ABANDON GAME</h3>
+									<a
+										className="card"
+										onClick={() => this.toggleModal()}
+									>
+										<h4>Connect Gameboard</h4>
 									</a>
+									<Modal
+										isOpen={this.state.modal}
+										toggle={this.toggleModal}
+									>
+										<ModalHeader toggle={this.toggle}>
+											Scan a Gameboard QR code.
+										</ModalHeader>
+										<ModalBody>
+											{' '}
+											<QrReader
+												delay={300}
+												onError={this.handleError}
+												onScan={this.handleScan}
+												style={{ width: '100%' }}
+											/>
+										</ModalBody>
+										<ModalFooter>
+											<Button
+												color="primary"
+												onClick={this.toggleModal}
+											>
+												Close
+											</Button>
+										</ModalFooter>
+									</Modal>
 								</div>
 							)
 						case gameStates.STARTED:
@@ -257,6 +309,11 @@ class Host extends Component {
 				})()}
 
 				<style jsx>{`
+					:global(html) {
+						width: 100vw;
+						height: 100vh;
+						font-size: 12px !important;
+					}
 					.row {
 						max-width: 60%;
 						margin-left: auto;

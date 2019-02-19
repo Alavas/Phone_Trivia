@@ -1,7 +1,6 @@
 if (typeof window != 'undefined') {
 	var QrReader = require('react-qr-reader')
 }
-
 import React, { Component } from 'react'
 import QRCode from 'qrcode.react'
 import Websocket from 'react-websocket'
@@ -128,7 +127,7 @@ class Player extends Component {
 				{this.state.gamestate !== gameStates.ENDED ? <Nav /> : null}
 				{this.state.joined ? (
 					<Websocket
-						url="wss:192.168.1.88:3000"
+						url={process.env.GAMESHOW_WEBSOCKET}
 						protocol={this.props.gameID}
 						onMessage={this.handleData.bind(this)}
 					/>

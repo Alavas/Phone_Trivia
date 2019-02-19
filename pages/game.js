@@ -1,4 +1,6 @@
 import React, { Component } from 'react'
+import Websocket from 'react-websocket'
+import QRCode from 'qrcode.react'
 import {
 	Alert,
 	Card,
@@ -7,7 +9,7 @@ import {
 	ListGroup,
 	ListGroupItem
 } from 'reactstrap'
-import QRCode from 'qrcode.react'
+import _ from 'lodash'
 import Head from '../components/head'
 import Nav from '../components/nav'
 import {
@@ -23,7 +25,6 @@ class Game extends Component {
 		super()
 		this.state = {
 			userID: '',
-			games: [],
 			gameID: '',
 			gamestate: 0,
 			question:
@@ -45,14 +46,14 @@ class Game extends Component {
 	}
 
 	componentDidMount() {
-		this.userLogin()
+		let userid = getCookie('gs_userid')
+		if (userid === '' || userid === 'undefined') {
+			userid = generateUUID(window.navigator.userAgent)
+		}
+		this.userLogin(userid)
 	}
 
-	async userLogin() {
-		let userID = getCookie('gs_userid')
-		if (userID === '' || userID === 'undefined') {
-			userID = generateUUID(window.navigator.userAgent)
-		}
+	async userLogin(userID) {
 		const userDetails = await loginUser(userID)
 		updateCookie(userDetails.userid)
 		this.setState({
@@ -62,18 +63,44 @@ class Game extends Component {
 		})
 	}
 
+	//TODO: Validate data coming in here.
+	handleData(data) {
+		data = JSON.parse(data)
+		if (this.state.gameID === '') {
+			this.setState({
+				gameID: data.gameID,
+				gamestate: gameStates.CREATED
+			})
+		} else {
+			console.log(data)
+		}
+	}
+
 	render() {
 		return (
 			<div>
 				<Head title="Gameshow" />
 				<Nav />
+				{this.state.userID !== '' ? (
+					<Websocket
+						url={process.env.GAMESHOW_WEBSOCKET}
+						protocol={`${this.state.userID}`}
+						onMessage={this.handleData.bind(this)}
+						reconnect={true}
+					/>
+				) : null}
 				{(() => {
 					switch (this.state.gamestate) {
 						case gameStates.NOTSTARTED:
 							return (
 								<div className="qr-container">
 									<div className="qr">
-										<Card style={{ backgroundColor: '#212529' }}>
+										<Card
+											style={{
+												backgroundColor: '#212529',
+												border: '0px'
+											}}
+										>
 											<QRCode
 												value={`${this.state.userID}`}
 												size={400}
@@ -95,9 +122,41 @@ class Game extends Component {
 									</div>
 								</div>
 							)
+						case gameStates.CREATED:
+							return (
+								<div className="qr-container">
+									<div className="qr">
+										<Card
+											style={{
+												backgroundColor: '#212529',
+												border: '0px'
+											}}
+										>
+											<QRCode
+												value={`${
+													process.env.GAMESHOW_ENDPOINT
+												}/player/${this.state.gameID}`}
+												size={400}
+												bgColor={'#ffffff'}
+												fgColor={'#000000'}
+												level={'L'}
+												includeMargin={true}
+												renderAs={'svg'}
+											/>
+											<CardBody>
+												<CardTitle>
+													<h1 className="text-white display-5 fluid">
+														Scan to join the game.
+													</h1>
+												</CardTitle>
+											</CardBody>
+										</Card>
+									</div>
+								</div>
+							)
 						case gameStates.QUESTIONS:
 							return (
-								<div className="grid-container">
+								<div className="questions-container">
 									<div className="title">
 										<i
 											style={{ marginTop: '20px' }}
@@ -222,7 +281,7 @@ class Game extends Component {
 						text-align: center;
 						grid-area: 2 / 2 / 3 / 3;
 					}
-					.grid-container {
+					.questions-container {
 						font-family: 'Dosis', sans-serif;
 						background-color: #212529;
 						width: 100vw;
