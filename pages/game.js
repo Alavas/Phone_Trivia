@@ -148,6 +148,16 @@ class Game extends Component {
 									</div>
 								</div>
 							)
+						case gameStates.STARTED:
+							return (
+								<div className="waiting-container">
+									<div className="waiting">
+										<h1 className="display-1">
+											Get ready to start...
+										</h1>
+									</div>
+								</div>
+							)
 						case gameStates.QUESTIONS:
 							return (
 								<div className="questions-container">
@@ -261,6 +271,20 @@ class Game extends Component {
 						width: 100vw;
 						height: 100vh;
 						min-width: 1400px;
+					}
+					.waiting-container {
+						font-family: 'Dosis', sans-serif;
+						background-color: #212529;
+						width: 100vw;
+						height: calc(100vh - 65px);
+						display: grid;
+						grid-template-columns: 1fr 400px 1fr;
+						grid-template-rows: 1fr 200px 1fr;
+					}
+					.waiting {
+						text-align: center;
+						color: white;
+						grid-area: 2 / 2 / 3 / 3;
 					}
 					.qr-container {
 						font-family: 'Dosis', sans-serif;
