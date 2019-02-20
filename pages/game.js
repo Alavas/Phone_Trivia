@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import Websocket from 'react-websocket'
 import QRCode from 'qrcode.react'
+import he from 'he'
 import {
 	Alert,
 	Card,
@@ -161,7 +162,7 @@ class Game extends Component {
 									</div>
 									<div className="question">
 										<h1 className="display-3 fluid">
-											{this.state.question}
+											{he.decode(this.state.question)}
 										</h1>
 									</div>
 									{this.state.answertype === 'multiple' ? (
@@ -172,7 +173,7 @@ class Game extends Component {
 													className="a-letter"
 												/>
 												<h1 className="display-3">
-													{this.state.answers[0]}
+													{he.decode(this.state.answers[0])}
 												</h1>
 											</div>
 											<div className="answer2 border border-white rounded">
@@ -181,7 +182,7 @@ class Game extends Component {
 													className="a-letter"
 												/>
 												<h1 className="display-3">
-													{this.state.answers[1]}
+													{he.decode(this.state.answers[1])}
 												</h1>
 											</div>
 											<div className="answer3 border border-white rounded">
@@ -190,7 +191,7 @@ class Game extends Component {
 													className="a-letter"
 												/>
 												<h1 className="display-3">
-													{this.state.answers[2]}
+													{he.decode(this.state.answers[2])}
 												</h1>
 											</div>
 											<div className="answer4 border border-white rounded">
@@ -199,7 +200,7 @@ class Game extends Component {
 													className="a-letter"
 												/>
 												<h1 className="display-3">
-													{this.state.answers[3]}
+													{he.decode(this.state.answers[3])}
 												</h1>
 											</div>
 										</React.Fragment>
