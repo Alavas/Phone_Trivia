@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS scores (gameid uuid REFERENCES games(gameid) ON DELET
 
 CREATE TABLE IF NOT EXISTS players (gameid uuid REFERENCES games(gameid) ON DELETE CASCADE, userid uuid REFERENCES users(userid), UNIQUE(userid));
 
-/* Add new entry into the scores table. */
+/* Add new entry into the scores table and update the users table with current score. */
 CREATE OR REPLACE FUNCTION newscore (
 	v_gameid uuid,
 	v_questionid uuid,
@@ -19,7 +19,7 @@ CREATE OR REPLACE FUNCTION newscore (
 	v_reaction int,
 	v_score int
 )
-RETURNS bool AS $v_winner$
+RETURNS void AS $$
 DECLARE 
 	v_winner bool := false;
 	v_correct bool := false;
@@ -32,6 +32,38 @@ BEGIN
 	END IF;
 	INSERT INTO scores (gameid, questionid, userid, answer, reaction, correct, score, winner) 
 	VALUES (v_gameid, v_questionid, v_userid, v_answer, v_reaction, v_correct, v_score, v_winner);
-	RETURN v_winner;
+	UPDATE users SET score = score + v_score WHERE userid = v_userid;
 END;
-$v_winner$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;
+
+/* Adds a player to the game and resets their score to zero. */
+CREATE OR REPLACE FUNCTION newPlayer (
+	v_gameid uuid,
+	v_userid uuid
+)
+RETURNS void AS $$
+BEGIN
+	INSERT INTO players (gameid, userid) VALUES (v_gameid, v_userid) ON CONFLICT (userid) DO UPDATE SET gameid = v_gameid;
+	UPDATE users SET score = 0 WHERE userid = v_userid;
+END;
+$$ LANGUAGE plpgsql;
+
+/* Gets scores for the supplied questionID. */
+CREATE OR REPLACE FUNCTION getscore(v_questionid uuid) 
+RETURNS TABLE (
+	userid uuid,
+	answer varchar(50),
+	reaction int,
+	correct bool,
+	score int,
+	winner bool,
+	totalscore int
+) 
+AS $$
+BEGIN
+RETURN query 
+	SELECT s.userid, s.answer, s.reaction, s.correct, s.score, s.winner, u.score AS totalscore FROM scores AS s 
+	INNER JOIN users AS u ON u.userid = s.userid
+	WHERE s.questionid = v_questionid;
+END;
+$$ LANGUAGE plpgsql;

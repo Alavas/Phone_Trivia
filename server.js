@@ -17,6 +17,7 @@ const {
 	postUsers,
 	getPlayers,
 	postPlayers,
+	getScores,
 	postScores
 } = require('./database')
 
@@ -40,7 +41,6 @@ app.prepare().then(() => {
 	const wss = new ws.Server({ server: httpsServer })
 
 	server.get('/api/game', async (req, res) => {
-		wsPlayers('100b9d06-5f12-4156-a878-7e528b9bb739')
 		const games = await getGames()
 		res.send(games)
 		res.end
@@ -164,6 +164,8 @@ app.prepare().then(() => {
 			res.end
 		} else {
 			const result = await postScores(answer)
+			const scores = await getScores(answer.questionID)
+			wsScores(answer.gameID, scores)
 			res.send(result)
 			res.end
 		}
@@ -223,16 +225,28 @@ function wsGameboard(gameboard) {
 	})
 }
 
+//Broadcasts current player information to a specified game.
 async function wsPlayers(gameID) {
 	let players = await getPlayers(gameID)
 	let gameboards = clients.filter(client => client.protocol === `gb_${gameID}`)
 	gameboards.forEach(board => {
 		if (board.readyState === ws.OPEN) {
-			board.send(JSON.stringify(players))
+			board.send(JSON.stringify({ players }))
 		}
 	})
 }
 
+//Broadcasts scores to the gameboards.
+async function wsScores(gameID, scores) {
+	let gameboards = clients.filter(client => client.protocol === `gb_${gameID}`)
+	gameboards.forEach(board => {
+		if (board.readyState === ws.OPEN) {
+			board.send(JSON.stringify({ scores }))
+		}
+	})
+}
+
+//Broadcasts questions and gamestate for a specified game.
 async function wsGame(game) {
 	let players = clients.filter(client => client.protocol === game.gameID)
 	let gameboards = clients.filter(

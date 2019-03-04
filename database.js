@@ -153,15 +153,16 @@ async function postUsers(userID) {
 	}
 }
 
+//TODO: Expand to send scores as well as avatars.
 async function getPlayers(gameID) {
 	try {
 		// prettier-ignore
-		const query = `SELECT userid FROM players WHERE gameid = '${gameID}';`
+		const query = `SELECT u.userid, u.avatar FROM users as u INNER JOIN players AS p ON p.userid = u.userid WHERE p.gameid = '${gameID}';`
 		const client = await postgres.connect()
 		const result = await client.query(query)
 		if (result.rowCount > 0) {
 			client.release()
-			let players = result.rows.map(x => x.userid)
+			let players = result.rows
 			return players
 		} else {
 			client.release()
@@ -175,7 +176,7 @@ async function getPlayers(gameID) {
 async function postPlayers({ userID, gameID }) {
 	try {
 		// prettier-ignore
-		const query = `INSERT INTO players (gameid, userid) VALUES ('${gameID}', '${userID}') ON CONFLICT (userid) DO UPDATE SET gameid = '${gameID}';`
+		const query = `SELECT newplayer(v_gameid := '${gameID}', v_userid := '${userID}');`
 		const client = await postgres.connect()
 		const result = await client.query(query)
 		if (result.rowCount > 0) {
@@ -187,6 +188,25 @@ async function postPlayers({ userID, gameID }) {
 		}
 	} catch (err) {
 		return false
+	}
+}
+
+async function getScores(questionID) {
+	try {
+		// prettier-ignore
+		const query = `SELECT * FROM getscore('${questionID}')`
+		const client = await postgres.connect()
+		const result = await client.query(query)
+		if (result.rowCount > 0) {
+			client.release()
+			let scores = result.rows
+			return scores
+		} else {
+			client.release()
+			return []
+		}
+	} catch (err) {
+		return []
 	}
 }
 
@@ -217,5 +237,6 @@ module.exports = {
 	postUsers,
 	getPlayers,
 	postPlayers,
+	getScores,
 	postScores
 }

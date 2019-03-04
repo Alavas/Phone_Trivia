@@ -31,7 +31,8 @@ class Game extends Component {
 			question: '',
 			answertype: '',
 			answers: [],
-			players: [
+			players: [],
+			scores: [
 				{ userid: '', avatar: '../static/avatar1.png', score: '950' },
 				{ userid: '', avatar: '../static/avatar2.png', score: '830' },
 				{ userid: '', avatar: '../static/avatar3.png', score: '604' },
@@ -57,16 +58,14 @@ class Game extends Component {
 		const userDetails = await loginUser(userID)
 		updateCookie(userDetails.userid)
 		this.setState({
-			userID: userDetails.userid,
-			avatar: userDetails.avatar,
-			score: userDetails.score
+			userID: userDetails.userid
 		})
 	}
 
 	//TODO: Validate data coming in here.
 	handleData(data) {
 		data = JSON.parse(data)
-
+		console.log(data)
 		this.setState({ ...data })
 	}
 
@@ -242,7 +241,7 @@ class Game extends Component {
 											Scores
 										</h1>
 										<ListGroup>
-											{this.state.players.map((player, index) => {
+											{this.state.scores.map((player, index) => {
 												return (
 													<ListGroupItem key={index}>
 														<img
@@ -250,7 +249,7 @@ class Game extends Component {
 															className="avatar"
 														/>
 														<h1 className="display-5 score">
-															{player.score}
+															{player.totalscore}
 														</h1>
 													</ListGroupItem>
 												)
