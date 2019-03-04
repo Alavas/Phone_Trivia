@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import Websocket from 'react-websocket'
 import QRCode from 'qrcode.react'
 import he from 'he'
+import _ from 'lodash'
 import {
 	Alert,
 	Card,
@@ -10,7 +11,6 @@ import {
 	ListGroup,
 	ListGroupItem
 } from 'reactstrap'
-import _ from 'lodash'
 import Head from '../components/head'
 import Nav from '../components/nav'
 import {
@@ -27,17 +27,15 @@ class Game extends Component {
 		this.state = {
 			userID: '',
 			gameID: '',
-			gamestate: 0,
+			gamestate: gameStates.NOTSTARTED,
 			question: '',
 			answertype: '',
 			answers: [],
 			players: [],
 			scores: [
-				{ userid: '', avatar: '../static/avatar1.png', score: '950' },
-				{ userid: '', avatar: '../static/avatar2.png', score: '830' },
-				{ userid: '', avatar: '../static/avatar3.png', score: '604' },
-				{ userid: '', avatar: '../static/avatar4.png', score: '582' },
-				{ userid: '', avatar: '../static/avatar5.png', score: '310' }
+				{ userid: '', avatar: '../static/avatar1.png', totalscore: '950' },
+				{ userid: '', avatar: '../static/avatar2.png', totalscore: '830' },
+				{ userid: '', avatar: '../static/avatar3.png', totalscore: '604' }
 			]
 		}
 	}
@@ -258,6 +256,56 @@ class Game extends Component {
 									</div>
 								</div>
 							)
+						case gameStates.ENDED:
+							return (
+								<div className="winners-container">
+									{_.isUndefined(this.state.scores[0]) ? null : (
+										<div className="first-place">
+											<h1
+												className="display-1"
+												style={{ marginTop: '25px' }}
+											>
+												1st Place:
+												<img
+													src={this.state.scores[0].avatar}
+													className="avatar-first"
+												/>
+												{this.state.scores[0].totalscore}
+											</h1>
+										</div>
+									)}
+									{_.isUndefined(this.state.scores[1]) ? null : (
+										<div className="second-place">
+											<p
+												className="display-3 align-middle"
+												style={{ marginTop: '30px' }}
+											>
+												2nd Place:
+												<img
+													src={this.state.scores[1].avatar}
+													className="avatar-secondthird"
+												/>
+												{this.state.scores[1].totalscore}
+											</p>
+										</div>
+									)}
+									{_.isUndefined(this.state.scores[2]) ? null : (
+										<div className="third-place">
+											<p
+												className="display-3"
+												style={{ marginTop: '30px' }}
+											>
+												3rd Place:
+												<img
+													src={this.state.scores[2].avatar}
+													className="avatar-secondthird"
+												/>
+												{this.state.scores[2].totalscore}
+											</p>
+										</div>
+									)}
+								</div>
+							)
 					}
 				})()}
 				<style jsx>{`
@@ -270,6 +318,30 @@ class Game extends Component {
 						width: 100vw;
 						height: 100vh;
 						min-width: 1400px;
+					}
+					.winners-container {
+						font-family: 'Dosis', sans-serif;
+						background-color: #212529;
+						width: 100vw;
+						height: calc(100vh - 65px);
+						display: grid;
+						grid-template-columns: 1fr 50px 600px 50px 1fr;
+						grid-template-rows: 1fr repeat(3, 30px 150px) 1fr;
+					}
+					.first-place {
+						text-align: center;
+						background-color: white;
+						grid-area: 2 / 2 / 4 / 5;
+					}
+					.second-place {
+						text-align: center;
+						background-color: white;
+						grid-area: 5 / 3 / 5 / 4;
+					}
+					.third-place {
+						text-align: center;
+						background-color: white;
+						grid-area: 7 / 3 / 8 / 4;
 					}
 					.waiting-container {
 						font-family: 'Dosis', sans-serif;
@@ -379,6 +451,22 @@ class Game extends Component {
 						vertical-align: middle;
 						width: 50px;
 						height: 50px;
+						border-radius: 50%;
+					}
+					.avatar-first {
+						margin-left: 10px;
+						margin-right: 10px;
+						margin-bottom: 15px;
+						width: 130px;
+						height: 130px;
+						border-radius: 50%;
+					}
+					.avatar-secondthird {
+						margin-left: 10px;
+						margin-right: 10px;
+						margin-bottom: 15px;
+						width: 80px;
+						height: 80px;
 						border-radius: 50%;
 					}
 					.a-letter {

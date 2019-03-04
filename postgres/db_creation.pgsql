@@ -64,6 +64,7 @@ BEGIN
 RETURN query 
 	SELECT s.userid, s.answer, s.reaction, s.correct, s.score, s.winner, u.score AS totalscore FROM scores AS s 
 	INNER JOIN users AS u ON u.userid = s.userid
-	WHERE s.questionid = v_questionid;
+	WHERE s.questionid = v_questionid
+	ORDER BY u.score DESC;
 END;
 $$ LANGUAGE plpgsql;
