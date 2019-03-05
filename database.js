@@ -171,7 +171,6 @@ async function putUsers({ userID, avatar }) {
 	}
 }
 
-//TODO: Expand to send scores as well as avatars.
 async function getPlayers(gameID) {
 	try {
 		// prettier-ignore
@@ -246,6 +245,19 @@ async function postScores(a) {
 	}
 }
 
+/*  */
+async function cleanupGames() {
+	try {
+		console.log('Deleting games older than 1 day.')
+		const query = `DELETE FROM games WHERE age(NOW():: timestamp, created) > '1 days';`
+		const client = await postgres.connect()
+		const result = await client.query(query)
+		console.log(`Deleted ${result.rowCount} games.`)
+	} catch (err) {
+		console.log(err)
+	}
+}
+
 module.exports = {
 	getGames,
 	postGames,
@@ -257,5 +269,6 @@ module.exports = {
 	getPlayers,
 	postPlayers,
 	getScores,
-	postScores
+	postScores,
+	cleanupGames
 }

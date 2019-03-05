@@ -5,6 +5,7 @@ const bodyParser = require('body-parser')
 const ws = require('ws')
 const _ = require('lodash')
 const fs = require('fs')
+const cron = require('node-cron')
 const fetch = require('node-fetch')
 const next = require('next')
 //Database functions.
@@ -19,13 +20,17 @@ const {
 	getPlayers,
 	postPlayers,
 	getScores,
-	postScores
+	postScores,
+	cleanupGames
 } = require('./database')
 
 const credentials = {
 	key: fs.readFileSync('certificate/server.key'),
 	cert: fs.readFileSync('certificate/server.cert')
 }
+
+//Removes old games, check every hour at the 15 minute mark.
+cron.schedule('15 */1 * * *', cleanupGames)
 
 const port = parseInt(process.env.PORT, 10) || 3000
 const dev = process.env.NODE_ENV !== 'production'
