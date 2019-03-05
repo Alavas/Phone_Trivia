@@ -9,9 +9,11 @@ import {
 	updateCookie,
 	generateUUID,
 	loginUser,
+	convertImage,
 	joinGame,
 	submitAnswer,
-	gameStates
+	gameStates,
+	updateUser
 } from '../utilities'
 import Head from '../components/head'
 import Nav from '../components/nav'
@@ -23,6 +25,7 @@ class Player extends Component {
 		super()
 		this.state = {
 			userID: '',
+			avatar: null,
 			result: 'No Result',
 			validGame: false,
 			gamestate: null,
@@ -42,6 +45,14 @@ class Player extends Component {
 
 	componentDidMount() {
 		this.handlePageOpened()
+	}
+
+	async convertedImg(avatar) {
+		const updated = await updateUser({
+			userID: this.state.userID,
+			avatar: avatar
+		})
+		this.setState({ avatar, imgReady: true })
 	}
 
 	async handlePageOpened() {
@@ -64,6 +75,14 @@ class Player extends Component {
 	async userLogin(userID) {
 		const userDetails = await loginUser(userID)
 		updateCookie(userDetails.userid)
+		//If the user doesn't have an avatar generate a random one.
+		console.log(userDetails)
+		if (userDetails.avatar === null) {
+			convertImage(
+				'https://picsum.photos/250/?random',
+				this.convertedImg.bind(this)
+			)
+		}
 		this.setState({
 			userID: userDetails.userid,
 			avatar: userDetails.avatar,
@@ -117,7 +136,6 @@ class Player extends Component {
 	handleData(data) {
 		data = JSON.parse(data)
 		this.setState({ ...data, answer: null })
-		console.log(data)
 	}
 
 	render() {

@@ -11,6 +11,7 @@
 /certificate
 /design
 avatar-test.js
+default-avatar.js
 
 # production
 /build

@@ -1,5 +1,22 @@
 import getUuid from 'uuid-by-string'
 
+export const convertImage = (url, callback) => {
+	var img = new Image()
+	img.crossOrigin = 'Anonymous'
+	img.onload = function() {
+		var canvas = document.createElement('CANVAS')
+		var ctx = canvas.getContext('2d')
+		var dataURL
+		canvas.height = this.height
+		canvas.width = this.width
+		ctx.drawImage(this, 0, 0)
+		dataURL = canvas.toDataURL('jpg')
+		callback(dataURL)
+		canvas = null
+	}
+	img.src = url
+}
+
 export const getCookie = cookie => {
 	var name = cookie + '='
 	var decodedCookie = decodeURIComponent(window.document.cookie)
@@ -42,6 +59,19 @@ export const loginUser = async userID => {
 		}
 	).then(res => res.json())
 	return userDetails
+}
+
+export const updateUser = async ({ userID, avatar }) => {
+	let data = JSON.stringify({ userID, avatar })
+	const user = await fetch(`${process.env.GAMESHOW_ENDPOINT}/api/user`, {
+		method: 'PUT',
+		headers: {
+			Accept: 'application/json, text/plain, */*',
+			'Content-Type': 'application/json'
+		},
+		body: data
+	})
+	return user
 }
 
 export const getGames = async () => {

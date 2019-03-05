@@ -32,11 +32,7 @@ class Game extends Component {
 			answertype: '',
 			answers: [],
 			players: [],
-			scores: [
-				{ userid: '', avatar: '../static/avatar1.png', totalscore: '950' },
-				{ userid: '', avatar: '../static/avatar2.png', totalscore: '830' },
-				{ userid: '', avatar: '../static/avatar3.png', totalscore: '604' }
-			]
+			scores: []
 		}
 	}
 
@@ -63,7 +59,6 @@ class Game extends Component {
 	//TODO: Validate data coming in here.
 	handleData(data) {
 		data = JSON.parse(data)
-		console.log(data)
 		this.setState({ ...data })
 	}
 
@@ -243,7 +238,17 @@ class Game extends Component {
 												return (
 													<ListGroupItem key={index}>
 														<img
-															src={player.avatar}
+															src={
+																_.find(
+																	this.state.players,
+																	x => {
+																		return (
+																			x.userid ===
+																			player.userid
+																		)
+																	}
+																).avatar
+															}
 															className="avatar"
 														/>
 														<h1 className="display-5 score">
@@ -267,7 +272,14 @@ class Game extends Component {
 											>
 												1st Place:
 												<img
-													src={this.state.scores[0].avatar}
+													src={
+														_.find(this.state.players, x => {
+															return (
+																x.userid ===
+																this.state.scores[0].userid
+															)
+														}).avatar
+													}
 													className="avatar-first"
 												/>
 												{this.state.scores[0].totalscore}
@@ -282,7 +294,14 @@ class Game extends Component {
 											>
 												2nd Place:
 												<img
-													src={this.state.scores[1].avatar}
+													src={
+														_.find(this.state.players, x => {
+															return (
+																x.userid ===
+																this.state.scores[1].userid
+															)
+														}).avatar
+													}
 													className="avatar-secondthird"
 												/>
 												{this.state.scores[1].totalscore}
@@ -297,7 +316,14 @@ class Game extends Component {
 											>
 												3rd Place:
 												<img
-													src={this.state.scores[2].avatar}
+													src={
+														_.find(this.state.players, x => {
+															return (
+																x.userid ===
+																this.state.scores[2].userid
+															)
+														}).avatar
+													}
 													className="avatar-secondthird"
 												/>
 												{this.state.scores[2].totalscore}

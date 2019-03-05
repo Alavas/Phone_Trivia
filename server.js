@@ -15,6 +15,7 @@ const {
 	deleteGames,
 	postQuestions,
 	postUsers,
+	putUsers,
 	getPlayers,
 	postPlayers,
 	getScores,
@@ -36,7 +37,7 @@ var clients = []
 app.prepare().then(() => {
 	const server = express()
 	server.use(cors())
-	server.use(bodyParser.json())
+	server.use(bodyParser.json({ limit: '50mb' }))
 	const httpsServer = https.createServer(credentials, server)
 	const wss = new ws.Server({ server: httpsServer })
 
@@ -131,6 +132,19 @@ app.prepare().then(() => {
 		}
 	})
 
+	server.put('/api/user', async (req, res) => {
+		const avatar = req.body.avatar
+		const userID = req.body.userID
+		if (_.isUndefined(userID)) {
+			res.sendStatus(400)
+			res.end
+		} else {
+			const user = putUsers({ userID, avatar })
+			res.send(user)
+			res.end
+		}
+	})
+
 	server.get('/api/player', async (req, res) => {
 		const gameID = req.query.gameID
 		if (_.isUndefined(gameID)) {
@@ -197,7 +211,6 @@ app.prepare().then(() => {
 
 	wss.on('connection', function open(ws) {
 		clients.push(ws)
-		clients.map(client => console.log('Client:', client.protocol))
 	})
 
 	wss.on('close', function close() {

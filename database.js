@@ -153,6 +153,24 @@ async function postUsers(userID) {
 	}
 }
 
+async function putUsers({ userID, avatar }) {
+	try {
+		// prettier-ignore
+		const query = `UPDATE users SET avatar = '${avatar}' WHERE userid = '${userID}';`
+		const client = await postgres.connect()
+		const result = await client.query(query)
+		if (result.rowCount > 0) {
+			client.release()
+			return true
+		} else {
+			client.release()
+			return true
+		}
+	} catch (err) {
+		return false
+	}
+}
+
 //TODO: Expand to send scores as well as avatars.
 async function getPlayers(gameID) {
 	try {
@@ -235,6 +253,7 @@ module.exports = {
 	deleteGames,
 	postQuestions,
 	postUsers,
+	putUsers,
 	getPlayers,
 	postPlayers,
 	getScores,
