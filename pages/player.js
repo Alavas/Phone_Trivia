@@ -48,7 +48,7 @@ class Player extends Component {
 	}
 
 	async convertedImg(avatar) {
-		const updated = await updateUser({
+		await updateUser({
 			userID: this.state.userID,
 			avatar: avatar
 		})
@@ -76,7 +76,6 @@ class Player extends Component {
 		const userDetails = await loginUser(userID)
 		updateCookie(userDetails.userid)
 		//If the user doesn't have an avatar generate a random one.
-		console.log(userDetails)
 		if (userDetails.avatar === null) {
 			convertImage(
 				'https://picsum.photos/250/?random',
