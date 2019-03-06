@@ -16,7 +16,8 @@ import {
 	updateGame,
 	deleteGame,
 	connectGameboard,
-	gameStates
+	gameStates,
+	updateUser
 } from '../utilities'
 import Head from '../components/head'
 import Nav from '../components/nav'
@@ -80,9 +81,24 @@ class Host extends Component {
 		})
 	}
 
+	async convertedImg(avatar) {
+		await updateUser({
+			userID: this.state.userID,
+			avatar: avatar
+		})
+		this.setState({ avatar, imgReady: true })
+	}
+
 	async userLogin(userID) {
 		const userDetails = await loginUser(userID)
 		updateCookie(userDetails.userid)
+		//If the user doesn't have an avatar generate a random one.
+		if (userDetails.avatar === null) {
+			convertImage(
+				'https://picsum.photos/250/?random',
+				this.convertedImg.bind(this)
+			)
+		}
 		this.setState({ ...userDetails, loggedIn: true })
 	}
 

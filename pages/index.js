@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import Link from 'next/link'
 import Head from '../components/head'
-import { getCookie, updateCookie, loginUser } from '../utilities'
+import { getCookie, updateCookie, loginUser, updateUser } from '../utilities'
 
 class Home extends Component {
 	constructor() {
