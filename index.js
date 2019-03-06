@@ -44,7 +44,7 @@ app.prepare().then(() => {
 		}
 		var wsServer = https.createServer(credentials, server)
 	} else {
-		var wsServer = http.createServer()
+		var wsServer = http.createServer(server)
 	}
 	const wss = new ws.Server({ server: wsServer })
 
