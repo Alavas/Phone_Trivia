@@ -141,7 +141,9 @@ class Player extends Component {
 		return (
 			<div>
 				<Head title="Gameshow" />
-				{this.state.gamestate !== gameStates.ENDED ? <Nav /> : null}
+				{this.state.gamestate !== gameStates.ENDED ? (
+					<Nav avatar={this.state.avatar} />
+				) : null}
 				{this.state.joined ? (
 					<Websocket
 						url={process.env.GAMESHOW_WEBSOCKET}
@@ -307,6 +309,11 @@ class Player extends Component {
 				})()}
 
 				<style jsx>{`
+					:global(html) {
+						width: 100vw;
+						height: 100vhnav;
+						font-size: 12px !important;
+					}
 					.row {
 						max-width: 60%;
 						margin-left: auto;

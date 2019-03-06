@@ -26,6 +26,7 @@ class Game extends Component {
 		super()
 		this.state = {
 			userID: '',
+			avatar: null,
 			gameID: '',
 			gamestate: gameStates.NOTSTARTED,
 			question: '',
@@ -66,7 +67,7 @@ class Game extends Component {
 		return (
 			<div>
 				<Head title="Gameshow" />
-				<Nav />
+				<Nav avatar={this.state.avatar} />
 				{this.state.userID !== '' ? (
 					<Websocket
 						url={process.env.GAMESHOW_WEBSOCKET}

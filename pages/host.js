@@ -17,7 +17,8 @@ import {
 	deleteGame,
 	connectGameboard,
 	gameStates,
-	updateUser
+	updateUser,
+	convertImage
 } from '../utilities'
 import Head from '../components/head'
 import Nav from '../components/nav'
@@ -28,6 +29,7 @@ class Host extends Component {
 		this.state = {
 			modal: false,
 			userid: '',
+			avatar: null,
 			gameID: '',
 			loggedIn: false,
 			gamestate: 0,
@@ -83,8 +85,8 @@ class Host extends Component {
 
 	async convertedImg(avatar) {
 		await updateUser({
-			userID: this.state.userID,
-			avatar: avatar
+			userID: this.state.userid,
+			avatar
 		})
 		this.setState({ avatar, imgReady: true })
 	}
@@ -164,7 +166,9 @@ class Host extends Component {
 		return (
 			<div>
 				<Head title="Gameshow" />
-				{this.state.gamestate !== gameStates.ENDED ? <Nav /> : null}
+				{this.state.gamestate !== gameStates.ENDED ? (
+					<Nav avatar={this.state.avatar} />
+				) : null}
 				{(() => {
 					switch (this.state.gamestate) {
 						case gameStates.NOTSTARTED:
@@ -327,7 +331,7 @@ class Host extends Component {
 				<style jsx>{`
 					:global(html) {
 						width: 100vw;
-						height: 100vh;
+						height: 100vhnav;
 						font-size: 12px !important;
 					}
 					.row {
