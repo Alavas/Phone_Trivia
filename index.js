@@ -1,6 +1,5 @@
 const express = require('express')
 const https = require('https')
-const cors = require('cors')
 const bodyParser = require('body-parser')
 const ws = require('ws')
 const _ = require('lodash')
@@ -41,9 +40,6 @@ var clients = []
 
 app.prepare().then(() => {
 	const server = express()
-	if (dev) {
-		server.use(cors())
-	}
 	server.use(bodyParser.json({ limit: '50mb' }))
 	const httpsServer = https.createServer(credentials, server)
 	const wss = new ws.Server({ server: httpsServer })
