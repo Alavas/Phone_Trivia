@@ -1,5 +1,6 @@
 const express = require('express')
 const https = require('https')
+const http = require('http')
 const bodyParser = require('body-parser')
 const ws = require('ws')
 const _ = require('lodash')
@@ -23,26 +24,29 @@ const {
 	cleanupGames
 } = require('./database')
 
-const credentials = {
-	key: fs.readFileSync('certificate/server.key'),
-	cert: fs.readFileSync('certificate/server.cert')
-}
-
-//Removes old games, check every hour at the 15 minute mark.
-cron.schedule('15 */1 * * *', cleanupGames)
-
 const port = parseInt(process.env.PORT, 10) || 3000
 const dev = process.env.NODE_ENV !== 'production'
 const app = next({ dev })
 const handle = app.getRequestHandler()
-//Global variable to store.
+//Global variable to store WebSocket clients.
 var clients = []
+
+//Removes old games, check every hour at the 15 minute mark.
+cron.schedule('15 */1 * * *', cleanupGames)
 
 app.prepare().then(() => {
 	const server = express()
 	server.use(bodyParser.json({ limit: '50mb' }))
-	const httpsServer = https.createServer(credentials, server)
-	const wss = new ws.Server({ server: httpsServer })
+	if (dev) {
+		const credentials = {
+			key: fs.readFileSync('certificate/server.key'),
+			cert: fs.readFileSync('certificate/server.cert')
+		}
+		var wsServer = https.createServer(credentials, server)
+	} else {
+		var wsServer = http.createServer()
+	}
+	const wss = new ws.Server({ server: wsServer })
 
 	server.get('/api/game', async (req, res) => {
 		const games = await getGames()
@@ -208,7 +212,7 @@ app.prepare().then(() => {
 		return handle(req, res)
 	})
 
-	httpsServer.listen(port, function() {
+	wsServer.listen(port, function() {
 		console.log(`Listening on port ${port}!`)
 	})
 
