@@ -41,7 +41,9 @@ var clients = []
 
 app.prepare().then(() => {
 	const server = express()
-	server.use(cors())
+	if (dev) {
+		server.use(cors())
+	}
 	server.use(bodyParser.json({ limit: '50mb' }))
 	const httpsServer = https.createServer(credentials, server)
 	const wss = new ws.Server({ server: httpsServer })
