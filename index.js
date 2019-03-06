@@ -1,6 +1,7 @@
 const express = require('express')
 const https = require('https')
 const http = require('http')
+const cors = require('cors')
 const bodyParser = require('body-parser')
 const ws = require('ws')
 const _ = require('lodash')
@@ -37,6 +38,7 @@ cron.schedule('15 */1 * * *', cleanupGames)
 app.prepare().then(() => {
 	const server = express()
 	server.use(bodyParser.json({ limit: '50mb' }))
+	server.use(cors())
 	if (dev) {
 		const credentials = {
 			key: fs.readFileSync('certificate/server.key'),
