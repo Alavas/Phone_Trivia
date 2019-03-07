@@ -138,6 +138,9 @@ class Player extends Component {
 	}
 
 	render() {
+		if (this.state.gamestate === gameStates.RESET) {
+			window.location = process.env.GAMESHOW_ENDPOINT
+		}
 		return (
 			<div>
 				<Head title="Gameshow" />
