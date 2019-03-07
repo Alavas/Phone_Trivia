@@ -218,5 +218,6 @@ export const gameStates = {
 	CREATED: 1,
 	STARTED: 2,
 	QUESTIONS: 3,
-	ENDED: 4
+	ENDED: 4,
+	RESET: 5
 }

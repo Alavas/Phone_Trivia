@@ -64,6 +64,17 @@ class Game extends Component {
 	}
 
 	render() {
+		if (this.state.gamestate === gameStates.RESET) {
+			this.setState({
+				gameID: '',
+				gamestate: gameStates.NOTSTARTED,
+				question: '',
+				answertype: '',
+				answers: [],
+				players: [],
+				scores: []
+			})
+		}
 		return (
 			<div>
 				<Head title="Gameshow" />
@@ -333,6 +344,8 @@ class Game extends Component {
 									)}
 								</div>
 							)
+						default:
+							break
 					}
 				})()}
 				<style jsx>{`

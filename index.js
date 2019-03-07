@@ -124,6 +124,7 @@ app.prepare().then(() => {
 			res.end
 		} else {
 			const deleted = await deleteGames(gameID)
+			wsGame({ gameID, gamestate: 5 }) //5 = RESET
 			res.send(deleted)
 			res.end
 		}
