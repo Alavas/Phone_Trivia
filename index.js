@@ -1,4 +1,5 @@
 const express = require('express')
+const slashes = require('connect-slashes')
 const https = require('https')
 const http = require('http')
 const cors = require('cors')
@@ -38,6 +39,7 @@ cron.schedule('15 */1 * * *', cleanupGames)
 app.prepare().then(() => {
 	const server = express()
 	server.use(bodyParser.json({ limit: '50mb' }))
+	server.use(slashes(false))
 	server.use(cors())
 	if (dev) {
 		const credentials = {
