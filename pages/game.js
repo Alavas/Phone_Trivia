@@ -186,7 +186,7 @@ class Game extends Component {
 													src="../static/A.png"
 													className="a-letter"
 												/>
-												<h1 className="display-3">
+												<h1 className="display-4">
 													{he.decode(this.state.answers[0])}
 												</h1>
 											</div>
@@ -195,7 +195,7 @@ class Game extends Component {
 													src="../static/B.png"
 													className="a-letter"
 												/>
-												<h1 className="display-3">
+												<h1 className="display-4">
 													{he.decode(this.state.answers[1])}
 												</h1>
 											</div>
@@ -204,7 +204,7 @@ class Game extends Component {
 													src="../static/C.png"
 													className="a-letter"
 												/>
-												<h1 className="display-3">
+												<h1 className="display-4">
 													{he.decode(this.state.answers[2])}
 												</h1>
 											</div>
@@ -213,7 +213,7 @@ class Game extends Component {
 													src="../static/D.png"
 													className="a-letter"
 												/>
-												<h1 className="display-3">
+												<h1 className="display-4">
 													{he.decode(this.state.answers[3])}
 												</h1>
 											</div>
@@ -458,28 +458,28 @@ class Game extends Component {
 						grid-area: 6 / 4 / 7 / 7;
 					}
 					.answer1 h1 {
-						margin-top: 10px;
+						margin-top: 15px;
 					}
 					.answer2 {
 						color: white;
 						grid-area: 8 / 4 / 9 / 7;
 					}
 					.answer2 h1 {
-						margin-top: 10px;
+						margin-top: 15px;
 					}
 					.answer3 {
 						color: white;
 						grid-area: 10 / 4 / 11 / 7;
 					}
 					.answer3 h1 {
-						margin-top: 10px;
+						margin-top: 15px;
 					}
 					.answer4 {
 						color: white;
 						grid-area: 12 / 4 / 13 / 7;
 					}
 					.answer4 h1 {
-						margin-top: 10px;
+						margin-top: 15px;
 					}
 					.scores {
 						grid-area: 2 / 2 / 13 / 3;
