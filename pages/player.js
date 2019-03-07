@@ -50,7 +50,7 @@ class Player extends Component {
 	async convertedImg(avatar) {
 		await updateUser({
 			userID: this.state.userID,
-			avatar: avatar
+			avatar
 		})
 		this.setState({ avatar, imgReady: true })
 	}
