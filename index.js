@@ -213,8 +213,21 @@ app.prepare().then(() => {
 		})
 	})
 
+	server.get('/:route', (req, res) => {
+		let route = req.params.route
+		if (
+			route !== 'game' ||
+			route !== 'player' ||
+			route !== 'host' ||
+			route !== 'index'
+		) {
+			res.redirect('/')
+		}
+		return app.render(req, res, `/${route}`)
+	})
+
 	server.get('*', (req, res) => {
-		return handle(req, res)
+		return app.render(req, res, '/')
 	})
 
 	wsServer.listen(port, function() {
