@@ -76,7 +76,7 @@ class Home extends Component {
 						<Link href="/game">
 							<a className="card">
 								<h3>Display a gameboard</h3>
-								<p>You'll need the unique game board ID.</p>
+								<p>The host will connect it to the game.</p>
 							</a>
 						</Link>
 						<Link href="/host">

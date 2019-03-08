@@ -14,7 +14,6 @@ avatar-test.js
 default-avatar.js
 
 # production
-/build
 /dist
 /.next
 
