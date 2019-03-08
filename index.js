@@ -3,6 +3,7 @@ const slashes = require('connect-slashes')
 const https = require('https')
 const http = require('http')
 const cors = require('cors')
+const enforce = require('express-sslify')
 const bodyParser = require('body-parser')
 const ws = require('ws')
 const _ = require('lodash')
@@ -40,6 +41,7 @@ app.prepare().then(() => {
 	const server = express()
 	server.use(bodyParser.json({ limit: '50mb' }))
 	server.use(slashes(false))
+	server.use(enforce.HTTPS({ trustProtoHeader: true }))
 	server.use(cors())
 	if (dev) {
 		const credentials = {

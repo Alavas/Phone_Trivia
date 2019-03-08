@@ -17,6 +17,7 @@
 		"cors": "^2.8.5",
 		"dotenv": "^6.2.0",
 		"express": "^4.16.4",
+		"express-sslify": "^1.2.0",
 		"he": "^1.2.0",
 		"isomorphic-unfetch": "^3.0.0",
 		"jslib-html5-camera-photo": "^3.0.2-beta.0",
