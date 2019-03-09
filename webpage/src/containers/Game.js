@@ -181,6 +181,7 @@ class Game extends Component {
 										<React.Fragment>
 											<div className="answer1 border border-white rounded">
 												<img
+													alt="Answer A"
 													src="../static/A.png"
 													className="a-letter"
 												/>
@@ -190,6 +191,7 @@ class Game extends Component {
 											</div>
 											<div className="answer2 border border-white rounded">
 												<img
+													alt="Answer B"
 													src="../static/B.png"
 													className="a-letter"
 												/>
@@ -199,6 +201,7 @@ class Game extends Component {
 											</div>
 											<div className="answer3 border border-white rounded">
 												<img
+													alt="Answer C"
 													src="../static/C.png"
 													className="a-letter"
 												/>
@@ -208,6 +211,7 @@ class Game extends Component {
 											</div>
 											<div className="answer4 border border-white rounded">
 												<img
+													alt="Answer D"
 													src="../static/D.png"
 													className="a-letter"
 												/>
@@ -248,6 +252,7 @@ class Game extends Component {
 												return (
 													<ListGroupItem key={index}>
 														<img
+															alt={indexedDB}
 															src={
 																_.find(
 																	this.state.players,
@@ -282,6 +287,7 @@ class Game extends Component {
 											>
 												1st Place:
 												<img
+													alt="first-place"
 													src={
 														_.find(this.state.players, x => {
 															return (
@@ -304,6 +310,7 @@ class Game extends Component {
 											>
 												2nd Place:
 												<img
+													alt="second-place"
 													src={
 														_.find(this.state.players, x => {
 															return (
@@ -326,6 +333,7 @@ class Game extends Component {
 											>
 												3rd Place:
 												<img
+													alt="third-place"
 													src={
 														_.find(this.state.players, x => {
 															return (

@@ -23,7 +23,7 @@ class Player extends Component {
 			avatar: null,
 			result: 'No Result',
 			validGame: false,
-			gamestate: gameStates.QUESTIONS,
+			gamestate: null,
 			gameID: '',
 			answer: null,
 			qNumber: 0,
@@ -172,9 +172,9 @@ class Player extends Component {
 						case gameStates.CREATED:
 							return (
 								<div className="row">
-									<a className="card">
+									<p className="card">
 										<h3>WAITING TO BEGIN...</h3>
-									</a>
+									</p>
 									<div className="qr">
 										<QRCode
 											value={`${
@@ -188,17 +188,17 @@ class Player extends Component {
 											renderAs={'svg'}
 										/>
 									</div>
-									<a className="card">
+									<p className="card">
 										<h3>LEAVE GAME</h3>
-									</a>
+									</p>
 								</div>
 							)
 						case gameStates.STARTED:
 							return (
 								<div className="row">
-									<a className="card">
+									<p className="card">
 										<h3>Waiting for a question...</h3>
-									</a>
+									</p>
 								</div>
 							)
 						case gameStates.QUESTIONS:
@@ -207,7 +207,7 @@ class Player extends Component {
 									<h3>Question Number {this.state.qNumber}</h3>
 									{this.state.answertype === 'boolean' ? (
 										<React.Fragment>
-											<a
+											<p
 												style={{
 													backgroundColor: '#FFF0000'
 												}}
@@ -221,8 +221,8 @@ class Player extends Component {
 												onClick={() => this.sendAnswer('A')}
 											>
 												<h3>TRUE</h3>
-											</a>
-											<a
+											</p>
+											<p
 												style={{ backgroundColor: '#0000FF' }}
 												className={
 													this.state.answer === null
@@ -234,11 +234,11 @@ class Player extends Component {
 												onClick={() => this.sendAnswer('B')}
 											>
 												<h3>FALSE</h3>
-											</a>
+											</p>
 										</React.Fragment>
 									) : (
 										<React.Fragment>
-											<a
+											<p
 												style={{ backgroundColor: '#24d678' }}
 												className={
 													this.state.answer === null
@@ -250,8 +250,8 @@ class Player extends Component {
 												onClick={() => this.sendAnswer('A')}
 											>
 												<h3>A</h3>
-											</a>
-											<a
+											</p>
+											<p
 												style={{ backgroundColor: '#2789c2' }}
 												className={
 													this.state.answer === null
@@ -263,8 +263,8 @@ class Player extends Component {
 												onClick={() => this.sendAnswer('B')}
 											>
 												<h3>B</h3>
-											</a>
-											<a
+											</p>
+											<p
 												style={{ backgroundColor: '#fbcb00' }}
 												className={
 													this.state.answer === null
@@ -276,8 +276,8 @@ class Player extends Component {
 												onClick={() => this.sendAnswer('C')}
 											>
 												<h3>C</h3>
-											</a>
-											<a
+											</p>
+											<p
 												style={{ backgroundColor: '#f2493f' }}
 												className={
 													this.state.answer === null
@@ -289,7 +289,7 @@ class Player extends Component {
 												onClick={() => this.sendAnswer('D')}
 											>
 												<h3>D</h3>
-											</a>
+											</p>
 										</React.Fragment>
 									)}
 								</div>
@@ -297,9 +297,9 @@ class Player extends Component {
 						case gameStates.ENDED:
 							return (
 								<div className="row">
-									<a className="card">
+									<p className="card">
 										<h1>GAME OVER</h1>
-									</a>
+									</p>
 								</div>
 							)
 						default:

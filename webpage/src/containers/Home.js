@@ -53,31 +53,29 @@ class Home extends Component {
 
 	render() {
 		return (
-			<div>
-				<div className="hero">
-					<h1 className="title">Welcome to Phone Trivia!</h1>
-					<p className="description">
-						You can either join an existing game, display a scoreboard, or
-						start a new game.
-					</p>
+			<div className="hero">
+				<h1 className="title">Welcome to Phone Trivia!</h1>
+				<p className="description">
+					You can either join an existing game, display a scoreboard, or
+					start a new game.
+				</p>
 
-					<div className="column">
-						<Link to="/player" className="card">
-							<h3>Join a Game</h3>
-							<p>
-								You'll need access to the game QR code or the unique
-								game ID.
-							</p>
-						</Link>
-						<Link to="/game" className="card">
-							<h3>Display a gameboard</h3>
-							<p>The host will connect it to the game.</p>
-						</Link>
-						<Link to="/host" className="card">
-							<h3>Start a Game</h3>
-							<p>Create you own game, you'll be the host!</p>
-						</Link>
-					</div>
+				<div className="column">
+					<Link to="/player" className="card">
+						<h3>Join a Game</h3>
+						<p>
+							You'll need access to the game QR code or the unique game
+							ID.
+						</p>
+					</Link>
+					<Link to="/game" className="card">
+						<h3>Display a gameboard</h3>
+						<p>The host will connect it to the game.</p>
+					</Link>
+					<Link to="/host" className="card">
+						<h3>Start a Game</h3>
+						<p>Create you own game, you'll be the host!</p>
+					</Link>
 				</div>
 				<style jsx>{`
 					.hero {

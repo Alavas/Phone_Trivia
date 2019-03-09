@@ -220,14 +220,14 @@ class Host extends Component {
 						case gameStates.CREATED:
 							return (
 								<div className="row">
-									<a
+									<p
 										className="card"
 										onClick={() =>
 											this.updateGame(gameStates.STARTED)
 										}
 									>
 										<h4>Begin Game</h4>
-									</a>
+									</p>
 									<div className="qr">
 										<QRCode
 											value={`${
@@ -241,12 +241,12 @@ class Host extends Component {
 											renderAs={'svg'}
 										/>
 									</div>
-									<a
+									<p
 										className="card"
 										onClick={() => this.toggleModal()}
 									>
 										<h4>Connect Gameboard</h4>
-									</a>
+									</p>
 									<Modal
 										isOpen={this.state.modal}
 										toggle={this.toggleModal}
@@ -277,46 +277,46 @@ class Host extends Component {
 						case gameStates.STARTED:
 							return (
 								<div className="row">
-									<a
+									<p
 										className="card"
 										onClick={() => this.nextQuestion()}
 									>
 										<h3>Start the questions...</h3>
-									</a>
-									<a className="info">
+									</p>
+									<p className="info">
 										There are {this.state.players} players waiting.
-									</a>
+									</p>
 								</div>
 							)
 						case gameStates.QUESTIONS:
 							return (
 								<div className="row">
-									<a
+									<p
 										className="card"
 										onClick={() => this.nextQuestion()}
 									>
 										<h3>Next Question</h3>
-									</a>
-									<a className="info">
+									</p>
+									<p className="info">
 										<h4>{this.state.qNumber}</h4>
-									</a>
-									<a className="info">
+									</p>
+									<p className="info">
 										<h4>{this.state.questionID}</h4>
-									</a>
-									<a className="info">
+									</p>
+									<p className="info">
 										<h4>{this.state.answertype}</h4>
-									</a>
+									</p>
 								</div>
 							)
 						case gameStates.ENDED:
 							return (
 								<div className="row">
-									<a className="info">
+									<p className="info">
 										<h1>GAME OVER</h1>
-									</a>
-									<a className="card" onClick={() => this.endGame()}>
+									</p>
+									<p className="card" onClick={() => this.endGame()}>
 										<h3>EXIT GAME</h3>
-									</a>
+									</p>
 								</div>
 							)
 						default:
@@ -326,7 +326,7 @@ class Host extends Component {
 				<style jsx>{`
 					:global(html) {
 						width: 100vw;
-						height: 100vhnav;
+						height: 100vh;
 						font-size: 12px !important;
 					}
 					.row {
@@ -365,6 +365,7 @@ class Host extends Component {
 						padding: 12px 0 0;
 						font-size: 13px;
 						color: #333;
+						cursor: pointer;
 					}
 				`}</style>
 			</div>
