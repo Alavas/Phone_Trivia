@@ -1,7 +1,19 @@
 import QrReader from 'react-qr-reader'
 import React, { Component } from 'react'
 import QRCode from 'qrcode.react'
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
+import {
+	Button,
+	Col,
+	Row,
+	Form,
+	FormGroup,
+	Label,
+	Input,
+	Modal,
+	ModalHeader,
+	ModalBody,
+	ModalFooter
+} from 'reactstrap'
 import {
 	getCookie,
 	updateCookie,
@@ -19,6 +31,7 @@ import {
 	convertImage
 } from '../utilities'
 import Nav from '../components/Nav'
+import '../styles/host.css'
 
 class Host extends Component {
 	constructor() {
@@ -161,73 +174,103 @@ class Host extends Component {
 
 	render() {
 		return (
-			<div>
-				{this.state.gamestate !== gameStates.ENDED ? (
-					<Nav avatar={this.state.avatar} />
-				) : null}
+			<div className="host-container">
+				<Nav avatar={this.state.avatar} />
 				{(() => {
 					switch (this.state.gamestate) {
 						case gameStates.NOTSTARTED:
 							return (
-								<div className="row" style={{ width: '200px' }}>
-									<h4>Select Game Options</h4>
-									<form onSubmit={this.submit}>
-										<h5>How many questions?</h5>
-										<input
-											type="number"
-											name="amount"
-											min="10"
-											max="50"
-											defaultValue="10"
-											ref={this.amount}
-										/>
-										<h5>Category?</h5>
-										<select name="category" ref={this.category}>
-											{gameCategories.map((choice, index) => {
-												return (
-													<option key={index} value={choice.value}>
-														{choice.display}
-													</option>
-												)
-											})}
-										</select>
-										<h5>How difficult?</h5>
-										<select ref={this.difficulty}>
-											{gameDifficulties.map((choice, index) => {
-												return (
-													<option key={index} value={choice.value}>
-														{choice.display}
-													</option>
-												)
-											})}
-										</select>
-										<h5>Question type?</h5>
-										<select ref={this.type}>
-											{questionType.map((choice, index) => {
-												return (
-													<option key={index} value={choice.value}>
-														{choice.display}
-													</option>
-												)
-											})}
-										</select>
-										<br />
-										<br />
-										<input type="submit" />
-									</form>
+								<div className="host-ui">
+									<h3>Choose Game Options</h3>
+									<Form onSubmit={this.submit}>
+										<Row form>
+											<Col xs={5}>
+												<FormGroup>
+													<Label>Number of Questions</Label>
+													<Input
+														type="number"
+														name="amount"
+														min="10"
+														max="50"
+														defaultValue="10"
+														innerRef={this.amount}
+													/>
+												</FormGroup>
+											</Col>
+											<Col xs={7}>
+												<FormGroup>
+													<Label>Question type?</Label>
+													<Input
+														type="select"
+														innerRef={this.type}
+													>
+														{questionType.map((choice, index) => {
+															return (
+																<option
+																	key={index}
+																	value={choice.value}
+																>
+																	{choice.display}
+																</option>
+															)
+														})}
+													</Input>
+												</FormGroup>
+											</Col>
+										</Row>
+										<FormGroup>
+											<Label>Category</Label>
+											<Input
+												type="select"
+												name="category"
+												innerRef={this.category}
+											>
+												{gameCategories.map((choice, index) => {
+													return (
+														<option
+															key={index}
+															value={choice.value}
+														>
+															{choice.display}
+														</option>
+													)
+												})}
+											</Input>
+										</FormGroup>
+										<FormGroup>
+											<Label>Difficulty</Label>
+											<Input
+												type="select"
+												innerRef={this.difficulty}
+											>
+												{gameDifficulties.map((choice, index) => {
+													return (
+														<option
+															key={index}
+															value={choice.value}
+														>
+															{choice.display}
+														</option>
+													)
+												})}
+											</Input>
+										</FormGroup>
+										<Button color="primary">Submit</Button>
+									</Form>
 								</div>
 							)
 						case gameStates.CREATED:
 							return (
-								<div className="row">
-									<p
-										className="card"
+								<div className="host-ui">
+									<Button
+										color="success"
+										size="lg"
 										onClick={() =>
 											this.updateGame(gameStates.STARTED)
 										}
 									>
-										<h4>Begin Game</h4>
-									</p>
+										Begin Game
+									</Button>
 									<div className="qr">
 										<QRCode
 											value={`${
@@ -237,16 +280,17 @@ class Host extends Component {
 											bgColor={'#ffffff'}
 											fgColor={'#000000'}
 											level={'L'}
-											includeMargin={false}
+											includeMargin={true}
 											renderAs={'svg'}
 										/>
 									</div>
-									<p
-										className="card"
+									<Button
+										color="danger"
+										size="lg"
 										onClick={() => this.toggleModal()}
 									>
-										<h4>Connect Gameboard</h4>
-									</p>
+										Connect Gameboard
+									</Button>
 									<Modal
 										isOpen={this.state.modal}
 										toggle={this.toggleModal}
@@ -260,7 +304,9 @@ class Host extends Component {
 												delay={300}
 												onError={this.handleError}
 												onScan={this.handleScan}
-												style={{ width: '100%' }}
+												style={{
+													width: '100%'
+												}}
 											/>
 										</ModalBody>
 										<ModalFooter>
@@ -276,27 +322,26 @@ class Host extends Component {
 							)
 						case gameStates.STARTED:
 							return (
-								<div className="row">
-									<p
-										className="card"
+								<div className="host-ui">
+									<Button
+										color="success"
+										size="lg"
 										onClick={() => this.nextQuestion()}
 									>
-										<h3>Start the questions...</h3>
-									</p>
-									<p className="info">
-										There are {this.state.players} players waiting.
-									</p>
+										Start the questions...
+									</Button>
 								</div>
 							)
 						case gameStates.QUESTIONS:
 							return (
-								<div className="row">
-									<p
-										className="card"
+								<div className="host-ui">
+									<Button
+										color="success"
+										size="lg"
 										onClick={() => this.nextQuestion()}
 									>
-										<h3>Next Question</h3>
-									</p>
+										Next Question
+									</Button>
 									<p className="info">
 										<h4>{this.state.qNumber}</h4>
 									</p>
@@ -310,64 +355,23 @@ class Host extends Component {
 							)
 						case gameStates.ENDED:
 							return (
-								<div className="row">
+								<div className="host-ui">
 									<p className="info">
 										<h1>GAME OVER</h1>
 									</p>
-									<p className="card" onClick={() => this.endGame()}>
-										<h3>EXIT GAME</h3>
-									</p>
+									<Button
+										color="danger"
+										size="lg"
+										onClick={() => this.endGame()}
+									>
+										EXIT GAME
+									</Button>
 								</div>
 							)
 						default:
 							return null
 					}
 				})()}
-				<style jsx>{`
-					:global(html) {
-						width: 100vw;
-						height: 100vh;
-						font-size: 12px !important;
-					}
-					.row {
-						max-width: 60%;
-						margin-left: auto;
-						margin-right: auto;
-						display: flex;
-						flex-direction: column;
-						justify-content: center;
-						height: calc(100vh - 65px);
-					}
-					.info {
-						padding: 18px 18px 24px;
-						margin-bottom: 25px;
-						text-decoration: none;
-						text-align: center;
-						color: #067df7;
-					}
-					.card {
-						padding: 18px 18px 24px;
-						margin-bottom: 25px;
-						text-decoration: none;
-						text-align: center;
-						color: #067df7;
-						border: 1px solid #9b9b9b;
-					}
-					.qr {
-						margin-bottom: 25px;
-						text-align: center;
-					}
-					.card:hover {
-						border-color: #067df7;
-					}
-					.card p {
-						margin: 0;
-						padding: 12px 0 0;
-						font-size: 13px;
-						color: #333;
-						cursor: pointer;
-					}
-				`}</style>
 			</div>
 		)
 	}

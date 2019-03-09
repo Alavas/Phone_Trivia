@@ -7,11 +7,11 @@ import Player from './containers/Player'
 
 class App extends Component {
 	render() {
-		console.log(process.env)
 		return (
 			<Switch>
 				<Route exact path="/host" component={Host} />
 				<Route exact path="/game" component={Game} />
+				<Route exact path="/player/:gameKey" component={Player} />
 				<Route exact path="/player" component={Player} />
 				<Route exact path="/" component={Home} />
 				<Redirect to="/" />

@@ -8,6 +8,7 @@ import {
 	loginUser,
 	updateUser
 } from '../utilities'
+import '../styles/home.css'
 
 class Home extends Component {
 	constructor() {
@@ -53,78 +54,25 @@ class Home extends Component {
 
 	render() {
 		return (
-			<div className="hero">
+			<div className="home-container">
 				<h1 className="title">Welcome to Phone Trivia!</h1>
-				<p className="description">
-					You can either join an existing game, display a scoreboard, or
-					start a new game.
-				</p>
-
-				<div className="column">
-					<Link to="/player" className="card">
+				<div className="route-container">
+					<Link to="/player" className="route">
 						<h3>Join a Game</h3>
 						<p>
 							You'll need access to the game QR code or the unique game
 							ID.
 						</p>
 					</Link>
-					<Link to="/game" className="card">
+					<Link to="/game" className="route">
 						<h3>Display a gameboard</h3>
 						<p>The host will connect it to the game.</p>
 					</Link>
-					<Link to="/host" className="card">
+					<Link to="/host" className="route">
 						<h3>Start a Game</h3>
 						<p>Create you own game, you'll be the host!</p>
 					</Link>
 				</div>
-				<style jsx>{`
-					.hero {
-						width: 100%;
-						color: #333;
-					}
-					.title {
-						margin: 0;
-						width: 100%;
-						padding-top: 80px;
-						line-height: 1.15;
-						font-size: 48px;
-					}
-					.title,
-					.description {
-						text-align: center;
-					}
-					.column {
-						max-width: 220px;
-						display: flex;
-						flex-direction: column;
-						justify-content: center;
-						margin-left: auto;
-						margin-right: auto;
-					}
-					.card {
-						padding: 18px 18px 24px;
-						width: 220px;
-						margin-bottom: 10px;
-						text-align: left;
-						text-decoration: none !important;
-						color: #434343;
-						border: 1px solid #9b9b9b;
-					}
-					.card:hover {
-						border-color: #067df7;
-					}
-					.card h3 {
-						margin: 0;
-						color: #067df7;
-						font-size: 18px;
-					}
-					.card p {
-						margin: 0;
-						padding: 12px 0 0;
-						font-size: 13px;
-						color: #333;
-					}
-				`}</style>
 			</div>
 		)
 	}

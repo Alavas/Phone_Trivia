@@ -1,7 +1,10 @@
 import React, { Component } from 'react'
 import QRCode from 'qrcode.react'
 import Websocket from 'react-websocket'
+import { withRouter } from 'react-router-dom'
 import QrReader from 'react-qr-reader'
+import { Alert, Button } from 'reactstrap'
+import _ from 'lodash'
 import {
 	getCookie,
 	updateCookie,
@@ -14,6 +17,7 @@ import {
 	updateUser
 } from '../utilities'
 import Nav from '../components/Nav'
+import '../styles/player.css'
 
 class Player extends Component {
 	constructor() {
@@ -24,7 +28,7 @@ class Player extends Component {
 			result: 'No Result',
 			validGame: false,
 			gamestate: null,
-			gameID: '',
+			gameID: null,
 			answer: null,
 			qNumber: 0,
 			qStart: 0,
@@ -34,11 +38,10 @@ class Player extends Component {
 		}
 	}
 
-	static getInitialProps({ query }) {
-		return { gameID: query.gameKey }
-	}
-
 	componentDidMount() {
+		if (!_.isUndefined(this.props.match.params.gameKey)) {
+			this.setState({ gameID: this.props.match.params.gameKey })
+		}
 		this.handlePageOpened()
 	}
 
@@ -56,8 +59,8 @@ class Player extends Component {
 			userID = generateUUID(window.navigator.userAgent)
 		}
 		const loggedIn = await this.userLogin(userID)
-		if (loggedIn && this.props.gameID != null) {
-			const gameID = this.props.gameID
+		if (loggedIn && this.state.gameID != null) {
+			const gameID = this.state.gameID
 			const joined = await joinGame({ userID, gameID })
 			if (joined) {
 				this.setState({ joined: true, gamestate: 1 })
@@ -133,14 +136,13 @@ class Player extends Component {
 	}
 
 	render() {
+		console.log(process.env.REACT_APP_GAMESHOW_ENDPOINT)
 		if (this.state.gamestate === gameStates.RESET) {
 			window.location = process.env.REACT_APP_GAMESHOW_ENDPOINT
 		}
 		return (
-			<div>
-				{this.state.gamestate !== gameStates.ENDED ? (
-					<Nav avatar={this.state.avatar} />
-				) : null}
+			<div className="player-container">
+				<Nav avatar={this.state.avatar} />
 				{this.state.joined ? (
 					<Websocket
 						url={process.env.REACT_APP_GAMESHOW_WEBSOCKET}
@@ -152,29 +154,22 @@ class Player extends Component {
 					switch (this.state.gamestate) {
 						case gameStates.NOTSTARTED:
 							return (
-								<div className="row">
-									{QrReader ? (
-										<QrReader
-											delay={300}
-											onError={this.handleError}
-											onScan={this.handleScan}
-											style={{ width: '100%' }}
-											className="card"
-										/>
-									) : null}
-									{this.state.validGame ? (
-										<p>JOIN</p>
-									) : (
-										<p>Scan a game QR code.</p>
-									)}
+								<div className="player-ui">
+									<QrReader
+										delay={300}
+										onError={this.handleError}
+										onScan={this.handleScan}
+										className="card"
+									/>
+									<p>Scan a game QR code.</p>
 								</div>
 							)
 						case gameStates.CREATED:
 							return (
-								<div className="row">
-									<p className="card">
-										<h3>WAITING TO BEGIN...</h3>
-									</p>
+								<div className="player-ui">
+									<Alert color="success" size="lg">
+										WAITING TO BEGIN...
+									</Alert>
 									<div className="qr">
 										<QRCode
 											value={`${
@@ -184,27 +179,27 @@ class Player extends Component {
 											bgColor={'#ffffff'}
 											fgColor={'#000000'}
 											level={'L'}
-											includeMargin={false}
+											includeMargin={true}
 											renderAs={'svg'}
 										/>
 									</div>
-									<p className="card">
-										<h3>LEAVE GAME</h3>
-									</p>
+									<Button color="danger" size="lg">
+										LEAVE GAME
+									</Button>
 								</div>
 							)
 						case gameStates.STARTED:
 							return (
-								<div className="row">
-									<p className="card">
+								<div className="player-ui">
+									<div className="card">
 										<h3>Waiting for a question...</h3>
-									</p>
+									</div>
 								</div>
 							)
 						case gameStates.QUESTIONS:
 							return (
-								<div className="row">
-									<h3>Question Number {this.state.qNumber}</h3>
+								<div className="player-ui">
+									<h3>Question {this.state.qNumber}</h3>
 									{this.state.answertype === 'boolean' ? (
 										<React.Fragment>
 											<p
@@ -238,130 +233,81 @@ class Player extends Component {
 										</React.Fragment>
 									) : (
 										<React.Fragment>
-											<p
-												style={{ backgroundColor: '#24d678' }}
+											<Button
+												color="success"
+												size="lg"
 												className={
 													this.state.answer === null
-														? 'card'
+														? ''
 														: this.state.answer === 'A'
-														? 'card answer'
-														: 'card disabled'
+														? 'answer'
+														: 'disabled'
 												}
 												onClick={() => this.sendAnswer('A')}
 											>
-												<h3>A</h3>
-											</p>
-											<p
-												style={{ backgroundColor: '#2789c2' }}
+												A
+											</Button>
+											<Button
+												color="primary"
+												size="lg"
 												className={
 													this.state.answer === null
-														? 'card'
+														? ''
 														: this.state.answer === 'B'
-														? 'card answer'
-														: 'card disabled'
+														? 'answer'
+														: 'disabled'
 												}
 												onClick={() => this.sendAnswer('B')}
 											>
-												<h3>B</h3>
-											</p>
-											<p
-												style={{ backgroundColor: '#fbcb00' }}
+												B
+											</Button>
+											<Button
+												color="warning"
+												size="lg"
 												className={
 													this.state.answer === null
-														? 'card'
+														? ''
 														: this.state.answer === 'C'
-														? 'card answer'
-														: 'card disabled'
+														? 'answer'
+														: 'disabled'
 												}
 												onClick={() => this.sendAnswer('C')}
 											>
-												<h3>C</h3>
-											</p>
-											<p
-												style={{ backgroundColor: '#f2493f' }}
+												C
+											</Button>
+											<Button
+												color="danger"
+												size="lg"
 												className={
 													this.state.answer === null
-														? 'card'
+														? ''
 														: this.state.answer === 'D'
-														? 'card answer'
-														: 'card disabled'
+														? 'answer'
+														: 'disabled'
 												}
 												onClick={() => this.sendAnswer('D')}
 											>
-												<h3>D</h3>
-											</p>
+												D
+											</Button>
 										</React.Fragment>
 									)}
 								</div>
 							)
 						case gameStates.ENDED:
 							return (
-								<div className="row">
-									<p className="card">
+								<div className="player-ui">
+									<div className="card">
 										<h1>GAME OVER</h1>
-									</p>
+									</div>
 								</div>
 							)
 						default:
 							return null
 					}
 				})()}
-				<style jsx>{`
-					:global(html) {
-						width: 100vw;
-						height: 100vhnav;
-						font-size: 12px !important;
-					}
-					.row {
-						max-width: 60%;
-						margin-left: auto;
-						margin-right: auto;
-						display: flex;
-						flex-direction: column;
-						justify-content: center;
-						height: calc(100vh - 68.3px);
-					}
-					.qr {
-						margin-bottom: 25px;
-						text-align: center;
-					}
-					.card {
-						padding: 18px 18px 24px;
-						margin-bottom: 25px;
-						text-decoration: none;
-						text-align: center;
-						border: 1px solid #9b9b9b;
-					}
-					.card:hover {
-						border-color: #067df7;
-					}
-					.card p {
-						margin: 0;
-						padding: 12px 0 0;
-						font-size: 13px;
-						color: #000000;
-					}
-					.card h3 {
-						color: black !important;
-					}
-					.disabled {
-						pointer-events: none;
-						cursor: not-allowed;
-						opacity: 0.25;
-						filter: alpha(opacity=25);
-						-webkit-box-shadow: none;
-						box-shadow: none;
-					}
-					.answer {
-						pointer-events: none;
-						cursor: not-allowed;
-						box-shadow: none;
-						border: 3px solid #9b9b9b;
-					}
-				`}</style>
 			</div>
 		)
 	}
 }
 
-export default Player
+export default withRouter(Player)

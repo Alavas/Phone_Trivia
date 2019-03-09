@@ -1,0 +1,39 @@
+.host-container {
+  width: 100vw;
+  height: calc(100vh - 65px);
+  background-color: #212529;
+}
+
+.host-ui {
+  max-width: 500px;
+  width: 85%;
+  height: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.host-ui h3,
+h4,
+label {
+  color: white;
+  text-align: center;
+}
+
+.info {
+  padding: 18px 18px 24px;
+  margin-bottom: 25px;
+  text-decoration: none;
+  text-align: center;
+  color: #067df7;
+}
+
+.qr {
+  margin-top: 25px;
+  margin-bottom: 25px;
+  text-align: center;
+}
+
+/*# sourceMappingURL=host.css.map */
