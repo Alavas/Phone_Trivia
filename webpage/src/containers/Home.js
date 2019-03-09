@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
-import Link from 'next/link'
-import Head from '../components/head'
+import { Link } from 'react-router-dom'
 import {
 	generateUUID,
+	convertImage,
 	getCookie,
 	updateCookie,
 	loginUser,
@@ -54,8 +54,6 @@ class Home extends Component {
 	render() {
 		return (
 			<div>
-				<Head title="Gameshow" />
-
 				<div className="hero">
 					<h1 className="title">Welcome to Phone Trivia!</h1>
 					<p className="description">
@@ -63,31 +61,24 @@ class Home extends Component {
 						start a new game.
 					</p>
 
-					<div className="row">
-						<Link href="/player">
-							<a className="card">
-								<h3>Join a Game</h3>
-								<p>
-									You'll need access to the game QR code or the unique
-									game ID.
-								</p>
-							</a>
+					<div className="column">
+						<Link to="/player" className="card">
+							<h3>Join a Game</h3>
+							<p>
+								You'll need access to the game QR code or the unique
+								game ID.
+							</p>
 						</Link>
-						<Link href="/game">
-							<a className="card">
-								<h3>Display a gameboard</h3>
-								<p>The host will connect it to the game.</p>
-							</a>
+						<Link to="/game" className="card">
+							<h3>Display a gameboard</h3>
+							<p>The host will connect it to the game.</p>
 						</Link>
-						<Link href="/host">
-							<a className="card">
-								<h3>Start a Game</h3>
-								<p>Create you own game, you'll be the host!</p>
-							</a>
+						<Link to="/host" className="card">
+							<h3>Start a Game</h3>
+							<p>Create you own game, you'll be the host!</p>
 						</Link>
 					</div>
 				</div>
-
 				<style jsx>{`
 					.hero {
 						width: 100%;
@@ -104,18 +95,20 @@ class Home extends Component {
 					.description {
 						text-align: center;
 					}
-					.row {
-						max-width: 880px;
-						margin: 80px auto 40px;
+					.column {
+						max-width: 220px;
 						display: flex;
-						flex-direction: row;
-						justify-content: space-around;
+						flex-direction: column;
+						justify-content: center;
+						margin-left: auto;
+						margin-right: auto;
 					}
 					.card {
 						padding: 18px 18px 24px;
 						width: 220px;
+						margin-bottom: 10px;
 						text-align: left;
-						text-decoration: none;
+						text-decoration: none !important;
 						color: #434343;
 						border: 1px solid #9b9b9b;
 					}

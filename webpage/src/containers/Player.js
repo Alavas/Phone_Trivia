@@ -1,9 +1,7 @@
-if (typeof window != 'undefined') {
-	var QrReader = require('react-qr-reader')
-}
 import React, { Component } from 'react'
 import QRCode from 'qrcode.react'
 import Websocket from 'react-websocket'
+import QrReader from 'react-qr-reader'
 import {
 	getCookie,
 	updateCookie,
@@ -15,10 +13,7 @@ import {
 	gameStates,
 	updateUser
 } from '../utilities'
-import Head from '../components/head'
-import Nav from '../components/nav'
-
-/*{gameID: "b467a78b-ec9d-45e7-a595-d6903c9ddc22", gamestate: 3, qNumber: 1, questionID: "f006b954-1d86-4a48-8752-05e150430418", answertype: "multiple"} */
+import Nav from '../components/Nav'
 
 class Player extends Component {
 	constructor() {
@@ -28,7 +23,7 @@ class Player extends Component {
 			avatar: null,
 			result: 'No Result',
 			validGame: false,
-			gamestate: null,
+			gamestate: gameStates.QUESTIONS,
 			gameID: '',
 			answer: null,
 			qNumber: 0,
@@ -139,17 +134,16 @@ class Player extends Component {
 
 	render() {
 		if (this.state.gamestate === gameStates.RESET) {
-			window.location = process.env.GAMESHOW_ENDPOINT
+			window.location = process.env.REACT_APP_GAMESHOW_ENDPOINT
 		}
 		return (
 			<div>
-				<Head title="Gameshow" />
 				{this.state.gamestate !== gameStates.ENDED ? (
 					<Nav avatar={this.state.avatar} />
 				) : null}
 				{this.state.joined ? (
 					<Websocket
-						url={process.env.GAMESHOW_WEBSOCKET}
+						url={process.env.REACT_APP_GAMESHOW_WEBSOCKET}
 						protocol={this.props.gameID}
 						onMessage={this.handleData.bind(this)}
 					/>
@@ -184,7 +178,7 @@ class Player extends Component {
 									<div className="qr">
 										<QRCode
 											value={`${
-												process.env.GAMESHOW_ENDPOINT
+												process.env.REACT_APP_GAMESHOW_ENDPOINT
 											}/player/${this.props.gameID}`}
 											size={225}
 											bgColor={'#ffffff'}
@@ -214,7 +208,9 @@ class Player extends Component {
 									{this.state.answertype === 'boolean' ? (
 										<React.Fragment>
 											<a
-												style={{ backgroundColor: '#FFF0000' }}
+												style={{
+													backgroundColor: '#FFF0000'
+												}}
 												className={
 													this.state.answer === null
 														? 'card'
@@ -243,7 +239,7 @@ class Player extends Component {
 									) : (
 										<React.Fragment>
 											<a
-												style={{ backgroundColor: '#FF0000' }}
+												style={{ backgroundColor: '#24d678' }}
 												className={
 													this.state.answer === null
 														? 'card'
@@ -256,7 +252,7 @@ class Player extends Component {
 												<h3>A</h3>
 											</a>
 											<a
-												style={{ backgroundColor: '#FFFF00' }}
+												style={{ backgroundColor: '#2789c2' }}
 												className={
 													this.state.answer === null
 														? 'card'
@@ -269,7 +265,7 @@ class Player extends Component {
 												<h3>B</h3>
 											</a>
 											<a
-												style={{ backgroundColor: '#008000' }}
+												style={{ backgroundColor: '#fbcb00' }}
 												className={
 													this.state.answer === null
 														? 'card'
@@ -282,7 +278,7 @@ class Player extends Component {
 												<h3>C</h3>
 											</a>
 											<a
-												style={{ backgroundColor: '#0000FF' }}
+												style={{ backgroundColor: '#f2493f' }}
 												className={
 													this.state.answer === null
 														? 'card'
@@ -310,7 +306,6 @@ class Player extends Component {
 							return null
 					}
 				})()}
-
 				<style jsx>{`
 					:global(html) {
 						width: 100vw;
@@ -335,7 +330,6 @@ class Player extends Component {
 						margin-bottom: 25px;
 						text-decoration: none;
 						text-align: center;
-						color: #000000;
 						border: 1px solid #9b9b9b;
 					}
 					.card:hover {
@@ -346,6 +340,9 @@ class Player extends Component {
 						padding: 12px 0 0;
 						font-size: 13px;
 						color: #000000;
+					}
+					.card h3 {
+						color: black !important;
 					}
 					.disabled {
 						pointer-events: none;

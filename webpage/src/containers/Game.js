@@ -11,8 +11,7 @@ import {
 	ListGroup,
 	ListGroupItem
 } from 'reactstrap'
-import Head from '../components/head'
-import Nav from '../components/nav'
+import Nav from '../components/Nav'
 import {
 	getCookie,
 	updateCookie,
@@ -77,11 +76,10 @@ class Game extends Component {
 		}
 		return (
 			<div>
-				<Head title="Gameshow" />
 				<Nav avatar={this.state.avatar} />
 				{this.state.userID !== '' ? (
 					<Websocket
-						url={process.env.GAMESHOW_WEBSOCKET}
+						url={process.env.REACT_APP_GAMESHOW_WEBSOCKET}
 						protocol={`${this.state.userID}`}
 						onMessage={this.handleData.bind(this)}
 						reconnect={true}
@@ -132,7 +130,7 @@ class Game extends Component {
 										>
 											<QRCode
 												value={`${
-													process.env.GAMESHOW_ENDPOINT
+													process.env.REACT_APP_GAMESHOW_ENDPOINT
 												}/player/${this.state.gameID}`}
 												size={400}
 												bgColor={'#ffffff'}

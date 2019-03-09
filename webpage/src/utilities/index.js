@@ -48,7 +48,7 @@ export const generateUUID = UA => {
 export const loginUser = async userID => {
 	let data = JSON.stringify({ userID })
 	const userDetails = await fetch(
-		`${process.env.GAMESHOW_ENDPOINT}/api/user`,
+		`${process.env.REACT_APP_GAMESHOW_ENDPOINT}/api/user`,
 		{
 			method: 'POST',
 			headers: {
@@ -63,109 +63,133 @@ export const loginUser = async userID => {
 
 export const updateUser = async ({ userID, avatar }) => {
 	let data = JSON.stringify({ userID, avatar })
-	const user = await fetch(`${process.env.GAMESHOW_ENDPOINT}/api/user`, {
-		method: 'PUT',
-		headers: {
-			Accept: 'application/json, text/plain, */*',
-			'Content-Type': 'application/json'
-		},
-		body: data
-	})
+	const user = await fetch(
+		`${process.env.REACT_APP_GAMESHOW_ENDPOINT}/api/user`,
+		{
+			method: 'PUT',
+			headers: {
+				Accept: 'application/json, text/plain, */*',
+				'Content-Type': 'application/json'
+			},
+			body: data
+		}
+	)
 	return user
 }
 
 export const getGames = async () => {
-	const games = await fetch(`${process.env.GAMESHOW_ENDPOINT}/api/game`, {
-		method: 'GET',
-		headers: {
-			Accept: 'application/json, text/plain, */*',
-			'Content-Type': 'application/json'
+	const games = await fetch(
+		`${process.env.REACT_APP_GAMESHOW_ENDPOINT}/api/game`,
+		{
+			method: 'GET',
+			headers: {
+				Accept: 'application/json, text/plain, */*',
+				'Content-Type': 'application/json'
+			}
 		}
-	}).then(res => res.json())
+	).then(res => res.json())
 	return games
 }
 
 //Request to create a new game.
 export const createGame = async gameSettings => {
 	let data = JSON.stringify({ gameSettings })
-	const game = await fetch(`${process.env.GAMESHOW_ENDPOINT}/api/game`, {
-		method: 'POST',
-		headers: {
-			Accept: 'application/json, text/plain, */*',
-			'Content-Type': 'application/json'
-		},
-		body: data
-	}).then(res => res.json())
+	const game = await fetch(
+		`${process.env.REACT_APP_GAMESHOW_ENDPOINT}/api/game`,
+		{
+			method: 'POST',
+			headers: {
+				Accept: 'application/json, text/plain, */*',
+				'Content-Type': 'application/json'
+			},
+			body: data
+		}
+	).then(res => res.json())
 	return game.gameid
 }
 
 //Update gamestate and question number to display.
 export const updateGame = async ({ state, gameID, qNumber }) => {
 	let data = JSON.stringify({ state, gameID, qNumber })
-	const game = await fetch(`${process.env.GAMESHOW_ENDPOINT}/api/game`, {
-		method: 'PUT',
-		headers: {
-			Accept: 'application/json, text/plain, */*',
-			'Content-Type': 'application/json'
-		},
-		body: data
-	}).then(res => res.json())
+	const game = await fetch(
+		`${process.env.REACT_APP_GAMESHOW_ENDPOINT}/api/game`,
+		{
+			method: 'PUT',
+			headers: {
+				Accept: 'application/json, text/plain, */*',
+				'Content-Type': 'application/json'
+			},
+			body: data
+		}
+	).then(res => res.json())
 	return game
 }
 
 //Delete a completed game.
 export const deleteGame = async gameID => {
 	let data = JSON.stringify({ gameID })
-	const deleted = await fetch(`${process.env.GAMESHOW_ENDPOINT}/api/game`, {
-		method: 'DELETE',
-		headers: {
-			Accept: 'application/json, text/plain, */*',
-			'Content-Type': 'application/json'
-		},
-		body: data
-	}).then(res => res.json())
+	const deleted = await fetch(
+		`${process.env.REACT_APP_GAMESHOW_ENDPOINT}/api/game`,
+		{
+			method: 'DELETE',
+			headers: {
+				Accept: 'application/json, text/plain, */*',
+				'Content-Type': 'application/json'
+			},
+			body: data
+		}
+	).then(res => res.json())
 	return deleted
 }
 
 //Join a game from QR code.
 export const joinGame = async ({ userID, gameID }) => {
 	let data = JSON.stringify({ userID, gameID })
-	const joined = await fetch(`${process.env.GAMESHOW_ENDPOINT}/api/player`, {
-		method: 'POST',
-		headers: {
-			Accept: 'application/json, text/plain, */*',
-			'Content-Type': 'application/json'
-		},
-		body: data
-	}).then(res => res.json())
+	const joined = await fetch(
+		`${process.env.REACT_APP_GAMESHOW_ENDPOINT}/api/player`,
+		{
+			method: 'POST',
+			headers: {
+				Accept: 'application/json, text/plain, */*',
+				'Content-Type': 'application/json'
+			},
+			body: data
+		}
+	).then(res => res.json())
 	return joined
 }
 
 //Submit answer to the current game.
 export const submitAnswer = async answer => {
 	let data = JSON.stringify({ answer })
-	const result = await fetch(`${process.env.GAMESHOW_ENDPOINT}/api/score`, {
-		method: 'POST',
-		headers: {
-			Accept: 'application/json, text/plain, */*',
-			'Content-Type': 'application/json'
-		},
-		body: data
-	})
+	const result = await fetch(
+		`${process.env.REACT_APP_GAMESHOW_ENDPOINT}/api/score`,
+		{
+			method: 'POST',
+			headers: {
+				Accept: 'application/json, text/plain, */*',
+				'Content-Type': 'application/json'
+			},
+			body: data
+		}
+	)
 	return result
 }
 
 //Connect gameboard to game.
 export const connectGameboard = async gameboard => {
 	let data = JSON.stringify(gameboard)
-	const board = await fetch(`${process.env.GAMESHOW_ENDPOINT}/api/gameboard`, {
-		method: 'POST',
-		headers: {
-			Accept: 'application/json, text/plain, */*',
-			'Content-Type': 'application/json'
-		},
-		body: data
-	})
+	const board = await fetch(
+		`${process.env.REACT_APP_GAMESHOW_ENDPOINT}/api/gameboard`,
+		{
+			method: 'POST',
+			headers: {
+				Accept: 'application/json, text/plain, */*',
+				'Content-Type': 'application/json'
+			},
+			body: data
+		}
+	)
 	return board
 }
 

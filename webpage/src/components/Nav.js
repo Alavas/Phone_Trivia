@@ -1,23 +1,16 @@
 import React from 'react'
-import Link from 'next/link'
+import { withRouter, Link } from 'react-router-dom'
 import _ from 'lodash'
-import 'bootstrap/dist/css/bootstrap.min.css'
 
 const Nav = props => {
 	return (
 		<nav className="fixed-bottom">
 			<ul>
 				<li>
-					<Link prefetch href="/">
-						<a>HOME</a>
-					</Link>
+					<Link to="/">HOME</Link>
 				</li>
 				<ul>
-					<li>
-						<Link href="https://github.com/alavas">
-							<a className="align-middle">PHONETRIVIA</a>
-						</Link>
-					</li>
+					<li>PHONETRIVIA</li>
 					<li
 						style={
 							_.isNull(props.avatar)
@@ -25,7 +18,7 @@ const Nav = props => {
 								: { padding: '0px', marginTop: '2.5px' }
 						}
 					>
-						<img src={props.avatar} className="avatar" />
+						<img src={props.avatar} alt="avatar" className="avatar" />
 					</li>
 				</ul>
 			</ul>
@@ -75,4 +68,4 @@ const Nav = props => {
 	)
 }
 
-export default Nav
+export default withRouter(Nav)

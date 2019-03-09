@@ -1,6 +1,4 @@
-if (typeof window != 'undefined') {
-	var QrReader = require('react-qr-reader')
-}
+import QrReader from 'react-qr-reader'
 import React, { Component } from 'react'
 import QRCode from 'qrcode.react'
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
@@ -20,8 +18,7 @@ import {
 	updateUser,
 	convertImage
 } from '../utilities'
-import Head from '../components/head'
-import Nav from '../components/nav'
+import Nav from '../components/Nav'
 
 class Host extends Component {
 	constructor() {
@@ -131,7 +128,7 @@ class Host extends Component {
 		const gameID = this.state.gameID
 		const deleted = await deleteGame(gameID)
 		if (deleted) {
-			window.location = process.env.GAMESHOW_ENDPOINT
+			window.location = process.env.REACT_APP_GAMESHOW_ENDPOINT
 		} else {
 			//TODO: Add error handling here for a failed deletion.
 			console.log('Something went wrong??')
@@ -165,7 +162,6 @@ class Host extends Component {
 	render() {
 		return (
 			<div>
-				<Head title="Gameshow" />
 				{this.state.gamestate !== gameStates.ENDED ? (
 					<Nav avatar={this.state.avatar} />
 				) : null}
@@ -235,7 +231,7 @@ class Host extends Component {
 									<div className="qr">
 										<QRCode
 											value={`${
-												process.env.GAMESHOW_ENDPOINT
+												process.env.REACT_APP_GAMESHOW_ENDPOINT
 											}/player/${this.state.gameID}`}
 											size={225}
 											bgColor={'#ffffff'}
@@ -327,7 +323,6 @@ class Host extends Component {
 							return null
 					}
 				})()}
-
 				<style jsx>{`
 					:global(html) {
 						width: 100vw;
@@ -341,7 +336,7 @@ class Host extends Component {
 						display: flex;
 						flex-direction: column;
 						justify-content: center;
-						height: calc(100vh - 68.3px);
+						height: calc(100vh - 65px);
 					}
 					.info {
 						padding: 18px 18px 24px;
