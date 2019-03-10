@@ -3,6 +3,7 @@ const slashes = require('connect-slashes')
 const https = require('https')
 const http = require('http')
 const cors = require('cors')
+const path = require('path')
 const enforce = require('express-sslify')
 const bodyParser = require('body-parser')
 const ws = require('ws')
@@ -215,6 +216,15 @@ wss.on('connection', function open(ws) {
 wss.on('close', function close() {
 	console.log('disconnected')
 })
+
+if (process.env.NODE_ENV === 'production') {
+	// Serve any static files
+	app.use(express.static(path.join(__dirname, 'webpage/build')))
+	// Handle React routing, return all requests to React app
+	app.get('*', function(req, res) {
+		res.sendFile(path.join(__dirname, 'webpage/build', 'index.html'))
+	})
+}
 
 /* **WebSocket functions.** */
 
