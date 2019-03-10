@@ -4,7 +4,7 @@
 	"description": "Web based game with phone based controls.",
 	"scripts": {
 		"start": "react-scripts start",
-		"build": "react-Scripts build",
+		"build": "react-scripts build",
 		"test": "react-scripts test",
 		"eject": "react-scripts eject"
 	},
