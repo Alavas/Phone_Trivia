@@ -29,6 +29,7 @@ const {
 
 const PORT = parseInt(process.env.PORT, 10) || 5000
 const dev = process.env.NODE_ENV !== 'production'
+console.log(process.env.NODE_ENV)
 //Global variable to store WebSocket clients.
 var clients = []
 

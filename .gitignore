@@ -14,7 +14,7 @@
 avatar-test.js
 
 # production
-/build
+/webpage/build
 /dist
 /.next
 
