@@ -6,7 +6,7 @@
 	"scripts": {
 		"server": "nodemon server.js",
 		"start": "node server.js",
-		"heroku-postbuild": "cd webpage && npm install --only=dev --no-shrinkwrap && npm run build"
+		"heroku-postbuild": "cd webpage && npm install && npm run build"
 	},
 	"author": "Justin Savala",
 	"license": "MIT",
