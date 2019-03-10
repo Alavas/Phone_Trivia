@@ -3,16 +3,17 @@
   font-family: -apple-system, BlinkMacSystemFont, Avenir Next, Avenir, Helvetica, sans-serif;
   width: 100vw;
   height: 100vh;
+  background-color: #212529;
 }
 
-.title {
+.home-title {
   margin: 0;
   width: 100%;
   padding-top: 80px;
   line-height: 1.15;
   font-size: 2.75em;
   text-align: center;
-  color: #212529;
+  color: whitesmoke;
   font-weight: 500;
 }
 
@@ -32,9 +33,7 @@
   margin: 10px;
   text-align: left;
   text-decoration: none !important;
-  color: #434343;
-  background-color: white;
-  border: 1px solid #9b9b9b;
+  background-color: whitesmoke;
 }
 
 .route:hover {
@@ -50,13 +49,13 @@
 .route p {
   margin: 0;
   padding: 12px 0 0;
-  font-size: 0.5em;
+  font-size: 0.6em;
   color: #212529;
 }
 
 @media only screen and (max-width: 600px) {
   .home-container {
-    font-size: 14px !important;
+    font-size: 12px !important;
   }
 
   .route-container {

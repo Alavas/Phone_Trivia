@@ -3,14 +3,7 @@ import Websocket from 'react-websocket'
 import QRCode from 'qrcode.react'
 import he from 'he'
 import _ from 'lodash'
-import {
-	Alert,
-	Card,
-	CardBody,
-	CardTitle,
-	ListGroup,
-	ListGroupItem
-} from 'reactstrap'
+import { Card, CardBody, CardTitle, ListGroup, ListGroupItem } from 'reactstrap'
 import Nav from '../components/Nav'
 import {
 	getCookie,
@@ -19,6 +12,11 @@ import {
 	loginUser,
 	gameStates
 } from '../utilities'
+import '../styles/game.css'
+import A from '../images/A.png'
+import B from '../images/B.png'
+import C from '../images/C.png'
+import D from '../images/D.png'
 
 class Game extends Component {
 	constructor() {
@@ -109,8 +107,7 @@ class Game extends Component {
 											<CardBody>
 												<CardTitle>
 													<h1 className="text-white display-5 fluid">
-														To connect to this gameboard the host
-														must scan the QR code.
+														HOST SCAN HERE
 													</h1>
 												</CardTitle>
 											</CardBody>
@@ -142,7 +139,7 @@ class Game extends Component {
 											<CardBody>
 												<CardTitle>
 													<h1 className="text-white display-5 fluid">
-														Scan to join the game.
+														SCAN TO JOIN
 													</h1>
 												</CardTitle>
 											</CardBody>
@@ -154,24 +151,14 @@ class Game extends Component {
 							return (
 								<div className="waiting-container">
 									<div className="waiting">
-										<h1 className="display-1">
-											Get ready to start...
-										</h1>
+										<h1 className="display-1">GET READY...</h1>
 									</div>
 								</div>
 							)
 						case gameStates.QUESTIONS:
 							return (
 								<div className="questions-container">
-									<div className="title">
-										<i
-											style={{ marginTop: '20px' }}
-											className="fas fa-mobile-alt text-white float-right"
-										/>
-										<h1 className="display-1 text-white">
-											Phone Trivia
-										</h1>
-									</div>
+									<div className="phonetrivia">Phone Trivia</div>
 									<div className="question">
 										<h1 className="display-3 fluid">
 											{he.decode(this.state.question)}
@@ -182,7 +169,7 @@ class Game extends Component {
 											<div className="answer1 border border-white rounded">
 												<img
 													alt="Answer A"
-													src="../static/A.png"
+													src={A}
 													className="a-letter"
 												/>
 												<h1 className="display-4">
@@ -192,7 +179,7 @@ class Game extends Component {
 											<div className="answer2 border border-white rounded">
 												<img
 													alt="Answer B"
-													src="../static/B.png"
+													src={B}
 													className="a-letter"
 												/>
 												<h1 className="display-4">
@@ -202,7 +189,7 @@ class Game extends Component {
 											<div className="answer3 border border-white rounded">
 												<img
 													alt="Answer C"
-													src="../static/C.png"
+													src={C}
 													className="a-letter"
 												/>
 												<h1 className="display-4">
@@ -212,7 +199,7 @@ class Game extends Component {
 											<div className="answer4 border border-white rounded">
 												<img
 													alt="Answer D"
-													src="../static/D.png"
+													src={D}
 													className="a-letter"
 												/>
 												<h1 className="display-4">
@@ -223,20 +210,10 @@ class Game extends Component {
 									) : (
 										<React.Fragment>
 											<div className="boolean-true">
-												<Alert
-													color="success"
-													className="display-3 text-center"
-												>
-													TRUE
-												</Alert>
+												<h1>TRUE</h1>
 											</div>
 											<div className="boolean-false">
-												<Alert
-													color="danger"
-													className="display-3 text-center"
-												>
-													FALSE
-												</Alert>
+												<h1>FALSE</h1>
 											</div>
 										</React.Fragment>
 									)}
@@ -354,178 +331,6 @@ class Game extends Component {
 							break
 					}
 				})()}
-				<style jsx>{`
-					:global(html) {
-						width: 100vw;
-						height: 100vh;
-						font-size: 12px !important;
-					}
-					:global(body) {
-						width: 100vw;
-						height: 100vh;
-						min-width: 1400px;
-					}
-					.winners-container {
-						font-family: 'Dosis', sans-serif;
-						background-color: #212529;
-						width: 100vw;
-						height: calc(100vh - 65px);
-						display: grid;
-						grid-template-columns: 1fr 50px 600px 50px 1fr;
-						grid-template-rows: 1fr repeat(3, 30px 150px) 1fr;
-					}
-					.first-place {
-						text-align: center;
-						background-color: white;
-						grid-area: 2 / 2 / 4 / 5;
-					}
-					.second-place {
-						text-align: center;
-						background-color: white;
-						grid-area: 5 / 3 / 5 / 4;
-					}
-					.third-place {
-						text-align: center;
-						background-color: white;
-						grid-area: 7 / 3 / 8 / 4;
-					}
-					.waiting-container {
-						font-family: 'Dosis', sans-serif;
-						background-color: #212529;
-						width: 100vw;
-						height: calc(100vh - 65px);
-						display: grid;
-						grid-template-columns: 1fr 400px 1fr;
-						grid-template-rows: 1fr 200px 1fr;
-					}
-					.waiting {
-						text-align: center;
-						color: white;
-						grid-area: 2 / 2 / 3 / 3;
-					}
-					.qr-container {
-						font-family: 'Dosis', sans-serif;
-						background-color: #212529;
-						width: 100vw;
-						height: calc(100vh - 65px);
-						display: grid;
-						grid-template-columns: 1fr 400px 1fr;
-						grid-template-rows: 1fr 500px 1fr;
-					}
-					.qr {
-						text-align: center;
-						grid-area: 2 / 2 / 3 / 3;
-					}
-					.questions-container {
-						font-family: 'Dosis', sans-serif;
-						background-color: #212529;
-						width: 100vw;
-						min-width: 1400px;
-						height: calc(100vh - 65px);
-						display: grid;
-						grid-template-columns: 40px 350px 60px 1fr 200px 450px 40px;
-						grid-template-rows: 40px 110px 25px 1fr 25px repeat(
-								4,
-								90px 25px
-							);
-					}
-					.title {
-						text-align: center;
-						font-size: 48px;
-						grid-area: 2 / 6 / 3 / 7;
-						justify-content: center;
-						font-style: italic;
-					}
-					.question {
-						grid-area: 4 / 4 / 5 / 7;
-						position: relative;
-					}
-					.question h1 {
-						padding: 15px;
-						background-color: #212529;
-						color: white;
-						position: relative;
-					}
-					.boolean-true {
-						width: 200px;
-						grid-area: 6 / 5 / 7 / 6;
-					}
-					.boolean-true h1 {
-						margin-top: 10px;
-					}
-					.boolean-false {
-						grid-area: 8 / 5 / 9 / 6;
-					}
-					.boolean false h1 {
-						margin-top: 10px;
-					}
-					.answer1 {
-						color: white;
-						grid-area: 6 / 4 / 7 / 7;
-					}
-					.answer1 h1 {
-						margin-top: 15px;
-					}
-					.answer2 {
-						color: white;
-						grid-area: 8 / 4 / 9 / 7;
-					}
-					.answer2 h1 {
-						margin-top: 15px;
-					}
-					.answer3 {
-						color: white;
-						grid-area: 10 / 4 / 11 / 7;
-					}
-					.answer3 h1 {
-						margin-top: 15px;
-					}
-					.answer4 {
-						color: white;
-						grid-area: 12 / 4 / 13 / 7;
-					}
-					.answer4 h1 {
-						margin-top: 15px;
-					}
-					.scores {
-						grid-area: 2 / 2 / 13 / 3;
-					}
-					.score {
-						float: right;
-					}
-					.avatar {
-						vertical-align: middle;
-						width: 50px;
-						height: 50px;
-						border-radius: 50%;
-					}
-					.avatar-first {
-						margin-left: 10px;
-						margin-right: 10px;
-						margin-bottom: 15px;
-						width: 130px;
-						height: 130px;
-						border-radius: 50%;
-					}
-					.avatar-secondthird {
-						margin-left: 10px;
-						margin-right: 10px;
-						margin-bottom: 15px;
-						width: 80px;
-						height: 80px;
-						border-radius: 50%;
-					}
-					.a-letter {
-						float: left;
-						margin-left: 20px;
-						margin-right: 20px;
-						margin-top: 20px;
-						vertical-align: middle;
-						width: 50px;
-						height: 50px;
-						border-radius: 50%;
-					}
-				`}</style>
 			</div>
 		)
 	}

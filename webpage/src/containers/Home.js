@@ -55,7 +55,7 @@ class Home extends Component {
 	render() {
 		return (
 			<div className="home-container">
-				<h1 className="title">Welcome to Phone Trivia!</h1>
+				<h1 className="home-title">Welcome to Phone Trivia!</h1>
 				<div className="route-container">
 					<Link to="/player" className="route">
 						<h3>Join a Game</h3>

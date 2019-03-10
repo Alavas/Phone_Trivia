@@ -1,0 +1,196 @@
+.winners-container {
+  font-family: "Dosis", sans-serif;
+  background-color: #212529;
+  width: 100vw;
+  height: calc(100vh - 65px);
+  display: grid;
+  grid-template-columns: 1fr 50px 600px 50px 1fr;
+  grid-template-rows: 1fr repeat(3, 30px 150px) 1fr;
+}
+
+.first-place {
+  text-align: center;
+  background-color: white;
+  grid-area: 2/2/4/5;
+}
+
+.second-place {
+  text-align: center;
+  background-color: white;
+  grid-area: 5/3/5/4;
+}
+
+.third-place {
+  text-align: center;
+  background-color: white;
+  grid-area: 7/3/8/4;
+}
+
+.waiting-container {
+  font-family: "Dosis", sans-serif;
+  background-color: #212529;
+  width: 100vw;
+  height: calc(100vh - 65px);
+  display: grid;
+  grid-template-columns: 1fr 500px 1fr;
+  grid-template-rows: 1fr 150px 1fr;
+}
+
+.waiting {
+  text-align: center;
+  color: white;
+  grid-area: 2/2/3/3;
+}
+
+.qr-container {
+  font-family: "Dosis", sans-serif;
+  background-color: #212529;
+  width: 100vw;
+  height: calc(100vh - 65px);
+  display: grid;
+  grid-template-columns: 1fr 400px 1fr;
+  grid-template-rows: 1fr 500px 1fr;
+}
+
+.qr {
+  text-align: center;
+  grid-area: 2/2/3/3;
+}
+
+.questions-container {
+  font-family: "Dosis", sans-serif;
+  background-color: #212529;
+  width: 100vw;
+  min-width: 1400px;
+  height: calc(100vh - 65px);
+  display: grid;
+  grid-template-columns: 40px 350px 60px 1fr 200px 450px 40px;
+  grid-template-rows: 40px 110px 25px 1fr 25px repeat(4, 90px 25px);
+}
+
+.phonetrivia {
+  text-align: center;
+  font-size: 4em;
+  grid-area: 2/6/3/7;
+  justify-content: center;
+  font-style: italic;
+  color: lightslategray !important;
+}
+
+.question {
+  grid-area: 4/4/5/7;
+  position: relative;
+}
+
+.question h1 {
+  padding: 15px;
+  background-color: #212529;
+  color: white;
+  position: relative;
+}
+
+.boolean-true {
+  background-color: forestgreen;
+  border-radius: 0.3rem;
+  grid-area: 6/5/7/6;
+}
+
+.boolean-true h1 {
+  text-align: center;
+  margin-top: 20px;
+  color: black;
+}
+
+.boolean-false {
+  background-color: crimson;
+  border-radius: 0.3rem;
+  grid-area: 8/5/9/6;
+}
+
+.boolean-false h1 {
+  text-align: center;
+  margin-top: 20px;
+  color: black;
+}
+
+.answer1 {
+  color: white;
+  grid-area: 6/4/7/7;
+}
+
+.answer1 h1 {
+  margin-top: 15px;
+}
+
+.answer2 {
+  color: white;
+  grid-area: 8/4/9/7;
+}
+
+.answer2 h1 {
+  margin-top: 15px;
+}
+
+.answer3 {
+  color: white;
+  grid-area: 10/4/11/7;
+}
+
+.answer3 h1 {
+  margin-top: 15px;
+}
+
+.answer4 {
+  color: white;
+  grid-area: 12/4/13/7;
+}
+
+.answer4 h1 {
+  margin-top: 15px;
+}
+
+.scores {
+  grid-area: 2/2/13/3;
+}
+
+.score {
+  float: right;
+}
+
+.avatar {
+  vertical-align: middle;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+
+.avatar-first {
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-bottom: 15px;
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+}
+
+.avatar-secondthird {
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-bottom: 15px;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+}
+
+.a-letter {
+  float: left;
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-top: 20px;
+  vertical-align: middle;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+
+/*# sourceMappingURL=game.css.map */

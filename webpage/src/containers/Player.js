@@ -136,7 +136,6 @@ class Player extends Component {
 	}
 
 	render() {
-		console.log(process.env.REACT_APP_GAMESHOW_ENDPOINT)
 		if (this.state.gamestate === gameStates.RESET) {
 			window.location = process.env.REACT_APP_GAMESHOW_ENDPOINT
 		}
@@ -146,7 +145,7 @@ class Player extends Component {
 				{this.state.joined ? (
 					<Websocket
 						url={process.env.REACT_APP_GAMESHOW_WEBSOCKET}
-						protocol={this.props.gameID}
+						protocol={this.state.gameID}
 						onMessage={this.handleData.bind(this)}
 					/>
 				) : null}
@@ -159,7 +158,7 @@ class Player extends Component {
 										delay={300}
 										onError={this.handleError}
 										onScan={this.handleScan}
-										className="card"
+										className="qr-reader"
 									/>
 									<p>Scan a game QR code.</p>
 								</div>
@@ -191,8 +190,8 @@ class Player extends Component {
 						case gameStates.STARTED:
 							return (
 								<div className="player-ui">
-									<div className="card">
-										<h3>Waiting for a question...</h3>
+									<div className="player-card">
+										<h3>Get ready!</h3>
 									</div>
 								</div>
 							)
@@ -202,34 +201,34 @@ class Player extends Component {
 									<h3>Question {this.state.qNumber}</h3>
 									{this.state.answertype === 'boolean' ? (
 										<React.Fragment>
-											<p
-												style={{
-													backgroundColor: '#FFF0000'
-												}}
+											<Button
+												color="success"
+												size="lg"
 												className={
 													this.state.answer === null
-														? 'card'
+														? ''
 														: this.state.answer === 'A'
-														? 'card answer'
-														: 'card disabled'
+														? 'answer'
+														: 'disabled'
 												}
 												onClick={() => this.sendAnswer('A')}
 											>
-												<h3>TRUE</h3>
-											</p>
-											<p
-												style={{ backgroundColor: '#0000FF' }}
+												TRUE
+											</Button>
+											<Button
+												color="danger"
+												size="lg"
 												className={
 													this.state.answer === null
-														? 'card'
+														? ''
 														: this.state.answer === 'B'
-														? 'card answer'
-														: 'card disabled'
+														? 'answer'
+														: 'disabled'
 												}
 												onClick={() => this.sendAnswer('B')}
 											>
-												<h3>FALSE</h3>
-											</p>
+												FALSE
+											</Button>
 										</React.Fragment>
 									) : (
 										<React.Fragment>
@@ -296,7 +295,7 @@ class Player extends Component {
 						case gameStates.ENDED:
 							return (
 								<div className="player-ui">
-									<div className="card">
+									<div className="player-card">
 										<h1>GAME OVER</h1>
 									</div>
 								</div>
