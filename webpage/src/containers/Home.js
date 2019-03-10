@@ -1,0 +1,81 @@
+import React, { Component } from 'react'
+import { Link } from 'react-router-dom'
+import {
+	generateUUID,
+	convertImage,
+	getCookie,
+	updateCookie,
+	loginUser,
+	updateUser
+} from '../utilities'
+import '../styles/home.css'
+
+class Home extends Component {
+	constructor() {
+		super()
+		this.state = {
+			userID: '',
+			loggedIn: false,
+			avatar: null
+		}
+	}
+
+	componentDidMount() {
+		let userid = getCookie('gs_userid')
+		if (userid === '' || userid === 'undefined') {
+			userid = generateUUID(window.navigator.userAgent)
+		}
+		this.userLogin(userid)
+	}
+
+	async convertedImg(avatar) {
+		await updateUser({
+			userID: this.state.userID,
+			avatar: avatar
+		})
+		this.setState({ avatar, imgReady: true })
+	}
+
+	async userLogin(userID) {
+		const userDetails = await loginUser(userID)
+		updateCookie(userDetails.userid)
+		//If the user doesn't have an avatar generate a random one.
+		if (userDetails.avatar === null) {
+			convertImage(
+				'https://picsum.photos/250/?random',
+				this.convertedImg.bind(this)
+			)
+		}
+		this.setState({
+			userID: userDetails.userid,
+			avatar: userDetails.avatar
+		})
+	}
+
+	render() {
+		return (
+			<div className="home-container">
+				<h1 className="home-title">Welcome to Phone Trivia!</h1>
+				<div className="route-container">
+					<Link to="/player" className="route">
+						<h3>Join a Game</h3>
+						<p>
+							You'll need access to the game QR code or the unique game
+							ID.
+						</p>
+					</Link>
+					<Link to="/game" className="route">
+						<h3>Display a gameboard</h3>
+						<p>The host will connect it to the game.</p>
+					</Link>
+					<Link to="/host" className="route">
+						<h3>Start a Game</h3>
+						<p>Create you own game, you'll be the host!</p>
+					</Link>
+				</div>
+			</div>
+		)
+	}
+}
+
+export default Home

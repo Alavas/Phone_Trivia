@@ -1,0 +1,70 @@
+.player-container {
+	width: 100vw;
+	height: calc(100vh - 65px);
+	background-color: #212529;
+}
+.player-ui {
+	max-width: 75%;
+	height: 100%;
+	margin-left: auto;
+	margin-right: auto;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+
+	.disabled {
+		pointer-events: none !important;
+		cursor: not-allowed !important;
+		opacity: 0.35 !important;
+		filter: alpha(opacity=35) !important;
+		-webkit-box-shadow: none !important;
+		box-shadow: none !important;
+	}
+	.answer {
+		pointer-events: none !important;
+		cursor: not-allowed !important;
+		box-shadow: none !important;
+		border: 3px solid black !important;
+	}
+	h3 {
+		color: white;
+		text-align: center;
+	}
+}
+.player-ui p {
+	text-align: center;
+}
+.player-ui .btn-lg {
+	line-height: 3em;
+	margin-bottom: 10px !important;
+	color: #212529;
+}
+.qr {
+	margin-bottom: 25px;
+	text-align: center;
+}
+.qr-reader {
+	width: 100%;
+}
+.player-card {
+	padding: 18px 18px 24px;
+	margin-bottom: 25px;
+	text-decoration: none;
+	text-align: center;
+	background-color: crimson !important;
+}
+.player-card p {
+	margin: 0;
+	padding: 12px 0 0;
+	font-size: 13px;
+	color: #000000;
+}
+.player-card h3 {
+	color: black !important;
+}
+
+@media only screen and (min-width: 600px) {
+	.player-ui {
+		max-width: 500px;
+	}
+}
