@@ -172,7 +172,7 @@ export const submitAnswer = async answer => {
 			},
 			body: data
 		}
-	)
+	).then(res => res.json())
 	return result
 }
 

@@ -260,10 +260,16 @@ async function wsPlayers(gameID) {
 
 //Broadcasts scores to the gameboards.
 async function wsScores(gameID, scores) {
+	let players = clients.filter(client => client.protocol === gameID)
 	let gameboards = clients.filter(client => client.protocol === `gb_${gameID}`)
 	gameboards.forEach(board => {
 		if (board.readyState === ws.OPEN) {
 			board.send(JSON.stringify({ scores }))
+		}
+	})
+	players.forEach(player => {
+		if (player.readyState === ws.OPEN) {
+			player.send(JSON.stringify({ scores }))
 		}
 	})
 }

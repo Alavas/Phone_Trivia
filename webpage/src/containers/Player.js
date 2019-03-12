@@ -37,6 +37,7 @@ class Player extends Component {
 			question: '',
 			answers: [],
 			joined: false
+			//scores: []
 		}
 	}
 
@@ -84,8 +85,7 @@ class Player extends Component {
 		}
 		this.setState({
 			userID: userDetails.userid,
-			avatar: userDetails.avatar,
-			score: userDetails.score
+			avatar: userDetails.avatar
 		})
 		return true
 	}
@@ -103,7 +103,7 @@ class Player extends Component {
 			reaction,
 			score
 		}
-		const result = submitAnswer(submission)
+		const result = await submitAnswer(submission)
 		if (result) {
 			this.setState({ answer })
 		}
@@ -141,9 +141,19 @@ class Player extends Component {
 		if (this.state.gamestate === gameStates.RESET) {
 			window.location = process.env.REACT_APP_GAMESHOW_ENDPOINT
 		}
+		var currentScore = _.find(this.state.scores, x => {
+			return x.userid === this.state.userID
+		})
+		if (!_.isUndefined(currentScore)) {
+			currentScore = currentScore.totalscore
+		} else if (this.state.gameID === null) {
+			currentScore = ''
+		} else {
+			currentScore = 0
+		}
 		return (
 			<div className="player-container">
-				<Nav avatar={this.state.avatar} />
+				<Nav avatar={this.state.avatar} score={currentScore} />
 				{this.state.joined ? (
 					<Websocket
 						url={process.env.REACT_APP_GAMESHOW_WEBSOCKET}
