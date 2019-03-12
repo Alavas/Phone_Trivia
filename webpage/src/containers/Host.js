@@ -137,6 +137,13 @@ class Host extends Component {
 		})
 	}
 
+	async startGame(delay) {
+		while (this.state.qNumber <= this.state.numQuestions) {
+			await this.nextQuestion()
+			await new Promise(resolve => setTimeout(resolve, delay))
+		}
+	}
+
 	async endGame() {
 		const gameID = this.state.gameID
 		const deleted = await deleteGame(gameID)
@@ -326,7 +333,7 @@ class Host extends Component {
 									<Button
 										color="success"
 										size="lg"
-										onClick={() => this.nextQuestion()}
+										onClick={() => this.startGame(7000)}
 									>
 										Start the questions...
 									</Button>
@@ -342,23 +349,23 @@ class Host extends Component {
 									>
 										Next Question
 									</Button>
-									<p className="info">
+									<div className="info">
 										<h4>{this.state.qNumber}</h4>
-									</p>
-									<p className="info">
+									</div>
+									<div className="info">
 										<h4>{this.state.questionID}</h4>
-									</p>
-									<p className="info">
+									</div>
+									<div className="info">
 										<h4>{this.state.answertype}</h4>
-									</p>
+									</div>
 								</div>
 							)
 						case gameStates.ENDED:
 							return (
 								<div className="host-ui">
-									<p className="info">
+									<div className="info">
 										<h1>GAME OVER</h1>
-									</p>
+									</div>
 									<Button
 										color="danger"
 										size="lg"

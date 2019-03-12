@@ -4,7 +4,6 @@ import _ from 'lodash'
 import '../styles/nav.css'
 
 const Nav = props => {
-	console.log(props.score)
 	return (
 		<nav className="fixed-bottom">
 			<ul>
@@ -17,7 +16,6 @@ const Nav = props => {
 							_.isUndefined(props.score)
 								? { display: 'none' }
 								: {
-										color: 'white',
 										marginTop: '5px',
 										color: 'lightslategray'
 								  }

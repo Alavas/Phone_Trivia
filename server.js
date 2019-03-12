@@ -34,7 +34,7 @@ console.log(process.env.NODE_ENV)
 var clients = []
 
 //Removes old games, check every hour at the 15 minute mark.
-//cron.schedule('15 */1 * * *', cleanupGames)
+cron.schedule('15 */1 * * *', cleanupGames)
 
 const app = express()
 app.use(bodyParser.json({ limit: '50mb' }))

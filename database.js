@@ -253,8 +253,10 @@ async function cleanupGames() {
 		const client = await postgres.connect()
 		const result = await client.query(query)
 		console.log(`Deleted ${result.rowCount} games.`)
+		return true
 	} catch (err) {
 		console.log(err)
+		return false
 	}
 }
 
