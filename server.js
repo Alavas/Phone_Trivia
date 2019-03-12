@@ -281,9 +281,6 @@ async function wsGame(game) {
 			board.send(JSON.stringify(game))
 		}
 	})
-	delete game.question
-	delete game.answers
-	delete game.correctAnswer
 	players.forEach(player => {
 		if (player.readyState === ws.OPEN) {
 			player.send(JSON.stringify(game))

@@ -4,6 +4,7 @@ import Websocket from 'react-websocket'
 import { withRouter } from 'react-router-dom'
 import QrReader from 'react-qr-reader'
 import { Alert, Button } from 'reactstrap'
+import he from 'he'
 import _ from 'lodash'
 import {
 	getCookie,
@@ -33,7 +34,8 @@ class Player extends Component {
 			qNumber: 0,
 			qStart: 0,
 			questionID: '',
-			answertype: '',
+			question: '',
+			answers: [],
 			joined: false
 		}
 	}
@@ -199,6 +201,7 @@ class Player extends Component {
 							return (
 								<div className="player-ui">
 									<h3>Question {this.state.qNumber}</h3>
+									<h5>{he.decode(this.state.question)}</h5>
 									{this.state.answertype === 'boolean' ? (
 										<React.Fragment>
 											<Button
@@ -244,7 +247,7 @@ class Player extends Component {
 												}
 												onClick={() => this.sendAnswer('A')}
 											>
-												A
+												{he.decode(this.state.answers[0])}
 											</Button>
 											<Button
 												color="primary"
@@ -258,7 +261,7 @@ class Player extends Component {
 												}
 												onClick={() => this.sendAnswer('B')}
 											>
-												B
+												{he.decode(this.state.answers[1])}
 											</Button>
 											<Button
 												color="warning"
@@ -272,7 +275,7 @@ class Player extends Component {
 												}
 												onClick={() => this.sendAnswer('C')}
 											>
-												C
+												{he.decode(this.state.answers[2])}
 											</Button>
 											<Button
 												color="danger"
@@ -286,7 +289,7 @@ class Player extends Component {
 												}
 												onClick={() => this.sendAnswer('D')}
 											>
-												D
+												{he.decode(this.state.answers[3])}
 											</Button>
 										</React.Fragment>
 									)}
