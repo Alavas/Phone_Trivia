@@ -7,6 +7,7 @@ import Player from './containers/Player'
 
 class App extends Component {
 	render() {
+		console.log(process.env)
 		return (
 			<Switch>
 				<Route exact path="/host" component={Host} />
