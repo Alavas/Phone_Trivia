@@ -280,6 +280,15 @@ async function wsGame(game) {
 	let gameboards = clients.filter(
 		client => client.protocol === `gb_${game.gameID}`
 	)
+	//Send list of players to the players for displaying the scores at the end.
+	if (game.gamestate === 2) {
+		let gamePlayers = await getPlayers(game.gameID)
+		players.forEach(player => {
+			if (player.readyState === ws.OPEN) {
+				player.send(JSON.stringify({ players: gamePlayers }))
+			}
+		})
+	}
 	//Timestamp for scoring.
 	game.qStart = Date.now()
 	gameboards.forEach(board => {

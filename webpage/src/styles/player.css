@@ -44,6 +44,22 @@
   height: 25px;
   border-radius: 50%;
 }
+.player-ui .player-scores {
+  margin-bottom: 10px;
+}
+.player-ui .player-score {
+  background-color: #0d1620;
+  border-radius: 0.3em;
+  margin-bottom: 5px;
+  font-size: 1.5em !important;
+}
+.player-ui .avatar-scores {
+  margin-left: 5px;
+  margin-top: -5px;
+  width: 32.5px;
+  height: 32.5px;
+  border-radius: 50%;
+}
 
 .player-ui p {
   text-align: center;

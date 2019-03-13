@@ -107,7 +107,7 @@ class Host extends Component {
 		//If the user doesn't have an avatar generate a random one.
 		if (userDetails.avatar === null) {
 			convertImage(
-				'https://picsum.photos/250/?random',
+				'https://picsum.photos/100/?random',
 				this.convertedImg.bind(this)
 			)
 		}

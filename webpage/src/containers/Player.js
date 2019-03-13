@@ -3,7 +3,7 @@ import QRCode from 'qrcode.react'
 import Websocket from 'react-websocket'
 import { withRouter } from 'react-router-dom'
 import QrReader from 'react-qr-reader'
-import { Alert, Button } from 'reactstrap'
+import { Alert, Button, ListGroup, ListGroupItem } from 'reactstrap'
 import he from 'he'
 import _ from 'lodash'
 import {
@@ -36,8 +36,11 @@ class Player extends Component {
 			questionID: '',
 			question: '',
 			answers: [],
-			joined: false
-			//scores: []
+			joined: false,
+			score: 0,
+			reaction: 0,
+			scores: [],
+			players: []
 		}
 	}
 
@@ -79,7 +82,7 @@ class Player extends Component {
 		//If the user doesn't have an avatar generate a random one.
 		if (userDetails.avatar === null) {
 			convertImage(
-				'https://picsum.photos/250/?random',
+				'https://picsum.photos/100/?random',
 				this.convertedImg.bind(this)
 			)
 		}
@@ -105,7 +108,7 @@ class Player extends Component {
 		}
 		const result = await submitAnswer(submission)
 		if (result) {
-			this.setState({ answer })
+			this.setState({ answer, score, reaction })
 		}
 	}
 
@@ -134,6 +137,7 @@ class Player extends Component {
 
 	handleData(data) {
 		data = JSON.parse(data)
+		console.log(data)
 		this.setState({ ...data, answer: null })
 	}
 
@@ -185,7 +189,7 @@ class Player extends Component {
 										<QRCode
 											value={`${
 												process.env.REACT_APP_GAMESHOW_ENDPOINT
-											}/player/${this.props.gameID}`}
+											}/player/${this.state.gameID}`}
 											size={225}
 											bgColor={'#ffffff'}
 											fgColor={'#000000'}
@@ -311,6 +315,76 @@ class Player extends Component {
 									<div className="player-card">
 										<h1>GAME OVER</h1>
 									</div>
+									<ListGroup className="player-scores">
+										{_.isUndefined(this.state.scores[0]) ? null : (
+											<ListGroupItem className="player-score">
+												<h3
+													style={{
+														fontSize: '1.75em'
+													}}
+												>
+													1<sup>st</sup> Place:
+													<img
+														alt="first-place"
+														src={
+															_.find(this.state.players, x => {
+																return (
+																	x.userid ===
+																	this.state.scores[0].userid
+																)
+															}).avatar
+														}
+														className="avatar-scores"
+													/>
+													{this.state.scores[0].totalscore}
+												</h3>
+											</ListGroupItem>
+										)}
+										{_.isUndefined(this.state.scores[1]) ? null : (
+											<ListGroupItem className="player-score">
+												<h3
+													style={{
+														fontSize: '1.75em'
+													}}
+												>
+													2<sup>nd</sup> Place:
+													<img
+														alt="avatar-scores"
+														src={
+															_.find(this.state.players, x => {
+																return (
+																	x.userid ===
+																	this.state.scores[1].userid
+																)
+															}).avatar
+														}
+														className="avatar-scores"
+													/>
+													{this.state.scores[1].totalscore}
+												</h3>
+											</ListGroupItem>
+										)}
+										{_.isUndefined(this.state.scores[2]) ? null : (
+											<ListGroupItem className="player-score">
+												<h3 style={{ fontSize: '1.75em' }}>
+													3<sup>rd</sup> Place:
+													<img
+														alt="third-place"
+														src={
+															_.find(this.state.players, x => {
+																return (
+																	x.userid ===
+																	this.state.scores[2].userid
+																)
+															}).avatar
+														}
+														className="avatar-scores"
+													/>
+													{this.state.scores[2].totalscore}
+												</h3>
+											</ListGroupItem>
+										)}
+									</ListGroup>
 								</div>
 							)
 						default:
