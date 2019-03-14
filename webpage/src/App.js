@@ -1,11 +1,27 @@
 import React, { Component } from 'react'
 import { Switch, Route, Redirect, withRouter } from 'react-router-dom'
+import ReactGA from 'react-ga'
 import Home from './containers/Home'
 import Host from './containers/Host'
 import Game from './containers/Game'
 import Player from './containers/Player'
 
 class App extends Component {
+	componentDidMount() {
+		ReactGA.initialize('UA-108465458-2')
+		ReactGA.pageview(window.location.pathname)
+	}
+
+	componentDidUpdate(prevProps) {
+		if (this.props.location.pathname !== prevProps.location) {
+			this.fireTracking()
+		}
+	}
+
+	fireTracking() {
+		ReactGA.pageview(window.location.pathname)
+	}
+
 	render() {
 		return (
 			<Switch>
