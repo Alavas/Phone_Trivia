@@ -137,8 +137,12 @@ class Player extends Component {
 
 	handleData(data) {
 		data = JSON.parse(data)
-		console.log(data)
-		this.setState({ ...data, answer: null })
+		const dataType = Object.keys(data)
+		if (dataType[0] === 'gameID') {
+			this.setState({ ...data, answer: null })
+		} else {
+			this.setState({ ...data })
+		}
 	}
 
 	render() {
