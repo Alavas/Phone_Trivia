@@ -59,18 +59,11 @@ class Home extends Component {
 				<div className="route-container">
 					<Link to="/player" className="route">
 						<h3>Join a Game</h3>
-						<p>
-							You'll need access to the game QR code or the unique game
-							ID.
-						</p>
-					</Link>
-					<Link to="/game" className="route">
-						<h3>Display a gameboard</h3>
-						<p>The host will connect it to the game.</p>
+						<p>You'll need to scan the game QR code.</p>
 					</Link>
 					<Link to="/host" className="route">
 						<h3>Start a Game</h3>
-						<p>Create you own game, you'll be the host!</p>
+						<p>Create your own game, you'll be the host!</p>
 					</Link>
 				</div>
 			</div>
