@@ -24,23 +24,23 @@ class Player extends Component {
 	constructor() {
 		super()
 		this.state = {
-			userID: '',
-			avatar: null,
-			result: 'No Result',
-			validGame: false,
-			gamestate: null,
-			gameID: null,
 			answer: null,
+			answers: [],
+			avatar: null,
+			gamestate: null,
+			joined: false,
+			gameID: null,
+			players: [],
 			qNumber: 0,
 			qStart: 0,
 			questionID: '',
 			question: '',
-			answers: [],
-			joined: false,
-			score: 0,
 			reaction: 0,
+			result: 'No Result',
+			score: 0,
 			scores: [],
-			players: []
+			userID: '',
+			validGame: false
 		}
 	}
 
