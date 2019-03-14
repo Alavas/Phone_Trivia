@@ -8,6 +8,7 @@ import {
 	loginUser,
 	updateUser
 } from '../utilities'
+import Ad from './BannerAd'
 import '../styles/home.css'
 
 class Home extends Component {
@@ -21,10 +22,6 @@ class Home extends Component {
 	}
 
 	componentDidMount() {
-		;(window.adsbygoogle = window.adsbygoogle || []).push({
-			google_ad_client: 'ca-pub-1008239361616945',
-			enable_page_level_ads: true
-		})
 		let userid = getCookie('gs_userid')
 		if (userid === '' || userid === 'undefined') {
 			userid = generateUUID(window.navigator.userAgent)
@@ -69,6 +66,7 @@ class Home extends Component {
 						<h3>Start a Game</h3>
 						<p>Create your own game, you'll be the host!</p>
 					</Link>
+					<Ad />
 				</div>
 			</div>
 		)

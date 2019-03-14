@@ -10,9 +10,13 @@ export default class Ad extends React.Component {
 			<div className="ad">
 				<ins
 					className="adsbygoogle"
+					style={{
+						display: 'inline-block',
+						width: '320px',
+						height: '100px'
+					}}
 					data-ad-client="ca-pub-1008239361616945"
-					data-ad-slot="xxxxxxxxxx"
-					enable_page_level_ads={true}
+					data-ad-slot="9268492262"
 				/>
 			</div>
 		)
