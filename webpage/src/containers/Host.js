@@ -5,16 +5,17 @@ import Websocket from 'react-websocket'
 import {
 	Button,
 	Col,
-	CustomInput,
-	Row,
 	Form,
 	FormGroup,
-	Label,
 	Input,
+	Label,
+	ListGroup,
+	ListGroupItem,
 	Modal,
 	ModalHeader,
 	ModalBody,
-	ModalFooter
+	ModalFooter,
+	Row
 } from 'reactstrap'
 import he from 'he'
 import _ from 'lodash'
@@ -547,15 +548,93 @@ class Host extends Component {
 						case gameStates.ENDED:
 							return (
 								<div className="host-ui">
-									<div className="info">
+									<div className="player-card">
 										<h1>GAME OVER</h1>
 									</div>
+									<ListGroup className="player-scores">
+										{_.isUndefined(this.state.scores[0]) ? null : (
+											<ListGroupItem className="player-score">
+												<h3
+													style={{
+														fontSize: '1.75em'
+													}}
+												>
+													1<sup>st</sup> Place:
+													<img
+														alt="first-place"
+														src={
+															_.find(this.state.players, x => {
+																return (
+																	x.userid ===
+																	this.state.scores[0].userid
+																)
+															}).avatar
+														}
+														className="avatar-scores"
+													/>
+													{this.state.scores[0].totalscore}
+												</h3>
+											</ListGroupItem>
+										)}
+										{_.isUndefined(this.state.scores[1]) ? null : (
+											<ListGroupItem className="player-score">
+												<h3
+													style={{
+														fontSize: '1.75em'
+													}}
+												>
+													2<sup>nd</sup> Place:
+													<img
+														alt="avatar-scores"
+														src={
+															_.find(this.state.players, x => {
+																return (
+																	x.userid ===
+																	this.state.scores[1].userid
+																)
+															}).avatar
+														}
+														className="avatar-scores"
+													/>
+													{this.state.scores[1].totalscore}
+												</h3>
+											</ListGroupItem>
+										)}
+										{_.isUndefined(this.state.scores[2]) ? null : (
+											<ListGroupItem className="player-score">
+												<h3
+													style={{
+														fontSize: '1.75em'
+													}}
+												>
+													3<sup>rd</sup> Place:
+													<img
+														alt="third-place"
+														src={
+															_.find(this.state.players, x => {
+																return (
+																	x.userid ===
+																	this.state.scores[2].userid
+																)
+															}).avatar
+														}
+														className="avatar-scores"
+													/>
+													{this.state.scores[2].totalscore}
+												</h3>
+											</ListGroupItem>
+										)}
+									</ListGroup>
 									<Button
 										color="danger"
 										size="lg"
+										style={{
+											color: '#212529',
+											backgroundColor: 'crimson'
+										}}
 										onClick={() => this.endGame()}
 									>
-										EXIT GAME
+										END GAME
 									</Button>
 								</div>
 							)
