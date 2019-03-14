@@ -3,7 +3,8 @@ import QRCode from 'qrcode.react'
 import Websocket from 'react-websocket'
 import { withRouter } from 'react-router-dom'
 import QrReader from 'react-qr-reader'
-import { Alert, Button } from 'reactstrap'
+import { Alert, Button, ListGroup, ListGroupItem } from 'reactstrap'
+import he from 'he'
 import _ from 'lodash'
 import {
 	getCookie,
@@ -23,18 +24,23 @@ class Player extends Component {
 	constructor() {
 		super()
 		this.state = {
-			userID: '',
-			avatar: null,
-			result: 'No Result',
-			validGame: false,
-			gamestate: null,
-			gameID: null,
 			answer: null,
+			answers: [],
+			avatar: null,
+			gamestate: null,
+			joined: false,
+			gameID: null,
+			players: [],
 			qNumber: 0,
 			qStart: 0,
 			questionID: '',
-			answertype: '',
-			joined: false
+			question: '',
+			reaction: 0,
+			result: 'No Result',
+			score: 0,
+			scores: [],
+			userID: '',
+			validGame: false
 		}
 	}
 
@@ -76,14 +82,13 @@ class Player extends Component {
 		//If the user doesn't have an avatar generate a random one.
 		if (userDetails.avatar === null) {
 			convertImage(
-				'https://picsum.photos/250/?random',
+				'https://picsum.photos/100/?random',
 				this.convertedImg.bind(this)
 			)
 		}
 		this.setState({
 			userID: userDetails.userid,
-			avatar: userDetails.avatar,
-			score: userDetails.score
+			avatar: userDetails.avatar
 		})
 		return true
 	}
@@ -101,9 +106,9 @@ class Player extends Component {
 			reaction,
 			score
 		}
-		const result = submitAnswer(submission)
+		const result = await submitAnswer(submission)
 		if (result) {
-			this.setState({ answer })
+			this.setState({ answer, score, reaction })
 		}
 	}
 
@@ -132,16 +137,31 @@ class Player extends Component {
 
 	handleData(data) {
 		data = JSON.parse(data)
-		this.setState({ ...data, answer: null })
+		const dataType = Object.keys(data)
+		if (dataType[0] === 'gameID') {
+			this.setState({ ...data, answer: null })
+		} else {
+			this.setState({ ...data })
+		}
 	}
 
 	render() {
 		if (this.state.gamestate === gameStates.RESET) {
 			window.location = process.env.REACT_APP_GAMESHOW_ENDPOINT
 		}
+		var currentScore = _.find(this.state.scores, x => {
+			return x.userid === this.state.userID
+		})
+		if (!_.isUndefined(currentScore)) {
+			currentScore = currentScore.totalscore
+		} else if (this.state.gameID === null) {
+			currentScore = ''
+		} else {
+			currentScore = 0
+		}
 		return (
 			<div className="player-container">
-				<Nav avatar={this.state.avatar} />
+				<Nav avatar={this.state.avatar} score={currentScore} />
 				{this.state.joined ? (
 					<Websocket
 						url={process.env.REACT_APP_GAMESHOW_WEBSOCKET}
@@ -173,7 +193,7 @@ class Player extends Component {
 										<QRCode
 											value={`${
 												process.env.REACT_APP_GAMESHOW_ENDPOINT
-											}/player/${this.props.gameID}`}
+											}/player/${this.state.gameID}`}
 											size={225}
 											bgColor={'#ffffff'}
 											fgColor={'#000000'}
@@ -199,6 +219,7 @@ class Player extends Component {
 							return (
 								<div className="player-ui">
 									<h3>Question {this.state.qNumber}</h3>
+									<h5>{he.decode(this.state.question)}</h5>
 									{this.state.answertype === 'boolean' ? (
 										<React.Fragment>
 											<Button
@@ -244,7 +265,7 @@ class Player extends Component {
 												}
 												onClick={() => this.sendAnswer('A')}
 											>
-												A
+												{he.decode(this.state.answers[0])}
 											</Button>
 											<Button
 												color="primary"
@@ -258,7 +279,7 @@ class Player extends Component {
 												}
 												onClick={() => this.sendAnswer('B')}
 											>
-												B
+												{he.decode(this.state.answers[1])}
 											</Button>
 											<Button
 												color="warning"
@@ -272,7 +293,7 @@ class Player extends Component {
 												}
 												onClick={() => this.sendAnswer('C')}
 											>
-												C
+												{he.decode(this.state.answers[2])}
 											</Button>
 											<Button
 												color="danger"
@@ -286,7 +307,7 @@ class Player extends Component {
 												}
 												onClick={() => this.sendAnswer('D')}
 											>
-												D
+												{he.decode(this.state.answers[3])}
 											</Button>
 										</React.Fragment>
 									)}
@@ -298,6 +319,76 @@ class Player extends Component {
 									<div className="player-card">
 										<h1>GAME OVER</h1>
 									</div>
+									<ListGroup className="player-scores">
+										{_.isUndefined(this.state.scores[0]) ? null : (
+											<ListGroupItem className="player-score">
+												<h3
+													style={{
+														fontSize: '1.75em'
+													}}
+												>
+													1<sup>st</sup> Place:
+													<img
+														alt="first-place"
+														src={
+															_.find(this.state.players, x => {
+																return (
+																	x.userid ===
+																	this.state.scores[0].userid
+																)
+															}).avatar
+														}
+														className="avatar-scores"
+													/>
+													{this.state.scores[0].totalscore}
+												</h3>
+											</ListGroupItem>
+										)}
+										{_.isUndefined(this.state.scores[1]) ? null : (
+											<ListGroupItem className="player-score">
+												<h3
+													style={{
+														fontSize: '1.75em'
+													}}
+												>
+													2<sup>nd</sup> Place:
+													<img
+														alt="avatar-scores"
+														src={
+															_.find(this.state.players, x => {
+																return (
+																	x.userid ===
+																	this.state.scores[1].userid
+																)
+															}).avatar
+														}
+														className="avatar-scores"
+													/>
+													{this.state.scores[1].totalscore}
+												</h3>
+											</ListGroupItem>
+										)}
+										{_.isUndefined(this.state.scores[2]) ? null : (
+											<ListGroupItem className="player-score">
+												<h3 style={{ fontSize: '1.75em' }}>
+													3<sup>rd</sup> Place:
+													<img
+														alt="third-place"
+														src={
+															_.find(this.state.players, x => {
+																return (
+																	x.userid ===
+																	this.state.scores[2].userid
+																)
+															}).avatar
+														}
+														className="avatar-scores"
+													/>
+													{this.state.scores[2].totalscore}
+												</h3>
+											</ListGroupItem>
+										)}
+									</ListGroup>
 								</div>
 							)
 						default:

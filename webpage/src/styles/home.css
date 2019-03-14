@@ -34,6 +34,7 @@
   text-align: left;
   text-decoration: none !important;
   background-color: whitesmoke;
+  border-radius: 0.3em;
 }
 
 .route:hover {

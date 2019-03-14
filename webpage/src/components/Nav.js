@@ -13,6 +13,18 @@ const Nav = props => {
 				<ul>
 					<li
 						style={
+							_.isUndefined(props.score)
+								? { display: 'none' }
+								: {
+										marginTop: '5px',
+										color: 'lightslategray'
+								  }
+						}
+					>
+						<h3>{props.score}</h3>
+					</li>
+					<li
+						style={
 							_.isNull(props.avatar)
 								? { display: 'none' }
 								: { padding: '0px', marginTop: '2.5px' }

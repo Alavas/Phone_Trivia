@@ -34,7 +34,7 @@ console.log(process.env.NODE_ENV)
 var clients = []
 
 //Removes old games, check every hour at the 15 minute mark.
-//cron.schedule('15 */1 * * *', cleanupGames)
+cron.schedule('15 */1 * * *', cleanupGames)
 
 const app = express()
 app.use(bodyParser.json({ limit: '50mb' }))
@@ -260,10 +260,16 @@ async function wsPlayers(gameID) {
 
 //Broadcasts scores to the gameboards.
 async function wsScores(gameID, scores) {
+	let players = clients.filter(client => client.protocol === gameID)
 	let gameboards = clients.filter(client => client.protocol === `gb_${gameID}`)
 	gameboards.forEach(board => {
 		if (board.readyState === ws.OPEN) {
 			board.send(JSON.stringify({ scores }))
+		}
+	})
+	players.forEach(player => {
+		if (player.readyState === ws.OPEN) {
+			player.send(JSON.stringify({ scores }))
 		}
 	})
 }
@@ -274,6 +280,15 @@ async function wsGame(game) {
 	let gameboards = clients.filter(
 		client => client.protocol === `gb_${game.gameID}`
 	)
+	//Send list of players to the players for displaying the scores at the end.
+	if (game.gamestate === 2) {
+		let gamePlayers = await getPlayers(game.gameID)
+		players.forEach(player => {
+			if (player.readyState === ws.OPEN) {
+				player.send(JSON.stringify({ players: gamePlayers }))
+			}
+		})
+	}
 	//Timestamp for scoring.
 	game.qStart = Date.now()
 	gameboards.forEach(board => {
@@ -281,9 +296,6 @@ async function wsGame(game) {
 			board.send(JSON.stringify(game))
 		}
 	})
-	delete game.question
-	delete game.answers
-	delete game.correctAnswer
 	players.forEach(player => {
 		if (player.readyState === ws.OPEN) {
 			player.send(JSON.stringify(game))
