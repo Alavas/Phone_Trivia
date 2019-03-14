@@ -21,6 +21,10 @@ class Home extends Component {
 	}
 
 	componentDidMount() {
+		;(window.adsbygoogle = window.adsbygoogle || []).push({
+			google_ad_client: 'ca-pub-1008239361616945',
+			enable_page_level_ads: true
+		})
 		let userid = getCookie('gs_userid')
 		if (userid === '' || userid === 'undefined') {
 			userid = generateUUID(window.navigator.userAgent)
