@@ -8,7 +8,7 @@ import {
 	loginUser,
 	updateUser
 } from '../utilities'
-import Ad from './BannerAd'
+import Nav from '../components/Nav'
 import '../styles/home.css'
 
 class Home extends Component {
@@ -56,17 +56,33 @@ class Home extends Component {
 	render() {
 		return (
 			<div className="home-container">
+				<Nav avatar={this.state.avatar} />
 				<h1 className="home-title">Welcome to Phone Trivia!</h1>
+				<h4
+					style={{
+						textAlign: 'center',
+						fontSize: '1em',
+						color: 'lightslategray',
+						marginTop: '10px'
+					}}
+				>
+					Play on your own or with a group of friends.
+				</h4>
 				<div className="route-container">
-					<Link to="/player" className="route">
-						<h3>Join a Game</h3>
-						<p>You'll need to scan the game QR code.</p>
-					</Link>
 					<Link to="/host" className="route">
 						<h3>Start a Game</h3>
 						<p>Create your own game, you'll be the host!</p>
 					</Link>
-					<Ad />
+					<Link to="/player" className="route">
+						<h3>Join a Game</h3>
+						<p>You'll need to scan the game QR code.</p>
+					</Link>
+					<a
+						style={{ textAlign: 'center', fontSize: '1em' }}
+						href="https://github.com/Alavas/Phone_Trivia/issues"
+					>
+						Report An Issue
+					</a>
 				</div>
 			</div>
 		)

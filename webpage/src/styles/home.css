@@ -1,6 +1,5 @@
 .home-container {
   font-size: 20px !important;
-  font-family: -apple-system, BlinkMacSystemFont, Avenir Next, Avenir, Helvetica, sans-serif;
   width: 100vw;
   height: 100vh;
   background-color: #212529;
@@ -8,21 +7,23 @@
 
 .home-title {
   margin: 0;
-  width: 100%;
+  padding: 0;
+  width: 100vw;
   padding-top: 80px;
   line-height: 1.15;
   font-size: 2.75em;
   text-align: center;
-  color: whitesmoke;
+  color: lightslategray;
+  text-shadow: 2px 2px #0d1260;
   font-weight: 500;
 }
 
 .route-container {
-  max-width: 800px;
+  max-width: 600px;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: center;
-  margin-top: 50px;
+  margin-top: 75px;
   margin-left: auto;
   margin-right: auto;
 }
@@ -33,23 +34,26 @@
   margin: 10px;
   text-align: left;
   text-decoration: none !important;
-  background-color: whitesmoke;
+  background-color: #0d1620;
   border-radius: 0.3em;
 }
 
 .route:hover {
-  border-color: #067df7;
+  border: 1px solid;
+  border-color: #067df7 !important;
 }
 
 .route h3 {
   margin: 0;
+  padding: 0;
+  text-align: center;
   color: #067df7;
   font-size: 1em;
 }
 
 .route p {
   margin: 0;
-  padding: 12px 0 0;
+  text-align: center;
   font-size: 0.6em;
   color: #212529;
 }
@@ -60,7 +64,7 @@
   }
 
   .route-container {
-    flex-direction: column;
+    margin-top: 20px;
     max-width: 250px;
   }
 
