@@ -14,17 +14,6 @@
   flex-direction: column;
   justify-content: center;
 }
-
-.host-ui {
-  max-width: 500px;
-  width: 85%;
-  height: 100%;
-  margin-left: auto;
-  margin-right: auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
 .host-ui .disabled {
   pointer-events: none !important;
   cursor: not-allowed !important;

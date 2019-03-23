@@ -45,30 +45,35 @@ class Host extends Component {
 		super()
 		this.state = {
 			answer: null,
-			answers: [],
+			answers: [
+				'First Answer',
+				'Second Answer',
+				'Third Answer',
+				'Fourth Answer'
+			],
 			answertype: '',
 			avatar: null,
 			category: 'any_category',
+			correctAnswer: null,
 			difficulty: 'easy',
+			gameID: '',
 			gamestate: 0,
-			hostPlay: false,
+			hostPlay: true,
 			joined: false,
-			gameID: null,
 			loggedIn: false,
 			modal: false,
 			numQuestions: 10,
 			players: [],
 			qNumber: 0,
 			qStart: 0,
+			question: 'This is a test question?',
 			questionID: '',
-			question: '',
 			reaction: 0,
-			result: 'No Result',
 			score: 0,
 			scores: [],
+			showAnswer: false,
 			type: 'any_type',
-			userID: '',
-			validGame: false
+			userID: ''
 		}
 		this.submit = this.submit.bind(this)
 		this.updateGame = this.updateGame.bind(this)
@@ -153,6 +158,24 @@ class Host extends Component {
 		}
 	}
 
+	async startGame(delay) {
+		if (this.state.hostPlay) {
+			do {
+				await this.nextQuestion()
+				await new Promise(resolve => setTimeout(resolve, delay))
+				const wsTest = {
+					action: 'SHOW_ANSWER',
+					data: { gameID: this.state.gameID }
+				}
+				this.wsRef.sendMessage(JSON.stringify(wsTest))
+				await new Promise(resolve => setTimeout(resolve, 1500))
+			} while (this.state.qNumber < this.state.numQuestions)
+			await this.nextQuestion()
+		} else {
+			this.nextQuestion()
+		}
+	}
+
 	async updateGame(state) {
 		const gameID = this.state.gameID
 		const qNumber = this.state.qNumber
@@ -163,18 +186,6 @@ class Host extends Component {
 			questionID: game.questionID,
 			answertype: game.answertype
 		})
-	}
-
-	async startGame(delay) {
-		if (this.state.hostPlay) {
-			do {
-				await this.nextQuestion()
-				await new Promise(resolve => setTimeout(resolve, delay))
-			} while (this.state.qNumber < this.state.numQuestions)
-			await this.nextQuestion()
-		} else {
-			this.nextQuestion()
-		}
 	}
 
 	async endGame() {
@@ -229,7 +240,9 @@ class Host extends Component {
 		data = JSON.parse(data)
 		const dataType = Object.keys(data)
 		if (dataType[0] === 'gameID') {
-			this.setState({ ...data, answer: null })
+			this.setState({ ...data, answer: null, showAnswer: false })
+		} else if (dataType[0] === 'scores') {
+			this.setState({ ...data })
 		} else {
 			this.setState({ ...data })
 		}
@@ -258,8 +271,12 @@ class Host extends Component {
 				{this.state.joined ? (
 					<Websocket
 						url={process.env.REACT_APP_GAMESHOW_WEBSOCKET}
+						debug={true}
 						protocol={this.state.gameID}
 						onMessage={this.handleData.bind(this)}
+						ref={Websocket => {
+							this.wsRef = Websocket
+						}}
 					/>
 				) : null}
 				{(() => {
@@ -449,7 +466,11 @@ class Host extends Component {
 												color="success"
 												size="lg"
 												className={
-													this.state.answer === null
+													this.state.showAnswer
+														? this.state.correctAnswer === 'A'
+															? 'correct'
+															: 'wrong'
+														: this.state.answer === null
 														? ''
 														: this.state.answer === 'A'
 														? 'answer'
@@ -463,7 +484,11 @@ class Host extends Component {
 												color="danger"
 												size="lg"
 												className={
-													this.state.answer === null
+													this.state.showAnswer
+														? this.state.correctAnswer === 'B'
+															? 'correct'
+															: 'wrong'
+														: this.state.answer === null
 														? ''
 														: this.state.answer === 'B'
 														? 'answer'
@@ -480,7 +505,11 @@ class Host extends Component {
 												color="success"
 												size="lg"
 												className={
-													this.state.answer === null
+													this.state.showAnswer
+														? this.state.correctAnswer === 'A'
+															? 'correct'
+															: 'wrong'
+														: this.state.answer === null
 														? ''
 														: this.state.answer === 'A'
 														? 'answer'
@@ -494,7 +523,11 @@ class Host extends Component {
 												color="primary"
 												size="lg"
 												className={
-													this.state.answer === null
+													this.state.showAnswer
+														? this.state.correctAnswer === 'B'
+															? 'correct'
+															: 'wrong'
+														: this.state.answer === null
 														? ''
 														: this.state.answer === 'B'
 														? 'answer'
@@ -508,7 +541,11 @@ class Host extends Component {
 												color="warning"
 												size="lg"
 												className={
-													this.state.answer === null
+													this.state.showAnswer
+														? this.state.correctAnswer === 'C'
+															? 'correct'
+															: 'wrong'
+														: this.state.answer === null
 														? ''
 														: this.state.answer === 'C'
 														? 'answer'
@@ -522,7 +559,11 @@ class Host extends Component {
 												color="danger"
 												size="lg"
 												className={
-													this.state.answer === null
+													this.state.showAnswer
+														? this.state.correctAnswer === 'D'
+															? 'correct'
+															: 'wrong'
+														: this.state.answer === null
 														? ''
 														: this.state.answer === 'D'
 														? 'answer'

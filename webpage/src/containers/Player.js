@@ -26,19 +26,22 @@ class Player extends Component {
 		this.state = {
 			answer: null,
 			answers: [],
+			answertype: '',
 			avatar: null,
+			correctAnswer: null,
+			gameID: null,
 			gamestate: null,
 			joined: false,
-			gameID: null,
 			players: [],
 			qNumber: 0,
 			qStart: 0,
-			questionID: '',
 			question: '',
+			questionID: '',
 			reaction: 0,
 			result: 'No Result',
 			score: 0,
 			scores: [],
+			showAnswer: false,
 			userID: '',
 			validGame: false
 		}
@@ -139,7 +142,9 @@ class Player extends Component {
 		data = JSON.parse(data)
 		const dataType = Object.keys(data)
 		if (dataType[0] === 'gameID') {
-			this.setState({ ...data, answer: null })
+			this.setState({ ...data, answer: null, showAnswer: false })
+		} else if (dataType[0] === 'scores') {
+			this.setState({ ...data })
 		} else {
 			this.setState({ ...data })
 		}
@@ -226,7 +231,11 @@ class Player extends Component {
 												color="success"
 												size="lg"
 												className={
-													this.state.answer === null
+													this.state.showAnswer
+														? this.state.correctAnswer === 'A'
+															? 'correct'
+															: 'wrong'
+														: this.state.answer === null
 														? ''
 														: this.state.answer === 'A'
 														? 'answer'
@@ -240,7 +249,11 @@ class Player extends Component {
 												color="danger"
 												size="lg"
 												className={
-													this.state.answer === null
+													this.state.showAnswer
+														? this.state.correctAnswer === 'B'
+															? 'correct'
+															: 'wrong'
+														: this.state.answer === null
 														? ''
 														: this.state.answer === 'B'
 														? 'answer'
@@ -257,7 +270,11 @@ class Player extends Component {
 												color="success"
 												size="lg"
 												className={
-													this.state.answer === null
+													this.state.showAnswer
+														? this.state.correctAnswer === 'A'
+															? 'correct'
+															: 'wrong'
+														: this.state.answer === null
 														? ''
 														: this.state.answer === 'A'
 														? 'answer'
@@ -271,7 +288,11 @@ class Player extends Component {
 												color="primary"
 												size="lg"
 												className={
-													this.state.answer === null
+													this.state.showAnswer
+														? this.state.correctAnswer === 'B'
+															? 'correct'
+															: 'wrong'
+														: this.state.answer === null
 														? ''
 														: this.state.answer === 'B'
 														? 'answer'
@@ -285,7 +306,11 @@ class Player extends Component {
 												color="warning"
 												size="lg"
 												className={
-													this.state.answer === null
+													this.state.showAnswer
+														? this.state.correctAnswer === 'C'
+															? 'correct'
+															: 'wrong'
+														: this.state.answer === null
 														? ''
 														: this.state.answer === 'C'
 														? 'answer'
@@ -299,7 +324,11 @@ class Player extends Component {
 												color="danger"
 												size="lg"
 												className={
-													this.state.answer === null
+													this.state.showAnswer
+														? this.state.correctAnswer === 'D'
+															? 'correct'
+															: 'wrong'
+														: this.state.answer === null
 														? ''
 														: this.state.answer === 'D'
 														? 'answer'

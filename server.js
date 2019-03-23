@@ -66,7 +66,7 @@ app.post('/api/game', async (req, res) => {
 		'https://f9c1f452-5f7d-43ab-adef-4093241aaae5.mock.pstmn.io/api.php?amount=10&type=multiple=multiple'
 	//If value is 'any' then remove that parameter.
 	URL = URL.replace(/(&.{1,10}=any)/g, '')
-	const gameQuestions = await fetch(URL).then(res => res.json())
+	const gameQuestions = await fetch(testURL).then(res => res.json())
 	if (gameQuestions.response_code === 0) {
 		const gameid = await postGames(game)
 		let questions = gameQuestions.results.map((q, index) => {
@@ -210,8 +210,9 @@ server.listen(PORT, function() {
 })
 
 wss.on('connection', function open(ws) {
-	clients.push(ws)
 	console.log('New Client:', ws.protocol)
+	ws.on('message', data => wsReceiveData(data))
+	clients.push(ws)
 })
 
 wss.on('close', function close() {
@@ -228,6 +229,26 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 /* **WebSocket functions.** */
+
+function wsReceiveData(data) {
+	const wsData = JSON.parse(data)
+	switch (wsData.action) {
+		case 'SHOW_ANSWER':
+			wsShowAnswer(wsData.data.gameID)
+			break
+		default:
+			break
+	}
+}
+
+function wsShowAnswer(gameID) {
+	let players = clients.filter(client => client.protocol === gameID)
+	players.forEach(player => {
+		if (player.readyState === ws.OPEN) {
+			player.send(JSON.stringify({ showAnswer: true }))
+		}
+	})
+}
 
 function wsGameboard(gameboard) {
 	let gameboards = clients.filter(

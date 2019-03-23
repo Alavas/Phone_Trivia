@@ -15,8 +15,24 @@
 	.disabled {
 		pointer-events: none !important;
 		cursor: not-allowed !important;
-		opacity: 0.35 !important;
-		filter: alpha(opacity=35) !important;
+		opacity: 0.4 !important;
+		filter: alpha(opacity=40) !important;
+		-webkit-box-shadow: none !important;
+		box-shadow: none !important;
+	}
+	.wrong {
+		pointer-events: none !important;
+		cursor: not-allowed !important;
+		opacity: 0 !important;
+		filter: alpha(opacity=0) !important;
+		-webkit-box-shadow: none !important;
+		box-shadow: none !important;
+		transition: opacity 0.3s;
+		-webkit-transition: opacity 0.3s;
+	}
+	.correct {
+		pointer-events: none !important;
+		cursor: not-allowed !important;
 		-webkit-box-shadow: none !important;
 		box-shadow: none !important;
 	}
@@ -24,7 +40,6 @@
 		pointer-events: none !important;
 		cursor: not-allowed !important;
 		box-shadow: none !important;
-		border: 3px solid black !important;
 	}
 	h3 {
 		color: lightslategray;
@@ -58,6 +73,18 @@
 		width: 32.5px;
 		height: 32.5px;
 		border-radius: 50%;
+	}
+	.correct-answer {
+		position: absolute !important;
+		text-align: center;
+		color: black;
+		//font-size: 2em;
+		top: 0px;
+		left: 0px;
+		width: 100vw !important;
+		height: calc(100vh - 65px) !important;
+		background-color: rgba(255, 255, 255, 0.9) !important;
+		z-index: 999 !important;
 	}
 }
 .player-ui p {
