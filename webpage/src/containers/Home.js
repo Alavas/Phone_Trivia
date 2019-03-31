@@ -79,7 +79,7 @@ class Home extends Component {
 					</Link>
 					<a
 						style={{ textAlign: 'center', fontSize: '1em' }}
-						href="https://github.com/Alavas/Phone_Trivia/issues"
+						href="https://forms.gle/kvVbjsCRHGuHkw8z6"
 					>
 						Report An Issue
 					</a>
