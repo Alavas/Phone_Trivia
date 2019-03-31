@@ -140,7 +140,7 @@ async function postUsers(userID) {
 				client.release()
 				return {
 					userid: `${userID}`,
-					username: '',
+					avatar: null,
 					score: 0
 				}
 			} else {
