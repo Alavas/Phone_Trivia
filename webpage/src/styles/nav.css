@@ -45,10 +45,10 @@ p {
     font-size: 12px !important;
   }
 
-  a,
-p {
+  nav a,
+nav p {
     margin-top: 5px;
-    font-size: 1.75em;
+    font-size: 1.6em;
   }
 }
 
