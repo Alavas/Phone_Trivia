@@ -66,7 +66,7 @@ app.post('/api/game', async (req, res) => {
 		'https://f9c1f452-5f7d-43ab-adef-4093241aaae5.mock.pstmn.io/api.php?amount=10&type=multiple=multiple'
 	//If value is 'any' then remove that parameter.
 	URL = URL.replace(/(&.{1,10}=any)/g, '')
-	const gameQuestions = await fetch(testURL).then(res => res.json())
+	const gameQuestions = await fetch(URL).then(res => res.json())
 	if (gameQuestions.response_code === 0) {
 		const gameid = await postGames(game)
 		let questions = gameQuestions.results.map((q, index) => {
