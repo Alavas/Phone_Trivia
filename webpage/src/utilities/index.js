@@ -33,8 +33,12 @@ export const getCookie = cookie => {
 	return ''
 }
 
+//Update/create cookie with a 30 day expiration.
 export const updateCookie = userid => {
-	document.cookie = `gs_userid=${userid}`
+	let d = new Date()
+	d.setTime(d.getTime() + 30 * 24 * 60 * 60 * 1000)
+	let expires = 'expires=' + d.toUTCString()
+	document.cookie = `gs_userid=${userid}; expires=${expires}`
 }
 
 //Create UUID from the current time and the UserAgent details to ensure variances.
