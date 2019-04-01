@@ -18,6 +18,7 @@ import {
 	updateUser
 } from '../utilities'
 import Nav from '../components/Nav'
+import '../components/CountdownBar'
 import '../styles/player.css'
 
 class Player extends Component {
@@ -109,9 +110,10 @@ class Player extends Component {
 			reaction,
 			score
 		}
+		document.getElementById('countdown-bar').stop()
 		const result = await submitAnswer(submission)
 		if (result) {
-			this.setState({ answer, score, reaction })
+			this.setState({ answer, reaction })
 		}
 	}
 
@@ -143,30 +145,31 @@ class Player extends Component {
 		const dataType = Object.keys(data)
 		if (dataType[0] === 'gameID') {
 			this.setState({ ...data, answer: null, showAnswer: false })
+			if (document.getElementById('countdown-bar')) {
+				document.getElementById('countdown-bar').reset()
+				document.getElementById('countdown-bar').start()
+			}
 		} else if (dataType[0] === 'scores') {
-			this.setState({ ...data })
+			var currentScore = _.find(data.scores, x => {
+				return x.userid === this.state.userID
+			})
+			if (!_.isUndefined(currentScore)) {
+				currentScore = currentScore.totalscore
+			} else if (this.state.gameID === null) {
+				currentScore = ''
+			} else {
+				currentScore = this.state.score
+			}
+			this.setState({ ...data, score: currentScore })
 		} else {
 			this.setState({ ...data })
 		}
 	}
 
 	render() {
-		if (this.state.gamestate === gameStates.RESET) {
-			window.location = process.env.REACT_APP_GAMESHOW_ENDPOINT
-		}
-		var currentScore = _.find(this.state.scores, x => {
-			return x.userid === this.state.userID
-		})
-		if (!_.isUndefined(currentScore)) {
-			currentScore = currentScore.totalscore
-		} else if (this.state.gameID === null) {
-			currentScore = ''
-		} else {
-			currentScore = 0
-		}
 		return (
 			<div className="player-container">
-				<Nav avatar={this.state.avatar} score={currentScore} />
+				<Nav avatar={this.state.avatar} score={this.state.score} />
 				{this.state.joined ? (
 					<Websocket
 						url={process.env.REACT_APP_GAMESHOW_WEBSOCKET}
@@ -340,6 +343,11 @@ class Player extends Component {
 											</Button>
 										</React.Fragment>
 									)}
+									<countdown-bar
+										id="countdown-bar"
+										duration={7000}
+										delay={1}
+									/>
 								</div>
 							)
 						case gameStates.ENDED:

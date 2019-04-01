@@ -78,7 +78,6 @@
 		position: absolute !important;
 		text-align: center;
 		color: black;
-		//font-size: 2em;
 		top: 0px;
 		left: 0px;
 		width: 100vw !important;
@@ -93,8 +92,11 @@
 .player-ui .btn-lg {
 	margin-bottom: 10px !important;
 	color: #212529 !important;
-	height: 5.5em;
+	height: 5em;
 	font-size: 1.3em;
+}
+.player-ui .btn-lg:focus {
+	outline: none !important;
 }
 .qr {
 	margin-bottom: 25px;

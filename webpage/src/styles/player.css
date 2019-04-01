@@ -94,8 +94,12 @@
 .player-ui .btn-lg {
   margin-bottom: 10px !important;
   color: #212529 !important;
-  height: 5.5em;
+  height: 5em;
   font-size: 1.3em;
+}
+
+.player-ui .btn-lg:focus {
+  outline: none !important;
 }
 
 .qr {

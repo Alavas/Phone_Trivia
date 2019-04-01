@@ -38,6 +38,7 @@ import {
 	convertImage
 } from '../utilities'
 import Nav from '../components/Nav'
+import '../components/CountdownBar'
 import '../styles/host.css'
 
 class Host extends Component {
@@ -212,9 +213,10 @@ class Host extends Component {
 			reaction,
 			score
 		}
+		document.getElementById('countdown-bar').stop()
 		const result = await submitAnswer(submission)
 		if (result) {
-			this.setState({ answer, score, reaction })
+			this.setState({ answer, reaction })
 		}
 	}
 
@@ -241,8 +243,22 @@ class Host extends Component {
 		const dataType = Object.keys(data)
 		if (dataType[0] === 'gameID') {
 			this.setState({ ...data, answer: null, showAnswer: false })
+			if (document.getElementById('countdown-bar')) {
+				document.getElementById('countdown-bar').reset()
+				document.getElementById('countdown-bar').start()
+			}
 		} else if (dataType[0] === 'scores') {
-			this.setState({ ...data })
+			var currentScore = _.find(data.scores, x => {
+				return x.userid === this.state.userID
+			})
+			if (!_.isUndefined(currentScore)) {
+				currentScore = currentScore.totalscore
+			} else if (this.state.gameID === null) {
+				currentScore = ''
+			} else {
+				currentScore = this.state.score
+			}
+			this.setState({ ...data, score: currentScore })
 		} else {
 			this.setState({ ...data })
 		}
@@ -255,23 +271,12 @@ class Host extends Component {
 	}
 
 	render() {
-		var currentScore = _.find(this.state.scores, x => {
-			return x.userid === this.state.userID
-		})
-		if (!_.isUndefined(currentScore)) {
-			currentScore = currentScore.totalscore
-		} else if (this.state.gameID === null) {
-			currentScore = ''
-		} else {
-			currentScore = 0
-		}
 		return (
 			<div className="host-container">
-				<Nav avatar={this.state.avatar} score={currentScore} />
+				<Nav avatar={this.state.avatar} score={this.state.score} />
 				{this.state.joined ? (
 					<Websocket
 						url={process.env.REACT_APP_GAMESHOW_WEBSOCKET}
-						debug={true}
 						protocol={this.state.gameID}
 						onMessage={this.handleData.bind(this)}
 						ref={Websocket => {
@@ -575,6 +580,11 @@ class Host extends Component {
 											</Button>
 										</React.Fragment>
 									)}
+									<countdown-bar
+										id="countdown-bar"
+										duration={7000}
+										delay={1}
+									/>
 								</div>
 							) : (
 								<div className="host-ui">

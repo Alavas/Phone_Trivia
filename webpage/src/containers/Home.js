@@ -63,7 +63,8 @@ class Home extends Component {
 						textAlign: 'center',
 						fontSize: '1em',
 						color: 'lightslategray',
-						marginTop: '10px'
+						marginTop: '10px',
+						textShadow: '2px 2px #0d1260'
 					}}
 				>
 					Play on your own or with a group of friends.
