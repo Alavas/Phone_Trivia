@@ -211,8 +211,9 @@ export const gameCategories = [
 	{ value: 13, display: 'Entertainment: Musicals & Theatres' },
 	{ value: 14, display: 'Entertainment: Television' },
 	{ value: 15, display: 'Entertainment: Video Games' },
-	{ value: 17, display: 'Science &amp; Nature' },
 	{ value: 18, display: 'Science: Computers' },
+	{ value: 30, display: 'Science: Gadgets' },
+	{ value: 17, display: 'Science: Nature' },
 	{ value: 19, display: 'Science: Mathematics' },
 	{ value: 20, display: 'Mythology' },
 	{ value: 21, display: 'Sports' },
@@ -222,8 +223,7 @@ export const gameCategories = [
 	{ value: 25, display: 'Art' },
 	{ value: 27, display: 'Animals' },
 	{ value: 26, display: 'Celebrities' },
-	{ value: 28, display: 'Vehicles' },
-	{ value: 30, display: 'Science: Gadgets' }
+	{ value: 28, display: 'Vehicles' }
 ]
 
 //Game difficulty levels.

@@ -17,7 +17,8 @@ const Nav = props => {
 								? { display: 'none' }
 								: {
 										marginTop: '5px',
-										color: 'lightslategray'
+										color: 'lightslategray',
+										textShadow: '2px 2px #0d1260'
 								  }
 						}
 					>
