@@ -13,6 +13,7 @@
 	"license": "MIT",
 	"dependencies": {
 		"bootstrap": "^4.3.1",
+		"connected-react-router": "^6.3.2",
 		"dotenv": "^6.2.0",
 		"he": "^1.2.0",
 		"isomorphic-unfetch": "^3.0.0",
@@ -24,14 +25,19 @@
 		"react-dom": "^16.8.4",
 		"react-ga": "^2.5.7",
 		"react-qr-reader": "^2.1.2",
+		"react-redux": "^6.0.1",
 		"react-router-dom": "^4.3.1",
 		"react-scripts": "2.1.8",
 		"react-websocket": "^2.0.1",
 		"reactstrap": "^7.1.0",
+		"redux": "^4.0.1",
+		"redux-thunk": "^2.3.0",
 		"styled-jsx": "^3.2.1",
 		"uuid-by-string": "^2.0.1"
 	},
-	"devDependencies": {},
+	"devDependencies": {
+		"redux-logger": "^3.0.6"
+	},
 	"eslintConfig": {
 		"extends": "react-app"
 	},
