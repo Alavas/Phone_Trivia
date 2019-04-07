@@ -1,19 +1,25 @@
-import React from 'react'
-import { withRouter, Link } from 'react-router-dom'
+import React, { useEffect } from 'react'
+import { connect } from 'react-redux'
+import { push } from 'connected-react-router'
 import _ from 'lodash'
+import { userLogin } from '../actions/userActions'
 import '../styles/nav.css'
 
 const Nav = props => {
+	useEffect(() => {
+		props.login()
+	}, [])
 	return (
 		<nav className="fixed-bottom">
 			<ul>
 				<li>
-					<Link to="/">PHONETRIVIA</Link>
+					{/*eslint-disable-next-line*/}
+					<a onClick={() => props.updateHistory('/')}>PHONETRIVIA</a>
 				</li>
 				<ul>
 					<li
 						style={
-							_.isUndefined(props.score)
+							_.isUndefined(props.user.score) || props.pathname === '/'
 								? { display: 'none' }
 								: {
 										marginTop: '5px',
@@ -22,16 +28,20 @@ const Nav = props => {
 								  }
 						}
 					>
-						<h3>{props.score}</h3>
+						<h3>{props.user.score}</h3>
 					</li>
 					<li
 						style={
-							_.isNull(props.avatar)
+							_.isNull(props.user.avatar) || props.user.avatar === ''
 								? { display: 'none' }
 								: { padding: '0px', marginTop: '2.5px' }
 						}
 					>
-						<img src={props.avatar} alt="avatar" className="avatar" />
+						<img
+							src={props.user.avatar}
+							alt="avatar"
+							className="avatar"
+						/>
 					</li>
 				</ul>
 			</ul>
@@ -39,4 +49,23 @@ const Nav = props => {
 	)
 }
 
-export default withRouter(Nav)
+const mapStateToProps = state => {
+	return {
+		pathname: state.router.location.pathname,
+		user: state.user
+	}
+}
+
+const mapDispatchToProps = dispatch => {
+	return {
+		updateHistory: route => {
+			dispatch(push(route))
+		},
+		login: () => dispatch(userLogin())
+	}
+}
+
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps
+)(Nav)

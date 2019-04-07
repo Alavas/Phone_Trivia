@@ -1,6 +1,7 @@
 import getUuid from 'uuid-by-string'
+import { promisify } from 'es6-promisify'
 
-export const convertImage = (url, callback) => {
+export function convertImage(url, callback) {
 	var img = new Image()
 	img.crossOrigin = 'Anonymous'
 	img.onload = function() {
@@ -11,11 +12,13 @@ export const convertImage = (url, callback) => {
 		canvas.width = this.width
 		ctx.drawImage(this, 0, 0)
 		dataURL = canvas.toDataURL('jpg')
-		callback(dataURL)
+		callback(null, dataURL)
 		canvas = null
 	}
 	img.src = url
 }
+
+export const getDefaultAvatar = promisify(convertImage)
 
 export const getCookie = cookie => {
 	var name = cookie + '='
@@ -38,7 +41,7 @@ export const updateCookie = userid => {
 	let d = new Date()
 	d.setTime(d.getTime() + 30 * 24 * 60 * 60 * 1000)
 	let expires = 'expires=' + d.toUTCString()
-	document.cookie = `gs_userid=${userid}; expires=${expires}`
+	document.cookie = `gs_userid=${userid}; expires=${expires}; path='/'`
 }
 
 //Create UUID from the current time and the UserAgent details to ensure variances.
@@ -49,7 +52,11 @@ export const generateUUID = UA => {
 }
 
 //Login to the game backend.
-export const loginUser = async userID => {
+export const loginUser = async () => {
+	let userID = getCookie('gs_userid')
+	if (userID === '' || userID === 'undefined') {
+		userID = generateUUID(window.navigator.userAgent)
+	}
 	let data = JSON.stringify({ userID })
 	const userDetails = await fetch(
 		`${process.env.REACT_APP_GAMESHOW_ENDPOINT}/api/user`,

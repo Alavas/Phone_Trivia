@@ -1,7 +1,10 @@
-import QrReader from 'react-qr-reader'
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import QrReader from 'react-qr-reader'
 import QRCode from 'qrcode.react'
 import Websocket from 'react-websocket'
+import he from 'he'
+import _ from 'lodash'
 import {
 	Button,
 	Col,
@@ -17,13 +20,7 @@ import {
 	ModalFooter,
 	Row
 } from 'reactstrap'
-import he from 'he'
-import _ from 'lodash'
 import {
-	getCookie,
-	updateCookie,
-	generateUUID,
-	loginUser,
 	gameCategories,
 	gameDifficulties,
 	questionType,
@@ -33,17 +30,15 @@ import {
 	deleteGame,
 	connectGameboard,
 	submitAnswer,
-	gameStates,
-	updateUser,
-	convertImage
+	gameStates
 } from '../utilities'
-import Nav from '../components/Nav'
+import { userSetScore } from '../actions/userActions'
 import '../components/CountdownBar'
 import '../styles/host.css'
 
 class Host extends Component {
-	constructor() {
-		super()
+	constructor(props) {
+		super(props)
 		this.state = {
 			answer: null,
 			answers: [
@@ -53,7 +48,6 @@ class Host extends Component {
 				'Fourth Answer'
 			],
 			answertype: '',
-			avatar: null,
 			category: 'any_category',
 			correctAnswer: null,
 			difficulty: 'easy',
@@ -61,7 +55,6 @@ class Host extends Component {
 			gamestate: 0,
 			hostPlay: true,
 			joined: false,
-			loggedIn: false,
 			modal: false,
 			numQuestions: 10,
 			players: [],
@@ -73,8 +66,7 @@ class Host extends Component {
 			score: 0,
 			scores: [],
 			showAnswer: false,
-			type: 'any_type',
-			userID: ''
+			type: 'any_type'
 		}
 		this.submit = this.submit.bind(this)
 		this.updateGame = this.updateGame.bind(this)
@@ -87,18 +79,6 @@ class Host extends Component {
 		this.handleScan = this.handleScan.bind(this)
 	}
 
-	static getInitialProps({ query }) {
-		return { game: query }
-	}
-
-	componentDidMount() {
-		let userID = getCookie('gs_userid')
-		if (userID === '' || userID === 'undefined') {
-			userID = generateUUID(window.navigator.userAgent)
-		}
-		this.userLogin(userID)
-	}
-
 	async submit(e) {
 		e.preventDefault()
 		const gameSettings = {
@@ -106,9 +86,9 @@ class Host extends Component {
 			category: this.category.current.value,
 			difficulty: this.difficulty.current.value,
 			type: this.type.current.value,
-			host: this.state.userID
+			host: this.props.user.userID
 		}
-		const userID = this.state.userID
+		const userID = this.props.user.userID
 		const gameID = await createGame(gameSettings)
 		const joined = await joinGame({ userID, gameID })
 		const hostPlay = this.hostPlay.current.value === 'true'
@@ -120,31 +100,6 @@ class Host extends Component {
 			category: gameSettings.type,
 			gamestate: gameStates.CREATED,
 			hostPlay
-		})
-	}
-
-	async convertedImg(avatar) {
-		await updateUser({
-			userID: this.state.userID,
-			avatar
-		})
-		this.setState({ avatar, imgReady: true })
-	}
-
-	async userLogin(userID) {
-		const userDetails = await loginUser(userID)
-		updateCookie(userDetails.userid)
-		//If the user doesn't have an avatar generate a random one.
-		if (userDetails.avatar === null) {
-			convertImage(
-				'https://picsum.photos/100/?random',
-				this.convertedImg.bind(this)
-			)
-		}
-		this.setState({
-			userID: userDetails.userid,
-			avatar: userDetails.avatar,
-			loggedIn: true
 		})
 	}
 
@@ -208,7 +163,7 @@ class Host extends Component {
 		const submission = {
 			gameID: this.state.gameID,
 			questionID: this.state.questionID,
-			userID: this.state.userID,
+			userID: this.props.user.userID,
 			answer,
 			reaction,
 			score
@@ -249,16 +204,14 @@ class Host extends Component {
 			}
 		} else if (dataType[0] === 'scores') {
 			var currentScore = _.find(data.scores, x => {
-				return x.userid === this.state.userID
+				return x.userid === this.props.user.userID
 			})
 			if (!_.isUndefined(currentScore)) {
-				currentScore = currentScore.totalscore
+				this.props.updateScore(currentScore.totalscore)
 			} else if (this.state.gameID === null) {
-				currentScore = ''
-			} else {
-				currentScore = this.state.score
+				this.props.updateScore('')
 			}
-			this.setState({ ...data, score: currentScore })
+			this.setState({ ...data })
 		} else {
 			this.setState({ ...data })
 		}
@@ -273,7 +226,6 @@ class Host extends Component {
 	render() {
 		return (
 			<div className="host-container">
-				<Nav avatar={this.state.avatar} score={this.state.score} />
 				{this.state.joined ? (
 					<Websocket
 						url={process.env.REACT_APP_GAMESHOW_WEBSOCKET}
@@ -702,4 +654,19 @@ class Host extends Component {
 	}
 }
 
-export default Host
+const mapStateToProps = state => {
+	return {
+		user: state.user
+	}
+}
+
+const mapDispatchToProps = dispatch => {
+	return {
+		updateScore: score => dispatch(userSetScore(score))
+	}
+}
+
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps
+)(Host)

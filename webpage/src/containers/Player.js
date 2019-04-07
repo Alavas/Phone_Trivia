@@ -1,23 +1,13 @@
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import QrReader from 'react-qr-reader'
 import QRCode from 'qrcode.react'
 import Websocket from 'react-websocket'
-import { withRouter } from 'react-router-dom'
-import QrReader from 'react-qr-reader'
-import { Alert, Button, ListGroup, ListGroupItem } from 'reactstrap'
 import he from 'he'
 import _ from 'lodash'
-import {
-	getCookie,
-	updateCookie,
-	generateUUID,
-	loginUser,
-	convertImage,
-	joinGame,
-	submitAnswer,
-	gameStates,
-	updateUser
-} from '../utilities'
-import Nav from '../components/Nav'
+import { Button, ListGroup, ListGroupItem } from 'reactstrap'
+import { joinGame, submitAnswer, gameStates } from '../utilities'
+import { userSetScore } from '../actions/userActions'
 import '../components/CountdownBar'
 import '../styles/player.css'
 
@@ -28,7 +18,6 @@ class Player extends Component {
 			answer: null,
 			answers: [],
 			answertype: '',
-			avatar: null,
 			correctAnswer: null,
 			gameID: null,
 			gamestate: null,
@@ -40,61 +29,38 @@ class Player extends Component {
 			questionID: '',
 			reaction: 0,
 			result: 'No Result',
-			score: 0,
 			scores: [],
 			showAnswer: false,
-			userID: '',
 			validGame: false
 		}
 	}
 
 	componentDidMount() {
-		if (!_.isUndefined(this.props.match.params.gameKey)) {
-			this.setState({ gameID: this.props.match.params.gameKey })
-		}
-		this.handlePageOpened()
-	}
-
-	async convertedImg(avatar) {
-		await updateUser({
-			userID: this.state.userID,
-			avatar
-		})
-		this.setState({ avatar, imgReady: true })
-	}
-
-	async handlePageOpened() {
-		let userID = getCookie('gs_userid')
-		if (userID === '' || userID === 'undefined') {
-			userID = generateUUID(window.navigator.userAgent)
-		}
-		const loggedIn = await this.userLogin(userID)
-		if (loggedIn && this.state.gameID != null) {
-			const gameID = this.state.gameID
-			const joined = await joinGame({ userID, gameID })
-			if (joined) {
-				this.setState({ joined: true, gamestate: 1 })
-			}
-		} else {
+		//Accessed page from the home screen.
+		if (this.props.user.loggedIn) {
 			this.setState({ gamestate: 0 })
 		}
 	}
 
-	async userLogin(userID) {
-		const userDetails = await loginUser(userID)
-		updateCookie(userDetails.userid)
-		//If the user doesn't have an avatar generate a random one.
-		if (userDetails.avatar === null) {
-			convertImage(
-				'https://picsum.photos/100/?random',
-				this.convertedImg.bind(this)
-			)
+	componentDidUpdate(prevProps) {
+		if (this.props.user.loggedIn !== prevProps.user.loggedIn) {
+			if (!_.isUndefined(this.props.match.params.gameKey)) {
+				this.setState({ gameID: this.props.match.params.gameKey })
+				this.handlePageOpened(this.props.match.params.gameKey)
+			} else {
+				this.setState({ gamestate: 0 })
+			}
 		}
-		this.setState({
-			userID: userDetails.userid,
-			avatar: userDetails.avatar
-		})
-		return true
+	}
+
+	async handleJoinGame(gameID) {
+		if (this.props.user.loggedIn && gameID != null) {
+			const userID = this.props.user.userID
+			const joined = await joinGame({ userID, gameID })
+			if (joined) {
+				this.setState({ joined: true, gamestate: 1 })
+			}
+		}
 	}
 
 	async sendAnswer(answer) {
@@ -105,7 +71,7 @@ class Player extends Component {
 		const submission = {
 			gameID: this.state.gameID,
 			questionID: this.state.questionID,
-			userID: this.state.userID,
+			userID: this.props.user.userID,
 			answer,
 			reaction,
 			score
@@ -151,16 +117,14 @@ class Player extends Component {
 			}
 		} else if (dataType[0] === 'scores') {
 			var currentScore = _.find(data.scores, x => {
-				return x.userid === this.state.userID
+				return x.userid === this.props.user.userID
 			})
 			if (!_.isUndefined(currentScore)) {
-				currentScore = currentScore.totalscore
+				this.props.updateScore(currentScore.totalscore)
 			} else if (this.state.gameID === null) {
-				currentScore = ''
-			} else {
-				currentScore = this.state.score
+				this.props.updateScore('')
 			}
-			this.setState({ ...data, score: currentScore })
+			this.setState({ ...data })
 		} else {
 			this.setState({ ...data })
 		}
@@ -169,7 +133,6 @@ class Player extends Component {
 	render() {
 		return (
 			<div className="player-container">
-				<Nav avatar={this.state.avatar} score={this.state.score} />
 				{this.state.joined ? (
 					<Websocket
 						url={process.env.REACT_APP_GAMESHOW_WEBSOCKET}
@@ -187,6 +150,9 @@ class Player extends Component {
 										onError={this.handleError}
 										onScan={this.handleScan}
 										className="qr-reader"
+										ref={QrReader => {
+											this.qrRef = QrReader
+										}}
 									/>
 									<p>Scan a game QR code.</p>
 								</div>
@@ -194,9 +160,9 @@ class Player extends Component {
 						case gameStates.CREATED:
 							return (
 								<div className="player-ui">
-									<Alert color="success" size="lg">
+									<Button color="success" size="lg">
 										WAITING TO BEGIN...
-									</Alert>
+									</Button>
 									<div className="qr">
 										<QRCode
 											value={`${
@@ -437,4 +403,19 @@ class Player extends Component {
 	}
 }
 
-export default withRouter(Player)
+const mapStateToProps = state => {
+	return {
+		user: state.user
+	}
+}
+
+const mapDispatchToProps = dispatch => {
+	return {
+		updateScore: score => dispatch(userSetScore(score))
+	}
+}
+
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps
+)(Player)

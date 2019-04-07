@@ -1,9 +1,20 @@
 import { combineReducers } from 'redux'
-import { userReducer } from './userReducer'
+import { combineEpics } from 'redux-observable'
+import user, {
+	userDefaultAvatarEpic,
+	userLoginEpic,
+	userUpdateCookieEpic
+} from './userReducer'
 import { connectRouter } from 'connected-react-router'
+
+export const rootEpic = combineEpics(
+	userLoginEpic,
+	userUpdateCookieEpic,
+	userDefaultAvatarEpic
+)
 
 export default history =>
 	combineReducers({
-		userReducer,
+		user,
 		router: connectRouter(history)
 	})
