@@ -29,7 +29,7 @@ const {
 
 const PORT = parseInt(process.env.PORT, 10) || 5000
 const dev = process.env.NODE_ENV !== 'production'
-console.log(process.env.NODE_ENV)
+console.log('DEV:', dev)
 //Global variable to store WebSocket clients.
 var clients = []
 
@@ -60,10 +60,15 @@ app.get('/api/game', async (req, res) => {
 
 app.post('/api/game', async (req, res) => {
 	const game = req.body.gameSettings
+	var URL = ''
 	// prettier-ignore
-	let URL = `https://opentdb.com/api.php?amount=${game.amount}&category=${game.category}&difficulty=${game.difficulty}&type=${game.type}`
-	let testURL =
-		'https://f9c1f452-5f7d-43ab-adef-4093241aaae5.mock.pstmn.io/api.php?amount=10&type=multiple=multiple'
+	if (dev) {
+		URL =
+			'https://f9c1f452-5f7d-43ab-adef-4093241aaae5.mock.pstmn.io/api.php?amount=10&type=multiple=multiple'
+	} else {
+
+		URL = `https://opentdb.com/api.php?amount=${game.amount}&category=${game.category}&difficulty=${game.difficulty}&type=${game.type}`
+	}
 	//If value is 'any' then remove that parameter.
 	URL = URL.replace(/(&.{1,10}=any)/g, '')
 	const gameQuestions = await fetch(URL).then(res => res.json())
