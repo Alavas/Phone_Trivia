@@ -51,7 +51,7 @@ class Host extends Component {
 			category: 'any_category',
 			correctAnswer: null,
 			difficulty: 'easy',
-			gameID: '',
+			gameID: null,
 			gamestate: 0,
 			hostPlay: true,
 			joined: false,
@@ -63,7 +63,6 @@ class Host extends Component {
 			question: 'This is a test question?',
 			questionID: '',
 			reaction: 0,
-			score: 0,
 			scores: [],
 			showAnswer: false,
 			type: 'any_type'

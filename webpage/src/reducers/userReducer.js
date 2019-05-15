@@ -1,5 +1,12 @@
-import { filter, mergeMap, catchError } from 'rxjs/operators'
+import {
+	filter,
+	mergeMap,
+	catchError,
+	map,
+	withLatestFrom
+} from 'rxjs/operators'
 import { ofType } from 'redux-observable'
+import _ from 'lodash'
 import {
 	getDefaultAvatar,
 	loginUser,
@@ -9,7 +16,8 @@ import {
 import {
 	userLoginSuccess,
 	userLoginError,
-	userSetAvatar
+	userSetAvatar,
+	userSetScore
 } from '../actions/userActions'
 
 //Login the user to the backend server.
@@ -47,6 +55,25 @@ export const userDefaultAvatarEpic = (action$, state$) =>
 			return userSetAvatar(avatar)
 		}),
 		catchError(err => userLoginError(err))
+	)
+
+export const userWSScoreEpic = (action$, state$) =>
+	action$.pipe(
+		ofType('WS_SCORES'),
+		withLatestFrom(state$),
+		map(state$ => ({ scores: state$[0].data, state: state$[1] })),
+		map(data => {
+			var currentScore = _.find(data.scores, score => {
+				return score.userid === data.state.user.userID
+			})
+			if (!_.isUndefined(currentScore)) {
+				currentScore = currentScore.totalscore
+			} else {
+				currentScore = data.state.user.score
+			}
+			return currentScore
+		}),
+		map(score => userSetScore(score))
 	)
 
 export default (

@@ -2,75 +2,50 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import QrReader from 'react-qr-reader'
 import QRCode from 'qrcode.react'
-import Websocket from 'react-websocket'
 import he from 'he'
 import _ from 'lodash'
 import { Button, ListGroup, ListGroupItem } from 'reactstrap'
-import { joinGame, submitAnswer, gameStates } from '../utilities'
+import { submitAnswer, gameStates } from '../utilities'
 import { userSetScore } from '../actions/userActions'
 import '../components/CountdownBar'
 import '../styles/player.css'
+import { gameStateUpdate, gameJoin } from '../actions/gameActions'
 
 class Player extends Component {
 	constructor() {
 		super()
 		this.state = {
 			answer: null,
-			answers: [],
-			answertype: '',
-			correctAnswer: null,
-			gameID: null,
-			gamestate: null,
-			joined: false,
-			players: [],
-			qNumber: 0,
-			qStart: 0,
-			question: '',
-			questionID: '',
-			reaction: 0,
-			result: 'No Result',
-			scores: [],
-			showAnswer: false,
-			validGame: false
+			reaction: 0
 		}
 	}
 
 	componentDidMount() {
 		//Accessed page from the home screen.
 		if (this.props.user.loggedIn) {
-			this.setState({ gamestate: 0 })
+			this.props.updateGameState(gameStates.NOTSTARTED)
 		}
 	}
 
 	componentDidUpdate(prevProps) {
 		if (this.props.user.loggedIn !== prevProps.user.loggedIn) {
 			if (!_.isUndefined(this.props.match.params.gameKey)) {
-				this.setState({ gameID: this.props.match.params.gameKey })
-				this.handlePageOpened(this.props.match.params.gameKey)
+				const gameID = this.props.match.params.gameKey
+				this.props.joinGame(gameID)
 			} else {
-				this.setState({ gamestate: 0 })
-			}
-		}
-	}
-
-	async handleJoinGame(gameID) {
-		if (this.props.user.loggedIn && gameID != null) {
-			const userID = this.props.user.userID
-			const joined = await joinGame({ userID, gameID })
-			if (joined) {
-				this.setState({ joined: true, gamestate: 1 })
+				this.props.updateGameState(gameStates.NOTSTARTED)
 			}
 		}
 	}
 
 	async sendAnswer(answer) {
-		let reaction = Date.now() - this.state.qStart
+		let reaction = Date.now() - this.props.game.qStart
 		reaction = Math.max(reaction, 1000)
 		let score = Math.round(25 * (10000 / (reaction - 500)))
 		score = Math.min(Math.max(score, 0), 250)
 		const submission = {
-			gameID: this.state.gameID,
-			questionID: this.state.questionID,
+			gameID: this.props.game.gameID,
+			questionID: this.props.game.questionID,
 			userID: this.props.user.userID,
 			answer,
 			reaction,
@@ -90,14 +65,8 @@ class Player extends Component {
 		if (data) {
 			//Regex to confirm that the link is valid.
 			if (regex.test(data)) {
-				this.setState({
-					result: data,
-					validGame: true
-				})
 				//Redirect to the game URL.
 				window.location = data
-			} else {
-				this.setState({ validGame: false })
 			}
 		}
 	}
@@ -106,42 +75,11 @@ class Player extends Component {
 		console.error(err)
 	}
 
-	handleData(data) {
-		data = JSON.parse(data)
-		const dataType = Object.keys(data)
-		if (dataType[0] === 'gameID') {
-			this.setState({ ...data, answer: null, showAnswer: false })
-			if (document.getElementById('countdown-bar')) {
-				document.getElementById('countdown-bar').reset()
-				document.getElementById('countdown-bar').start()
-			}
-		} else if (dataType[0] === 'scores') {
-			var currentScore = _.find(data.scores, x => {
-				return x.userid === this.props.user.userID
-			})
-			if (!_.isUndefined(currentScore)) {
-				this.props.updateScore(currentScore.totalscore)
-			} else if (this.state.gameID === null) {
-				this.props.updateScore('')
-			}
-			this.setState({ ...data })
-		} else {
-			this.setState({ ...data })
-		}
-	}
-
 	render() {
 		return (
 			<div className="player-container">
-				{this.state.joined ? (
-					<Websocket
-						url={process.env.REACT_APP_GAMESHOW_WEBSOCKET}
-						protocol={this.state.gameID}
-						onMessage={this.handleData.bind(this)}
-					/>
-				) : null}
 				{(() => {
-					switch (this.state.gamestate) {
+					switch (this.props.game.gamestate) {
 						case gameStates.NOTSTARTED:
 							return (
 								<div className="player-ui">
@@ -167,7 +105,7 @@ class Player extends Component {
 										<QRCode
 											value={`${
 												process.env.REACT_APP_GAMESHOW_ENDPOINT
-											}/player/${this.state.gameID}`}
+											}/player/${this.props.game.gameID}`}
 											size={225}
 											bgColor={'#ffffff'}
 											fgColor={'#000000'}
@@ -192,21 +130,22 @@ class Player extends Component {
 						case gameStates.QUESTIONS:
 							return (
 								<div className="player-ui">
-									<h3>Question {this.state.qNumber}</h3>
-									<h5>{he.decode(this.state.question)}</h5>
-									{this.state.answertype === 'boolean' ? (
+									<h3>Question {this.props.game.qNumber}</h3>
+									<h5>{he.decode(this.props.game.question)}</h5>
+									{this.props.game.answertype === 'boolean' ? (
 										<React.Fragment>
 											<Button
 												color="success"
 												size="lg"
 												className={
-													this.state.showAnswer
-														? this.state.correctAnswer === 'A'
+													this.props.game.showAnswer
+														? this.props.game.correctAnswer ===
+														  'A'
 															? 'correct'
 															: 'wrong'
-														: this.state.answer === null
+														: this.props.game.answer === null
 														? ''
-														: this.state.answer === 'A'
+														: this.props.game.answer === 'A'
 														? 'answer'
 														: 'disabled'
 												}
@@ -218,13 +157,14 @@ class Player extends Component {
 												color="danger"
 												size="lg"
 												className={
-													this.state.showAnswer
-														? this.state.correctAnswer === 'B'
+													this.props.game.showAnswer
+														? this.props.game.correctAnswer ===
+														  'B'
 															? 'correct'
 															: 'wrong'
-														: this.state.answer === null
+														: this.props.game.answer === null
 														? ''
-														: this.state.answer === 'B'
+														: this.props.game.answer === 'B'
 														? 'answer'
 														: 'disabled'
 												}
@@ -239,73 +179,77 @@ class Player extends Component {
 												color="success"
 												size="lg"
 												className={
-													this.state.showAnswer
-														? this.state.correctAnswer === 'A'
+													this.props.game.showAnswer
+														? this.props.game.correctAnswer ===
+														  'A'
 															? 'correct'
 															: 'wrong'
-														: this.state.answer === null
+														: this.props.game.answer === null
 														? ''
-														: this.state.answer === 'A'
+														: this.props.game.answer === 'A'
 														? 'answer'
 														: 'disabled'
 												}
 												onClick={() => this.sendAnswer('A')}
 											>
-												{he.decode(this.state.answers[0])}
+												{he.decode(this.props.game.answers[0])}
 											</Button>
 											<Button
 												color="primary"
 												size="lg"
 												className={
-													this.state.showAnswer
-														? this.state.correctAnswer === 'B'
+													this.props.game.showAnswer
+														? this.props.game.correctAnswer ===
+														  'B'
 															? 'correct'
 															: 'wrong'
-														: this.state.answer === null
+														: this.props.game.answer === null
 														? ''
-														: this.state.answer === 'B'
+														: this.props.game.answer === 'B'
 														? 'answer'
 														: 'disabled'
 												}
 												onClick={() => this.sendAnswer('B')}
 											>
-												{he.decode(this.state.answers[1])}
+												{he.decode(this.props.game.answers[1])}
 											</Button>
 											<Button
 												color="warning"
 												size="lg"
 												className={
-													this.state.showAnswer
-														? this.state.correctAnswer === 'C'
+													this.props.game.showAnswer
+														? this.props.game.correctAnswer ===
+														  'C'
 															? 'correct'
 															: 'wrong'
-														: this.state.answer === null
+														: this.props.game.answer === null
 														? ''
-														: this.state.answer === 'C'
+														: this.props.game.answer === 'C'
 														? 'answer'
 														: 'disabled'
 												}
 												onClick={() => this.sendAnswer('C')}
 											>
-												{he.decode(this.state.answers[2])}
+												{he.decode(this.props.game.answers[2])}
 											</Button>
 											<Button
 												color="danger"
 												size="lg"
 												className={
-													this.state.showAnswer
-														? this.state.correctAnswer === 'D'
+													this.props.game.showAnswer
+														? this.props.game.correctAnswer ===
+														  'D'
 															? 'correct'
 															: 'wrong'
-														: this.state.answer === null
+														: this.props.game.answer === null
 														? ''
-														: this.state.answer === 'D'
+														: this.props.game.answer === 'D'
 														? 'answer'
 														: 'disabled'
 												}
 												onClick={() => this.sendAnswer('D')}
 											>
-												{he.decode(this.state.answers[3])}
+												{he.decode(this.props.game.answers[3])}
 											</Button>
 										</React.Fragment>
 									)}
@@ -323,7 +267,9 @@ class Player extends Component {
 										<h1>GAME OVER</h1>
 									</div>
 									<ListGroup className="player-scores">
-										{_.isUndefined(this.state.scores[0]) ? null : (
+										{_.isUndefined(
+											this.props.game.scores[0]
+										) ? null : (
 											<ListGroupItem className="player-score">
 												<h3
 													style={{
@@ -334,20 +280,26 @@ class Player extends Component {
 													<img
 														alt="first-place"
 														src={
-															_.find(this.state.players, x => {
-																return (
-																	x.userid ===
-																	this.state.scores[0].userid
-																)
-															}).avatar
+															_.find(
+																this.props.game.players,
+																x => {
+																	return (
+																		x.userid ===
+																		this.props.game.scores[0]
+																			.userid
+																	)
+																}
+															).avatar
 														}
 														className="avatar-scores"
 													/>
-													{this.state.scores[0].totalscore}
+													{this.props.game.scores[0].totalscore}
 												</h3>
 											</ListGroupItem>
 										)}
-										{_.isUndefined(this.state.scores[1]) ? null : (
+										{_.isUndefined(
+											this.props.game.scores[1]
+										) ? null : (
 											<ListGroupItem className="player-score">
 												<h3
 													style={{
@@ -358,36 +310,46 @@ class Player extends Component {
 													<img
 														alt="avatar-scores"
 														src={
-															_.find(this.state.players, x => {
-																return (
-																	x.userid ===
-																	this.state.scores[1].userid
-																)
-															}).avatar
+															_.find(
+																this.props.game.players,
+																x => {
+																	return (
+																		x.userid ===
+																		this.props.game.scores[1]
+																			.userid
+																	)
+																}
+															).avatar
 														}
 														className="avatar-scores"
 													/>
-													{this.state.scores[1].totalscore}
+													{this.props.game.scores[1].totalscore}
 												</h3>
 											</ListGroupItem>
 										)}
-										{_.isUndefined(this.state.scores[2]) ? null : (
+										{_.isUndefined(
+											this.props.game.scores[2]
+										) ? null : (
 											<ListGroupItem className="player-score">
 												<h3 style={{ fontSize: '1.75em' }}>
 													3<sup>rd</sup> Place:
 													<img
 														alt="third-place"
 														src={
-															_.find(this.state.players, x => {
-																return (
-																	x.userid ===
-																	this.state.scores[2].userid
-																)
-															}).avatar
+															_.find(
+																this.props.game.players,
+																x => {
+																	return (
+																		x.userid ===
+																		this.props.game.scores[2]
+																			.userid
+																	)
+																}
+															).avatar
 														}
 														className="avatar-scores"
 													/>
-													{this.state.scores[2].totalscore}
+													{this.props.game.scores[2].totalscore}
 												</h3>
 											</ListGroupItem>
 										)}
@@ -405,12 +367,15 @@ class Player extends Component {
 
 const mapStateToProps = state => {
 	return {
+		game: state.game,
 		user: state.user
 	}
 }
 
 const mapDispatchToProps = dispatch => {
 	return {
+		joinGame: gameID => dispatch(gameJoin(gameID)),
+		updateGameState: gamestate => dispatch(gameStateUpdate(gamestate)),
 		updateScore: score => dispatch(userSetScore(score))
 	}
 }

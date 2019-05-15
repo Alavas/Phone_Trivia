@@ -1,7 +1,7 @@
 import getUuid from 'uuid-by-string'
 import { promisify } from 'es6-promisify'
 
-export function convertImage(url, callback) {
+function convertImage(url, callback) {
 	var img = new Image()
 	img.crossOrigin = 'Anonymous'
 	img.onload = function() {
@@ -72,6 +72,7 @@ export const loginUser = async () => {
 	return userDetails
 }
 
+//Update the avatar of the user.
 export const updateUser = async ({ userID, avatar }) => {
 	let data = JSON.stringify({ userID, avatar })
 	const user = await fetch(
@@ -88,6 +89,7 @@ export const updateUser = async ({ userID, avatar }) => {
 	return user
 }
 
+//Get list of all existing games.
 export const getGames = async () => {
 	const games = await fetch(
 		`${process.env.REACT_APP_GAMESHOW_ENDPOINT}/api/game`,
@@ -248,6 +250,7 @@ export const questionType = [
 	{ value: 'any', display: 'Mixed' }
 ]
 
+//Gamestates for consistency.
 export const gameStates = {
 	NOTSTARTED: 0,
 	CREATED: 1,

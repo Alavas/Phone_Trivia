@@ -237,6 +237,7 @@ if (process.env.NODE_ENV === 'production') {
 
 function wsReceiveData(data) {
 	const wsData = JSON.parse(data)
+	console.log('WS Msg: ', wsData)
 	switch (wsData.action) {
 		case 'SHOW_ANSWER':
 			wsShowAnswer(wsData.data.gameID)
@@ -251,6 +252,7 @@ function wsShowAnswer(gameID) {
 	players.forEach(player => {
 		if (player.readyState === ws.OPEN) {
 			player.send(JSON.stringify({ showAnswer: true }))
+			player.send(JSON.stringify({ type: 'WS_SHOWANSWER', data: true }))
 		}
 	})
 }
@@ -296,6 +298,7 @@ async function wsScores(gameID, scores) {
 	players.forEach(player => {
 		if (player.readyState === ws.OPEN) {
 			player.send(JSON.stringify({ scores }))
+			player.send(JSON.stringify({ type: 'WS_SCORES', data: scores }))
 		}
 	})
 }
@@ -312,6 +315,9 @@ async function wsGame(game) {
 		players.forEach(player => {
 			if (player.readyState === ws.OPEN) {
 				player.send(JSON.stringify({ players: gamePlayers }))
+				player.send(
+					JSON.stringify({ type: 'WS_PLAYERS', data: gamePlayers })
+				)
 			}
 		})
 	}
@@ -325,6 +331,7 @@ async function wsGame(game) {
 	players.forEach(player => {
 		if (player.readyState === ws.OPEN) {
 			player.send(JSON.stringify(game))
+			player.send(JSON.stringify({ type: 'WS_GAME', data: game }))
 		}
 	})
 }
