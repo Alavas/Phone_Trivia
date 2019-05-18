@@ -22,3 +22,12 @@ export const gameJoinError = err => ({
 	type: 'GAME_JOIN_ERROR',
 	err
 })
+
+export const gameUpdateAnswer = answer => ({
+	type: 'GAME_UPDATE_ANSWER',
+	answer
+})
+
+export const gameShowAnswer = () => ({
+	type: 'GAME_SHOW_ANSWER'
+})

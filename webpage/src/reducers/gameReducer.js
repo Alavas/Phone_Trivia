@@ -3,7 +3,8 @@ import {
 	withLatestFrom,
 	map,
 	catchError,
-	switchMap
+	switchMap,
+	ignoreElements
 } from 'rxjs/operators'
 import { webSocket } from 'rxjs/webSocket'
 import { ofType } from 'redux-observable'
@@ -12,6 +13,7 @@ import { gameJoinSuccess, gameJoinError } from '../actions/gameActions'
 
 var socket$ //Placeholder for websocket stream.
 
+//Join a game.
 export const gameJoinEpic = (action$, state$) =>
 	action$.pipe(
 		ofType('GAME_JOIN'),
@@ -30,6 +32,7 @@ export const gameJoinEpic = (action$, state$) =>
 		catchError(err => gameJoinError(err))
 	)
 
+//Create a Websocket connection to the server once the game is joined.
 export const gameWebSocketEpic = (action$, state$) =>
 	action$.pipe(
 		ofType('GAME_JOIN_SUCCESS'),
@@ -52,12 +55,30 @@ export const gameWebSocketEpic = (action$, state$) =>
 				msg =>
 					msg.type === 'WS_GAME' ||
 					msg.type === 'WS_SCORES' ||
-					msg.type === 'WS_PLAYERS'
+					msg.type === 'WS_PLAYERS' ||
+					msg.type === 'WS_SHOW_ANSWER'
 			)
 		}),
 		map(msg => ({ type: msg.type, data: msg.data }))
 	)
 
+//Websocket message to server for showing game answer, rebroadcast to all players.
+export const gameShowAnswerEpic = (action$, state$) =>
+	action$.pipe(
+		ofType('GAME_SHOW_ANSWER'),
+		withLatestFrom(state$),
+		map(([, state]) => state),
+		map(state => {
+			const wsData = {
+				type: 'SHOW_ANSWER',
+				gameID: state.game.gameID
+			}
+			socket$._socket.send(JSON.stringify(wsData))
+		}),
+		ignoreElements()
+	)
+
+//Receive general Websocket messages for the game. State/Questions/etc...
 export const gameWSGameEpic = action$ =>
 	action$.pipe(
 		ofType('WS_GAME'),
@@ -73,16 +94,25 @@ export const gameWSGameEpic = action$ =>
 		})
 	)
 
+//Receive Websocket message of game scores.
 export const gameWSScoresEpic = action$ =>
 	action$.pipe(
 		ofType('WS_SCORES'),
 		map(action => ({ type: 'GAME_WS_SCORES', scores: action.data }))
 	)
 
+//Receive Websocket message containing all players for the gmae.
 export const gameWSPlayersEpic = action$ =>
 	action$.pipe(
 		ofType('WS_PLAYERS'),
 		map(action => ({ type: 'GAME_WS_PLAYERS', players: action.data }))
+	)
+
+//Receive Websocket message to show the answer to the current question.
+export const gameWSShowAnswerEpic = action$ =>
+	action$.pipe(
+		ofType('WS_SHOW_ANSWER'),
+		map(action => ({ type: 'GAME_WS_SHOW_ANSWER', showAnswer: action.data }))
 	)
 
 export default (
@@ -112,6 +142,9 @@ export default (
 		case 'GAME_UPDATE_STATE':
 			state = { ...state, gamestate: action.gamestate }
 			break
+		case 'GAME_UPDATE_ANSWER':
+			state = { ...state, answer: action.answer }
+			break
 		case 'GAME_JOIN_SUCCESS':
 			state = {
 				...state,
@@ -121,8 +154,6 @@ export default (
 			}
 			break
 		case 'GAME_WS_UPDATE':
-			const test = { WSTest: 'testing...' }
-			socket$._socket.send(JSON.stringify(test))
 			state = { ...state, ...action.data }
 			break
 		case 'GAME_WS_SCORES':
@@ -130,6 +161,9 @@ export default (
 			break
 		case 'GAME_WS_PLAYERS':
 			state = { ...state, players: action.players }
+			break
+		case 'GAME_WS_SHOW_ANSWER':
+			state = { ...state, showAnswer: action.showAnswer }
 			break
 		default:
 			break

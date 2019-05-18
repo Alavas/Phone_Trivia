@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import QrReader from 'react-qr-reader'
 import QRCode from 'qrcode.react'
-import Websocket from 'react-websocket'
 import he from 'he'
 import _ from 'lodash'
 import {
@@ -24,7 +23,6 @@ import {
 	gameCategories,
 	gameDifficulties,
 	questionType,
-	joinGame,
 	createGame,
 	updateGame,
 	deleteGame,
@@ -35,40 +33,22 @@ import {
 import { userSetScore } from '../actions/userActions'
 import '../components/CountdownBar'
 import '../styles/host.css'
+import {
+	gameJoin,
+	gameStateUpdate,
+	gameShowAnswer,
+	gameUpdateAnswer
+} from '../actions/gameActions'
 
 class Host extends Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			answer: null,
-			answers: [
-				'First Answer',
-				'Second Answer',
-				'Third Answer',
-				'Fourth Answer'
-			],
-			answertype: '',
-			category: 'any_category',
-			correctAnswer: null,
-			difficulty: 'easy',
-			gameID: null,
-			gamestate: 0,
 			hostPlay: true,
-			joined: false,
 			modal: false,
-			numQuestions: 10,
-			players: [],
-			qNumber: 0,
-			qStart: 0,
-			question: 'This is a test question?',
-			questionID: '',
-			reaction: 0,
-			scores: [],
-			showAnswer: false,
-			type: 'any_type'
+			numQuestions: 0
 		}
 		this.submit = this.submit.bind(this)
-		this.updateGame = this.updateGame.bind(this)
 		this.amount = React.createRef()
 		this.category = React.createRef()
 		this.difficulty = React.createRef()
@@ -76,6 +56,19 @@ class Host extends Component {
 		this.hostPlay = React.createRef()
 		this.toggleModal = this.toggleModal.bind(this)
 		this.handleScan = this.handleScan.bind(this)
+	}
+
+	componentDidMount() {
+		//Accessed page from the home screen.
+		if (this.props.user.loggedIn) {
+			this.props.updateGameState(gameStates.NOTSTARTED)
+		}
+	}
+
+	componentDidUpdate(prevProps) {
+		if (this.props.user.loggedIn !== prevProps.user.loggedIn) {
+			this.props.updateGameState(gameStates.NOTSTARTED)
+		}
 	}
 
 	async submit(e) {
@@ -87,30 +80,13 @@ class Host extends Component {
 			type: this.type.current.value,
 			host: this.props.user.userID
 		}
-		const userID = this.props.user.userID
 		const gameID = await createGame(gameSettings)
-		const joined = await joinGame({ userID, gameID })
+		this.props.joinGame(gameID)
 		const hostPlay = this.hostPlay.current.value === 'true'
 		this.setState({
-			gameID,
-			joined,
-			numQuestions: parseInt(gameSettings.amount),
-			difficulty: gameSettings.difficulty,
-			category: gameSettings.type,
-			gamestate: gameStates.CREATED,
-			hostPlay
+			hostPlay,
+			numQuestions: gameSettings.amount
 		})
-	}
-
-	async nextQuestion() {
-		const nextQ = this.state.qNumber + 1
-		if (nextQ > this.state.numQuestions) {
-			this.updateGame(gameStates.ENDED)
-		} else {
-			this.setState({ qNumber: nextQ }, () =>
-				this.updateGame(gameStates.QUESTIONS)
-			)
-		}
 	}
 
 	async startGame(delay) {
@@ -118,33 +94,31 @@ class Host extends Component {
 			do {
 				await this.nextQuestion()
 				await new Promise(resolve => setTimeout(resolve, delay))
-				const wsTest = {
-					action: 'SHOW_ANSWER',
-					data: { gameID: this.state.gameID }
-				}
-				this.wsRef.sendMessage(JSON.stringify(wsTest))
+				this.props.showAnswer()
 				await new Promise(resolve => setTimeout(resolve, 1500))
-			} while (this.state.qNumber < this.state.numQuestions)
+			} while (this.props.game.qNumber < this.state.numQuestions)
 			await this.nextQuestion()
 		} else {
 			this.nextQuestion()
 		}
 	}
 
-	async updateGame(state) {
-		const gameID = this.state.gameID
-		const qNumber = this.state.qNumber
-		const game = await updateGame({ state, gameID, qNumber })
-		this.setState({
-			gamestate: game.gamestate,
-			qNumber: game.qNumber,
-			questionID: game.questionID,
-			answertype: game.answertype
-		})
+	async nextQuestion() {
+		const qNumber = this.props.game.qNumber + 1
+		const gameID = this.props.game.gameID
+		if (qNumber > this.state.numQuestions) {
+			await updateGame({ gamestate: gameStates.ENDED, gameID })
+		} else {
+			await updateGame({
+				gamestate: gameStates.QUESTIONS,
+				gameID,
+				qNumber
+			})
+		}
 	}
 
 	async endGame() {
-		const gameID = this.state.gameID
+		const gameID = this.props.game.gameID
 		const deleted = await deleteGame(gameID)
 		if (deleted) {
 			window.location = process.env.REACT_APP_GAMESHOW_ENDPOINT
@@ -155,13 +129,13 @@ class Host extends Component {
 	}
 
 	async sendAnswer(answer) {
-		let reaction = Date.now() - this.state.qStart
+		let reaction = Date.now() - this.props.game.qStart
 		reaction = Math.max(reaction, 1000)
 		let score = Math.round(25 * (10000 / (reaction - 500)))
 		score = Math.min(Math.max(score, 0), 250)
 		const submission = {
-			gameID: this.state.gameID,
-			questionID: this.state.questionID,
+			gameID: this.props.game.gameID,
+			questionID: this.props.game.questionID,
 			userID: this.props.user.userID,
 			answer,
 			reaction,
@@ -170,7 +144,8 @@ class Host extends Component {
 		document.getElementById('countdown-bar').stop()
 		const result = await submitAnswer(submission)
 		if (result) {
-			this.setState({ answer, reaction })
+			this.setState({ answer })
+			this.props.updateAnswer(answer)
 		}
 	}
 
@@ -181,7 +156,7 @@ class Host extends Component {
 		if (data) {
 			//Regex to confirm that the link is valid.
 			if (regex.test(data)) {
-				const gameID = this.state.gameID
+				const gameID = this.props.game.gameID
 				connectGameboard({ userID: data, gameID })
 				this.setState({ modal: false })
 			}
@@ -190,30 +165,6 @@ class Host extends Component {
 
 	handleError(err) {
 		console.error(err)
-	}
-
-	handleData(data) {
-		data = JSON.parse(data)
-		const dataType = Object.keys(data)
-		if (dataType[0] === 'gameID') {
-			this.setState({ ...data, answer: null, showAnswer: false })
-			if (document.getElementById('countdown-bar')) {
-				document.getElementById('countdown-bar').reset()
-				document.getElementById('countdown-bar').start()
-			}
-		} else if (dataType[0] === 'scores') {
-			var currentScore = _.find(data.scores, x => {
-				return x.userid === this.props.user.userID
-			})
-			if (!_.isUndefined(currentScore)) {
-				this.props.updateScore(currentScore.totalscore)
-			} else if (this.state.gameID === null) {
-				this.props.updateScore('')
-			}
-			this.setState({ ...data })
-		} else {
-			this.setState({ ...data })
-		}
 	}
 
 	toggleModal() {
@@ -225,18 +176,8 @@ class Host extends Component {
 	render() {
 		return (
 			<div className="host-container">
-				{this.state.joined ? (
-					<Websocket
-						url={process.env.REACT_APP_GAMESHOW_WEBSOCKET}
-						protocol={this.state.gameID}
-						onMessage={this.handleData.bind(this)}
-						ref={Websocket => {
-							this.wsRef = Websocket
-						}}
-					/>
-				) : null}
 				{(() => {
-					switch (this.state.gamestate) {
+					switch (this.props.game.gamestate) {
 						case gameStates.NOTSTARTED:
 							return (
 								<div className="host-ui">
@@ -345,7 +286,10 @@ class Host extends Component {
 										color="success"
 										size="lg"
 										onClick={() =>
-											this.updateGame(gameStates.STARTED)
+											updateGame({
+												gamestate: gameStates.STARTED,
+												gameID: this.props.game.gameID
+											})
 										}
 									>
 										Begin Game
@@ -354,7 +298,7 @@ class Host extends Component {
 										<QRCode
 											value={`${
 												process.env.REACT_APP_GAMESHOW_ENDPOINT
-											}/player/${this.state.gameID}`}
+											}/player/${this.props.game.gameID}`}
 											size={225}
 											bgColor={'#ffffff'}
 											fgColor={'#000000'}
@@ -414,21 +358,22 @@ class Host extends Component {
 						case gameStates.QUESTIONS:
 							return this.state.hostPlay ? (
 								<div className="player-ui">
-									<h3>Question {this.state.qNumber}</h3>
-									<h5>{he.decode(this.state.question)}</h5>
-									{this.state.answertype === 'boolean' ? (
+									<h3>Question {this.props.game.qNumber}</h3>
+									<h5>{he.decode(this.props.game.question)}</h5>
+									{this.props.game.answertype === 'boolean' ? (
 										<React.Fragment>
 											<Button
 												color="success"
 												size="lg"
 												className={
-													this.state.showAnswer
-														? this.state.correctAnswer === 'A'
+													this.props.game.showAnswer
+														? this.props.game.correctAnswer ===
+														  'A'
 															? 'correct'
 															: 'wrong'
-														: this.state.answer === null
+														: this.props.game.answer === null
 														? ''
-														: this.state.answer === 'A'
+														: this.props.game.answer === 'A'
 														? 'answer'
 														: 'disabled'
 												}
@@ -440,13 +385,14 @@ class Host extends Component {
 												color="danger"
 												size="lg"
 												className={
-													this.state.showAnswer
-														? this.state.correctAnswer === 'B'
+													this.props.game.showAnswer
+														? this.props.game.correctAnswer ===
+														  'B'
 															? 'correct'
 															: 'wrong'
-														: this.state.answer === null
+														: this.props.game.answer === null
 														? ''
-														: this.state.answer === 'B'
+														: this.props.game.answer === 'B'
 														? 'answer'
 														: 'disabled'
 												}
@@ -461,73 +407,77 @@ class Host extends Component {
 												color="success"
 												size="lg"
 												className={
-													this.state.showAnswer
-														? this.state.correctAnswer === 'A'
+													this.props.game.showAnswer
+														? this.props.game.correctAnswer ===
+														  'A'
 															? 'correct'
 															: 'wrong'
-														: this.state.answer === null
+														: this.props.game.answer === null
 														? ''
-														: this.state.answer === 'A'
+														: this.props.game.answer === 'A'
 														? 'answer'
 														: 'disabled'
 												}
 												onClick={() => this.sendAnswer('A')}
 											>
-												{he.decode(this.state.answers[0])}
+												{he.decode(this.props.game.answers[0])}
 											</Button>
 											<Button
 												color="primary"
 												size="lg"
 												className={
-													this.state.showAnswer
-														? this.state.correctAnswer === 'B'
+													this.props.game.showAnswer
+														? this.props.game.correctAnswer ===
+														  'B'
 															? 'correct'
 															: 'wrong'
-														: this.state.answer === null
+														: this.props.game.answer === null
 														? ''
-														: this.state.answer === 'B'
+														: this.props.game.answer === 'B'
 														? 'answer'
 														: 'disabled'
 												}
 												onClick={() => this.sendAnswer('B')}
 											>
-												{he.decode(this.state.answers[1])}
+												{he.decode(this.props.game.answers[1])}
 											</Button>
 											<Button
 												color="warning"
 												size="lg"
 												className={
-													this.state.showAnswer
-														? this.state.correctAnswer === 'C'
+													this.props.game.showAnswer
+														? this.props.game.correctAnswer ===
+														  'C'
 															? 'correct'
 															: 'wrong'
-														: this.state.answer === null
+														: this.props.game.answer === null
 														? ''
-														: this.state.answer === 'C'
+														: this.props.game.answer === 'C'
 														? 'answer'
 														: 'disabled'
 												}
 												onClick={() => this.sendAnswer('C')}
 											>
-												{he.decode(this.state.answers[2])}
+												{he.decode(this.props.game.answers[2])}
 											</Button>
 											<Button
 												color="danger"
 												size="lg"
 												className={
-													this.state.showAnswer
-														? this.state.correctAnswer === 'D'
+													this.props.game.showAnswer
+														? this.props.game.correctAnswer ===
+														  'D'
 															? 'correct'
 															: 'wrong'
-														: this.state.answer === null
+														: this.props.game.answer === null
 														? ''
-														: this.state.answer === 'D'
+														: this.props.game.answer === 'D'
 														? 'answer'
 														: 'disabled'
 												}
 												onClick={() => this.sendAnswer('D')}
 											>
-												{he.decode(this.state.answers[3])}
+												{he.decode(this.props.game.answers[3])}
 											</Button>
 										</React.Fragment>
 									)}
@@ -539,8 +489,8 @@ class Host extends Component {
 								</div>
 							) : (
 								<div className="host-ui">
-									<h3>Question {this.state.qNumber}</h3>
-									<h5>{he.decode(this.state.question)}</h5>
+									<h3>Question {this.props.game.qNumber}</h3>
+									<h5>{he.decode(this.props.game.question)}</h5>
 									<br />
 									<Button
 										color="success"
@@ -558,7 +508,9 @@ class Host extends Component {
 										<h1>GAME OVER</h1>
 									</div>
 									<ListGroup className="player-scores">
-										{_.isUndefined(this.state.scores[0]) ? null : (
+										{_.isUndefined(
+											this.props.game.scores[0]
+										) ? null : (
 											<ListGroupItem className="player-score">
 												<h3
 													style={{
@@ -569,20 +521,26 @@ class Host extends Component {
 													<img
 														alt="first-place"
 														src={
-															_.find(this.state.players, x => {
-																return (
-																	x.userid ===
-																	this.state.scores[0].userid
-																)
-															}).avatar
+															_.find(
+																this.props.game.players,
+																x => {
+																	return (
+																		x.userid ===
+																		this.props.game.scores[0]
+																			.userid
+																	)
+																}
+															).avatar
 														}
 														className="avatar-scores"
 													/>
-													{this.state.scores[0].totalscore}
+													{this.props.game.scores[0].totalscore}
 												</h3>
 											</ListGroupItem>
 										)}
-										{_.isUndefined(this.state.scores[1]) ? null : (
+										{_.isUndefined(
+											this.props.game.scores[1]
+										) ? null : (
 											<ListGroupItem className="player-score">
 												<h3
 													style={{
@@ -593,20 +551,26 @@ class Host extends Component {
 													<img
 														alt="avatar-scores"
 														src={
-															_.find(this.state.players, x => {
-																return (
-																	x.userid ===
-																	this.state.scores[1].userid
-																)
-															}).avatar
+															_.find(
+																this.props.game.players,
+																x => {
+																	return (
+																		x.userid ===
+																		this.props.game.scores[1]
+																			.userid
+																	)
+																}
+															).avatar
 														}
 														className="avatar-scores"
 													/>
-													{this.state.scores[1].totalscore}
+													{this.props.game.scores[1].totalscore}
 												</h3>
 											</ListGroupItem>
 										)}
-										{_.isUndefined(this.state.scores[2]) ? null : (
+										{_.isUndefined(
+											this.props.game.scores[2]
+										) ? null : (
 											<ListGroupItem className="player-score">
 												<h3
 													style={{
@@ -617,16 +581,20 @@ class Host extends Component {
 													<img
 														alt="third-place"
 														src={
-															_.find(this.state.players, x => {
-																return (
-																	x.userid ===
-																	this.state.scores[2].userid
-																)
-															}).avatar
+															_.find(
+																this.props.game.players,
+																x => {
+																	return (
+																		x.userid ===
+																		this.props.game.scores[2]
+																			.userid
+																	)
+																}
+															).avatar
 														}
 														className="avatar-scores"
 													/>
-													{this.state.scores[2].totalscore}
+													{this.props.game.scores[2].totalscore}
 												</h3>
 											</ListGroupItem>
 										)}
@@ -655,13 +623,18 @@ class Host extends Component {
 
 const mapStateToProps = state => {
 	return {
+		game: state.game,
 		user: state.user
 	}
 }
 
 const mapDispatchToProps = dispatch => {
 	return {
-		updateScore: score => dispatch(userSetScore(score))
+		joinGame: gameID => dispatch(gameJoin(gameID)),
+		updateAnswer: answer => dispatch(gameUpdateAnswer(answer)),
+		updateGameState: gamestate => dispatch(gameStateUpdate(gamestate)),
+		updateScore: score => dispatch(userSetScore(score)),
+		showAnswer: () => dispatch(gameShowAnswer())
 	}
 }
 
