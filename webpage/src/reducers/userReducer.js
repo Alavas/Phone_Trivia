@@ -3,7 +3,8 @@ import {
 	mergeMap,
 	catchError,
 	map,
-	withLatestFrom
+	withLatestFrom,
+	ignoreElements
 } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import _ from 'lodash'
@@ -35,10 +36,10 @@ export const userLoginEpic = action$ =>
 export const userUpdateCookieEpic = action$ =>
 	action$.pipe(
 		ofType('USER_LOGIN_SUCCESS'),
-		mergeMap(async action => {
+		map(async action => {
 			await updateCookie(action.user.userid)
-			return { type: 'USER_UPDATE_COOKIE' }
-		})
+		}),
+		ignoreElements()
 	)
 
 //Once the user is logged in check to see if they have an Avatar.
