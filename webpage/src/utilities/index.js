@@ -1,6 +1,7 @@
 import getUuid from 'uuid-by-string'
 import { promisify } from 'es6-promisify'
 
+//Takes in an image URL and returns a BASE64 encoded data file.
 function convertImage(url, callback) {
 	var img = new Image()
 	img.crossOrigin = 'Anonymous'
@@ -18,8 +19,10 @@ function convertImage(url, callback) {
 	img.src = url
 }
 
+//Promisify the convertImage function.
 export const getDefaultAvatar = promisify(convertImage)
 
+//Retrieve the user cookie if exists.
 export const getCookie = cookie => {
 	var name = cookie + '='
 	var decodedCookie = decodeURIComponent(window.document.cookie)
@@ -122,8 +125,8 @@ export const createGame = async gameSettings => {
 }
 
 //Update gamestate and question number to display.
-export const updateGame = async ({ state, gameID, qNumber }) => {
-	let data = JSON.stringify({ state, gameID, qNumber })
+export const updateGame = async ({ gamestate, gameID, qNumber = 0 }) => {
+	let data = JSON.stringify({ gamestate, gameID, qNumber })
 	const game = await fetch(
 		`${process.env.REACT_APP_GAMESHOW_ENDPOINT}/api/game`,
 		{
@@ -243,7 +246,7 @@ export const gameDifficulties = [
 	{ value: 'hard', display: 'Hard' }
 ]
 
-//Possible question types.
+//Game question types.
 export const questionType = [
 	{ value: 'multiple', display: 'Multiple Choice' },
 	{ value: 'boolean', display: 'True / False' },

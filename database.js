@@ -41,10 +41,10 @@ async function postGames(game) {
 	}
 }
 
-async function putGames({ state, gameID, qNumber }) {
+async function putGames({ gamestate, gameID, qNumber }) {
 	try {
 		// prettier-ignore
-		const query = `UPDATE games SET gamestate = ${state} WHERE gameid = '${gameID}' RETURNING gamestate;`
+		const query = `UPDATE games SET gamestate = ${gamestate} WHERE gameid = '${gameID}' RETURNING gamestate;`
 		const client = await postgres.connect()
 		const result = await client.query(query)
 		client.release()
@@ -57,7 +57,7 @@ async function putGames({ state, gameID, qNumber }) {
 			if (result.rowCount > 0) {
 				game = {
 					gameID,
-					gamestate: state,
+					gamestate,
 					qNumber,
 					questionID: result.rows[0].questionid,
 					answertype: result.rows[0].answertype,
@@ -73,7 +73,7 @@ async function putGames({ state, gameID, qNumber }) {
 			} else {
 				game = {
 					gameID,
-					gamestate: state,
+					gamestate,
 					qNumber,
 					questionID: '',
 					answertype: '',

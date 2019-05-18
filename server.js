@@ -108,14 +108,14 @@ app.post('/api/game', async (req, res) => {
 })
 
 app.put('/api/game', async (req, res) => {
-	const state = req.body.state
+	const gamestate = req.body.gamestate
 	const gameID = req.body.gameID
 	const qNumber = req.body.qNumber || 0
 	if (_.isUndefined(gameID)) {
 		res.sendStatus(400)
 		res.end
 	} else {
-		const game = await putGames({ state, gameID, qNumber })
+		const game = await putGames({ gamestate, gameID, qNumber })
 		if (game.gamestate > 0) {
 			wsGame(game)
 		}
@@ -215,7 +215,6 @@ server.listen(PORT, function() {
 })
 
 wss.on('connection', function open(ws) {
-	console.log('New Client:', ws.protocol)
 	ws.on('message', data => wsReceiveData(data))
 	clients.push(ws)
 })
@@ -235,13 +234,14 @@ if (process.env.NODE_ENV === 'production') {
 
 /* **WebSocket functions.** */
 
+//Receive commands from Host/Player.
 function wsReceiveData(data) {
-	const wsData = JSON.parse(data)
-	console.log('WS Msg: ', wsData)
-	switch (wsData.action) {
+	const action = JSON.parse(data)
+	switch (action.type) {
 		case 'SHOW_ANSWER':
-			wsShowAnswer(wsData.data.gameID)
+			wsShowAnswer(action.gameID)
 			break
+		//TODO: Listen for message from Player to leave game.
 		default:
 			break
 	}
@@ -251,8 +251,7 @@ function wsShowAnswer(gameID) {
 	let players = clients.filter(client => client.protocol === gameID)
 	players.forEach(player => {
 		if (player.readyState === ws.OPEN) {
-			player.send(JSON.stringify({ showAnswer: true }))
-			player.send(JSON.stringify({ type: 'WS_SHOWANSWER', data: true }))
+			player.send(JSON.stringify({ type: 'WS_SHOW_ANSWER', data: true }))
 		}
 	})
 }
@@ -297,7 +296,6 @@ async function wsScores(gameID, scores) {
 	})
 	players.forEach(player => {
 		if (player.readyState === ws.OPEN) {
-			player.send(JSON.stringify({ scores }))
 			player.send(JSON.stringify({ type: 'WS_SCORES', data: scores }))
 		}
 	})
@@ -314,7 +312,6 @@ async function wsGame(game) {
 		let gamePlayers = await getPlayers(game.gameID)
 		players.forEach(player => {
 			if (player.readyState === ws.OPEN) {
-				player.send(JSON.stringify({ players: gamePlayers }))
 				player.send(
 					JSON.stringify({ type: 'WS_PLAYERS', data: gamePlayers })
 				)
@@ -330,7 +327,6 @@ async function wsGame(game) {
 	})
 	players.forEach(player => {
 		if (player.readyState === ws.OPEN) {
-			player.send(JSON.stringify(game))
 			player.send(JSON.stringify({ type: 'WS_GAME', data: game }))
 		}
 	})
