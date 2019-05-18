@@ -35,6 +35,12 @@ p {
 	border-radius: 50%;
 	border: 1px solid lightslategray;
 }
+.phone-trivia {
+	img {
+		object-fit: contain;
+		height: 2.5rem;
+	}
+}
 
 @media only screen and (max-width: 600px) {
 	body {
@@ -43,7 +49,6 @@ p {
 	nav {
 		a,
 		p {
-			margin-top: 5px;
 			font-size: 1.6em;
 		}
 	}
