@@ -1,8 +1,10 @@
-import { applyMiddleware, compose, createStore } from 'redux'
+import { applyMiddleware, createStore } from 'redux'
+import { composeWithDevTools } from 'redux-devtools-extension'
 import { routerMiddleware } from 'connected-react-router'
 import { createEpicMiddleware } from 'redux-observable'
 import { createBrowserHistory } from 'history'
-import createRootReducer, { rootEpic } from '../reducers'
+import createRootReducer from '../reducers'
+import rootEpic from '../epics'
 import thunk from 'redux-thunk'
 
 const epicMiddleware = createEpicMiddleware()
@@ -21,7 +23,7 @@ if (process.env.NODE_ENV !== 'production') {
 export default function configureStore() {
 	const store = createStore(
 		createRootReducer(history),
-		compose(applyMiddleware(...middlewares))
+		composeWithDevTools(applyMiddleware(...middlewares))
 	)
 	epicMiddleware.run(rootEpic)
 
