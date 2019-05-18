@@ -35,9 +35,7 @@
 		"redux-observable": "^1.1.0",
 		"redux-thunk": "^2.3.0",
 		"rxjs": "^6.4.0",
-		"styled-jsx": "^3.2.1",
-		"uuid-by-string": "^2.0.1",
-		"websocket": "^1.0.28"
+		"uuid-by-string": "^2.0.1"
 	},
 	"devDependencies": {
 		"redux-devtools-extension": "^2.13.8",
