@@ -95,6 +95,7 @@ class CountdownBar extends HTMLElement {
 		this._duration = this.duration / 1000
 		this._countdownBar = this.shadowRoot.getElementById('countdown-bar')
 		this._initWidth = this._countdownBar.offsetWidth
+		this.start() //Start counting once added to the DOM.
 	}
 }
 
