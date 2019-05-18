@@ -318,8 +318,6 @@ async function wsGame(game) {
 			}
 		})
 	}
-	//Timestamp for scoring.
-	game.qStart = Date.now()
 	gameboards.forEach(board => {
 		if (board.readyState === ws.OPEN) {
 			board.send(JSON.stringify(game))

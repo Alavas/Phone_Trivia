@@ -89,7 +89,12 @@ export const gameWSGameEpic = action$ =>
 			}
 			return {
 				type: 'GAME_WS_UPDATE',
-				data: { ...action.data, answer: null, showAnswer: false }
+				data: {
+					...action.data,
+					answer: null,
+					showAnswer: false,
+					qStart: Date.now()
+				}
 			}
 		})
 	)
