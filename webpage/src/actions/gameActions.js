@@ -31,3 +31,8 @@ export const gameUpdateAnswer = answer => ({
 export const gameShowAnswer = () => ({
 	type: 'GAME_SHOW_ANSWER'
 })
+
+export const gameEnd = gameID => ({
+	type: 'GAME_END',
+	gameID
+})

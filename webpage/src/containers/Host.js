@@ -25,7 +25,6 @@ import {
 	questionType,
 	createGame,
 	updateGame,
-	deleteGame,
 	connectGameboard,
 	submitAnswer,
 	gameStates
@@ -37,7 +36,8 @@ import {
 	gameJoin,
 	gameStateUpdate,
 	gameShowAnswer,
-	gameUpdateAnswer
+	gameUpdateAnswer,
+	gameEnd
 } from '../actions/gameActions'
 
 class Host extends Component {
@@ -114,17 +114,6 @@ class Host extends Component {
 				gameID,
 				qNumber
 			})
-		}
-	}
-
-	async endGame() {
-		const gameID = this.props.game.gameID
-		const deleted = await deleteGame(gameID)
-		if (deleted) {
-			window.location = process.env.REACT_APP_GAMESHOW_ENDPOINT
-		} else {
-			//TODO: Add error handling here for a failed deletion.
-			console.log('Something went wrong??')
 		}
 	}
 
@@ -606,7 +595,9 @@ class Host extends Component {
 											color: '#212529',
 											backgroundColor: 'crimson'
 										}}
-										onClick={() => this.endGame()}
+										onClick={() =>
+											this.props.endGame(this.props.game.gameID)
+										}
 									>
 										END GAME
 									</Button>
@@ -631,6 +622,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
 	return {
 		joinGame: gameID => dispatch(gameJoin(gameID)),
+		endGame: gameID => dispatch(gameEnd(gameID)),
 		updateAnswer: answer => dispatch(gameUpdateAnswer(answer)),
 		updateGameState: gamestate => dispatch(gameStateUpdate(gamestate)),
 		updateScore: score => dispatch(userSetScore(score)),

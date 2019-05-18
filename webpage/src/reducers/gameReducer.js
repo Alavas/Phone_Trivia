@@ -32,6 +32,24 @@ export const gameJoinEpic = (action$, state$) =>
 		catchError(err => gameJoinError(err))
 	)
 
+//Delete the game after it has been finished.
+export const gameEndEpic = action$ =>
+	action$.pipe(
+		ofType('GAME_END'),
+		map(async action => {
+			let data = JSON.stringify({ gameID: action.gameID })
+			await fetch(`${process.env.REACT_APP_GAMESHOW_ENDPOINT}/api/game`, {
+				method: 'DELETE',
+				headers: {
+					Accept: 'application/json, text/plain, */*',
+					'Content-Type': 'application/json'
+				},
+				body: data
+			})
+		}),
+		ignoreElements()
+	)
+
 //Create a Websocket connection to the server once the game is joined.
 export const gameWebSocketEpic = (action$, state$) =>
 	action$.pipe(
@@ -86,6 +104,9 @@ export const gameWSGameEpic = action$ =>
 			if (document.getElementById('countdown-bar')) {
 				document.getElementById('countdown-bar').reset()
 				document.getElementById('countdown-bar').start()
+			}
+			if (action.data.gamestate === gameStates.RESET) {
+				window.location = process.env.REACT_APP_GAMESHOW_ENDPOINT
 			}
 			return {
 				type: 'GAME_WS_UPDATE',

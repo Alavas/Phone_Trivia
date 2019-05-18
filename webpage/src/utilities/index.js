@@ -141,23 +141,6 @@ export const updateGame = async ({ gamestate, gameID, qNumber = 0 }) => {
 	return game
 }
 
-//Delete a completed game.
-export const deleteGame = async gameID => {
-	let data = JSON.stringify({ gameID })
-	const deleted = await fetch(
-		`${process.env.REACT_APP_GAMESHOW_ENDPOINT}/api/game`,
-		{
-			method: 'DELETE',
-			headers: {
-				Accept: 'application/json, text/plain, */*',
-				'Content-Type': 'application/json'
-			},
-			body: data
-		}
-	).then(res => res.json())
-	return deleted
-}
-
 //Join a game from QR code.
 export const joinGame = async ({ userID, gameID }) => {
 	let data = JSON.stringify({ userID, gameID })

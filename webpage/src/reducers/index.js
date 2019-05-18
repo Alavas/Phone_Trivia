@@ -8,6 +8,7 @@ import user, {
 } from './userReducer'
 import game, {
 	gameJoinEpic,
+	gameEndEpic,
 	gameWebSocketEpic,
 	gameWSGameEpic,
 	gameWSScoresEpic,
@@ -19,6 +20,7 @@ import { connectRouter } from 'connected-react-router'
 
 export const rootEpic = combineEpics(
 	gameJoinEpic,
+	gameEndEpic,
 	gameWebSocketEpic,
 	gameShowAnswerEpic,
 	gameWSGameEpic,
