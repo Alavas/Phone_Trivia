@@ -27,6 +27,15 @@ const {
 	cleanupGames
 } = require('./database')
 
+const gameStates = {
+	NOTSTARTED: 0,
+	CREATED: 1,
+	STARTED: 2,
+	QUESTIONS: 3,
+	ENDED: 4,
+	RESET: 5
+}
+
 const PORT = parseInt(process.env.PORT, 10) || 5000
 const dev = process.env.NODE_ENV !== 'production'
 console.log('DEV:', dev)
@@ -116,7 +125,7 @@ app.put('/api/game', async (req, res) => {
 		res.end
 	} else {
 		const game = await putGames({ gamestate, gameID, qNumber })
-		if (game.gamestate > 0) {
+		if (game.gamestate > gameStates.NOTSTARTED) {
 			wsGame(game)
 		}
 		res.send(game)
@@ -131,7 +140,7 @@ app.delete('/api/game', async (req, res) => {
 		res.end
 	} else {
 		const deleted = await deleteGames(gameID)
-		wsGame({ gameID, gamestate: 5 }) //5 = RESET
+		wsGame({ gameID, gamestate: gameStates.RESET })
 		res.send(deleted)
 		res.end
 	}
@@ -205,7 +214,7 @@ app.post('/api/score', async (req, res) => {
 app.post('/api/gameboard', (req, res) => {
 	const userID = req.body.userID
 	const gameID = req.body.gameID
-	wsGameboard({ userID, gameID, gamestate: 1 })
+	wsGameboard({ userID, gameID, gamestate: gameStates.CREATED })
 	res.sendStatus(201)
 	res.end
 })
@@ -308,7 +317,7 @@ async function wsGame(game) {
 		client => client.protocol === `gb_${game.gameID}`
 	)
 	//Send list of players to the players for displaying the scores at the end.
-	if (game.gamestate === 2) {
+	if (game.gamestate === gameStates.STARTED) {
 		let gamePlayers = await getPlayers(game.gameID)
 		players.forEach(player => {
 			if (player.readyState === ws.OPEN) {
