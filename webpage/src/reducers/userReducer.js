@@ -57,13 +57,14 @@ export const userDefaultAvatarEpic = (action$, state$) =>
 		catchError(err => userLoginError(err))
 	)
 
+//Socket is not connected until the game has been joined. Update individual user score when scores object received.
 export const userWSScoreEpic = (action$, state$) =>
 	action$.pipe(
 		ofType('WS_SCORES'),
 		withLatestFrom(state$),
 		map(state$ => ({ scores: state$[0].data, state: state$[1] })),
 		map(data => {
-			var currentScore = _.find(data.scores, score => {
+			let currentScore = _.find(data.scores, score => {
 				return score.userid === data.state.user.userID
 			})
 			if (!_.isUndefined(currentScore)) {
