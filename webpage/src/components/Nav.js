@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { push } from 'connected-react-router'
 import _ from 'lodash'
 import { userLogin } from '../actions/userActions'
+import PhoneTrivia from '../images/PhoneTrivia.png'
 import '../styles/nav.css'
 
 const Nav = props => {
@@ -14,7 +15,12 @@ const Nav = props => {
 			<ul>
 				<li>
 					{/*eslint-disable-next-line*/}
-					<a onClick={() => props.updateHistory('/')}>PHONETRIVIA</a>
+					<a
+						className="phone-trivia"
+						onClick={() => props.updateHistory('/')}
+					>
+						<img src={PhoneTrivia} alt="PhoneTrivia" />
+					</a>
 				</li>
 				<ul>
 					<li
