@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
-import { push } from 'connected-react-router'
 import _ from 'lodash'
 import { userLogin } from '../actions/userActions'
 import PhoneTrivia from '../images/PhoneTrivia.png'
 import '../styles/nav.css'
+import { resetApp } from '../actions/appActions'
 
 const Nav = props => {
 	useEffect(() => {
@@ -15,10 +15,7 @@ const Nav = props => {
 			<ul>
 				<li>
 					{/*eslint-disable-next-line*/}
-					<a
-						className="phone-trivia"
-						onClick={() => props.updateHistory('/')}
-					>
+					<a className="phone-trivia" onClick={() => props.reset()}>
 						<img src={PhoneTrivia} alt="PhoneTrivia" />
 					</a>
 				</li>
@@ -64,10 +61,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
 	return {
-		updateHistory: route => {
-			dispatch(push(route))
-		},
-		login: () => dispatch(userLogin())
+		login: () => dispatch(userLogin()),
+		reset: () => dispatch(resetApp())
 	}
 }
 

@@ -20,9 +20,19 @@ if (process.env.NODE_ENV !== 'production') {
 	middlewares.push(logger)
 }
 
+const appReducer = createRootReducer(history)
+const rootReducer = (state, action) => {
+	if (action.type === 'RESET_APP') {
+		const { user } = state
+		state = { user }
+	}
+
+	return appReducer(state, action)
+}
+
 export default function configureStore() {
 	const store = createStore(
-		createRootReducer(history),
+		rootReducer,
 		composeWithDevTools(applyMiddleware(...middlewares))
 	)
 	epicMiddleware.run(rootEpic)
