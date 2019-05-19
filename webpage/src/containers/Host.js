@@ -23,7 +23,6 @@ import {
 	gameCategories,
 	gameDifficulties,
 	questionType,
-	createGame,
 	updateGame,
 	connectGameboard,
 	submitAnswer,
@@ -39,22 +38,17 @@ import {
 	gameUpdateAnswer,
 	gameEnd
 } from '../actions/gameActions'
+import { hostCreateGame, hostToggleModal } from '../actions/hostActions'
 
 class Host extends Component {
 	constructor(props) {
 		super(props)
-		this.state = {
-			hostPlay: true,
-			modal: false,
-			numQuestions: 0
-		}
 		this.submit = this.submit.bind(this)
 		this.amount = React.createRef()
 		this.category = React.createRef()
 		this.difficulty = React.createRef()
 		this.type = React.createRef()
 		this.hostPlay = React.createRef()
-		this.toggleModal = this.toggleModal.bind(this)
 		this.handleScan = this.handleScan.bind(this)
 	}
 
@@ -78,25 +72,20 @@ class Host extends Component {
 			category: this.category.current.value,
 			difficulty: this.difficulty.current.value,
 			type: this.type.current.value,
-			host: this.props.user.userID
+			host: this.props.user.userID,
+			hostPlay: this.hostPlay.current.value === 'true'
 		}
-		const gameID = await createGame(gameSettings)
-		this.props.joinGame(gameID)
-		const hostPlay = this.hostPlay.current.value === 'true'
-		this.setState({
-			hostPlay,
-			numQuestions: gameSettings.amount
-		})
+		this.props.createGame(gameSettings)
 	}
 
 	async startGame(delay) {
-		if (this.state.hostPlay) {
+		if (this.props.host.hostPlay) {
 			do {
 				await this.nextQuestion()
 				await new Promise(resolve => setTimeout(resolve, delay))
 				this.props.showAnswer()
 				await new Promise(resolve => setTimeout(resolve, 1500))
-			} while (this.props.game.qNumber < this.state.numQuestions)
+			} while (this.props.game.qNumber < this.props.host.amount)
 			await this.nextQuestion()
 		} else {
 			this.nextQuestion()
@@ -106,7 +95,7 @@ class Host extends Component {
 	async nextQuestion() {
 		const qNumber = this.props.game.qNumber + 1
 		const gameID = this.props.game.gameID
-		if (qNumber > this.state.numQuestions) {
+		if (qNumber > this.props.host.amount) {
 			await updateGame({ gamestate: gameStates.ENDED, gameID })
 		} else {
 			await updateGame({
@@ -147,7 +136,7 @@ class Host extends Component {
 			if (regex.test(data)) {
 				const gameID = this.props.game.gameID
 				connectGameboard({ userID: data, gameID })
-				this.setState({ modal: false })
+				this.props.toggleModal()
 			}
 		}
 	}
@@ -299,14 +288,11 @@ class Host extends Component {
 									<Button
 										color="danger"
 										size="lg"
-										onClick={() => this.toggleModal()}
+										onClick={() => this.props.toggleModal()}
 									>
 										Connect Gameboard
 									</Button>
-									<Modal
-										isOpen={this.state.modal}
-										toggle={this.toggleModal}
-									>
+									<Modal isOpen={this.props.host.modal}>
 										<ModalHeader toggle={this.toggle}>
 											Scan a Gameboard QR code.
 										</ModalHeader>
@@ -324,7 +310,7 @@ class Host extends Component {
 										<ModalFooter>
 											<Button
 												color="primary"
-												onClick={this.toggleModal}
+												onClick={() => this.props.toggleModal()}
 											>
 												Close
 											</Button>
@@ -345,7 +331,7 @@ class Host extends Component {
 								</div>
 							)
 						case gameStates.QUESTIONS:
-							return this.state.hostPlay ? (
+							return this.props.host.hostPlay ? (
 								<div className="player-ui">
 									<h3>Question {this.props.game.qNumber}</h3>
 									<h5>{he.decode(this.props.game.question)}</h5>
@@ -615,18 +601,21 @@ class Host extends Component {
 const mapStateToProps = state => {
 	return {
 		game: state.game,
+		host: state.host,
 		user: state.user
 	}
 }
 
 const mapDispatchToProps = dispatch => {
 	return {
-		joinGame: gameID => dispatch(gameJoin(gameID)),
+		createGame: game => dispatch(hostCreateGame(game)),
 		endGame: gameID => dispatch(gameEnd(gameID)),
+		joinGame: gameID => dispatch(gameJoin(gameID)),
 		updateAnswer: answer => dispatch(gameUpdateAnswer(answer)),
 		updateGameState: gamestate => dispatch(gameStateUpdate(gamestate)),
 		updateScore: score => dispatch(userSetScore(score)),
-		showAnswer: () => dispatch(gameShowAnswer())
+		showAnswer: () => dispatch(gameShowAnswer()),
+		toggleModal: () => dispatch(hostToggleModal())
 	}
 }
 

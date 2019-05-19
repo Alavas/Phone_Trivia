@@ -1,10 +1,5 @@
 import { combineEpics } from 'redux-observable'
-import {
-	userDefaultAvatarEpic,
-	userLoginEpic,
-	userUpdateCookieEpic,
-	userWSScoreEpic
-} from './userEpics'
+import { appResetEpic } from './appEpics'
 import {
 	gameJoinEpic,
 	gameEndEpic,
@@ -15,8 +10,16 @@ import {
 	gameShowAnswerEpic,
 	gameWSShowAnswerEpic
 } from './gameEpics'
+import { hostCreateGameEpic } from './hostEpics'
+import {
+	userDefaultAvatarEpic,
+	userLoginEpic,
+	userUpdateCookieEpic,
+	userWSScoreEpic
+} from './userEpics'
 
 export default combineEpics(
+	appResetEpic,
 	gameJoinEpic,
 	gameEndEpic,
 	gameWebSocketEpic,
@@ -25,6 +28,7 @@ export default combineEpics(
 	gameWSScoresEpic,
 	gameWSPlayersEpic,
 	gameWSShowAnswerEpic,
+	hostCreateGameEpic,
 	userLoginEpic,
 	userUpdateCookieEpic,
 	userDefaultAvatarEpic,

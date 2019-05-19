@@ -12,14 +12,6 @@ import '../styles/player.css'
 import { gameStateUpdate, gameJoin } from '../actions/gameActions'
 
 class Player extends Component {
-	constructor() {
-		super()
-		this.state = {
-			answer: null,
-			reaction: 0
-		}
-	}
-
 	componentDidMount() {
 		//Accessed page from the home screen.
 		if (this.props.user.loggedIn) {

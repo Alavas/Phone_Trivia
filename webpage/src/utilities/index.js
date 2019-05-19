@@ -107,23 +107,6 @@ export const getGames = async () => {
 	return games
 }
 
-//Request to create a new game.
-export const createGame = async gameSettings => {
-	let data = JSON.stringify({ gameSettings })
-	const game = await fetch(
-		`${process.env.REACT_APP_GAMESHOW_ENDPOINT}/api/game`,
-		{
-			method: 'POST',
-			headers: {
-				Accept: 'application/json, text/plain, */*',
-				'Content-Type': 'application/json'
-			},
-			body: data
-		}
-	).then(res => res.json())
-	return game.gameid
-}
-
 //Update gamestate and question number to display.
 export const updateGame = async ({ gamestate, gameID, qNumber = 0 }) => {
 	let data = JSON.stringify({ gamestate, gameID, qNumber })
