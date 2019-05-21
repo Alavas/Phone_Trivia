@@ -7,9 +7,9 @@ export const userLoginSuccess = user => ({
 	user
 })
 
-export const userLoginError = err => ({
+export const userLoginError = error => ({
 	type: 'USER_LOGIN_ERROR',
-	err
+	error
 })
 
 export const userSetAvatar = avatar => ({

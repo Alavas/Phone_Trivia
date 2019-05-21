@@ -22,11 +22,10 @@ if (process.env.NODE_ENV !== 'production') {
 
 const appReducer = createRootReducer(history)
 const rootReducer = (state, action) => {
-	if (action.type === 'RESET_APP') {
+	if (action.type === 'APP_RESET') {
 		const { user } = state
 		state = { user }
 	}
-
 	return appReducer(state, action)
 }
 

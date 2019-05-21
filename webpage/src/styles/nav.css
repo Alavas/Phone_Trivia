@@ -45,6 +45,40 @@ p {
   height: 2.5rem;
 }
 
+#error-toast {
+  visibility: hidden;
+  width: 250px;
+  margin-left: -125px;
+  background-color: crimson;
+  color: white;
+  text-align: center;
+  border-radius: 0.3rem;
+  padding: 16px;
+  position: fixed;
+  z-index: 1;
+  left: 50%;
+  bottom: 0px;
+  font-size: 0.9rem;
+  opacity: 0;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+#error-toast.show {
+  visibility: visible;
+  bottom: 90px;
+  opacity: 1;
+  transition: all 0.5s ease-out;
+  -webkit-transition: all 0.5s ease-out;
+}
+
+#error-toast.hide {
+  bottom: 0px;
+  opacity: 0;
+  transition: all 0.5s ease-out;
+  -webkit-transition: all 0.5s ease-out;
+}
+
 @media only screen and (max-width: 600px) {
   body {
     font-size: 12px !important;

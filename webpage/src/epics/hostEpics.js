@@ -1,14 +1,16 @@
-import { mergeMap } from 'rxjs/operators'
+import { switchMap } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import { gameJoin } from '../actions/gameActions'
+import { hostCreateGameError } from '../actions/hostActions'
 
 //Create a new game, join after it is created.
 export const hostCreateGameEpic = action$ =>
 	action$.pipe(
 		ofType('HOST_CREATE_GAME'),
-		mergeMap(async action => {
+		switchMap(async action => {
 			let data = JSON.stringify({ gameSettings: action.game })
-			const game = await fetch(
+			let errorMsg = ''
+			return await fetch(
 				`${process.env.REACT_APP_GAMESHOW_ENDPOINT}/api/game`,
 				{
 					method: 'POST',
@@ -18,7 +20,15 @@ export const hostCreateGameEpic = action$ =>
 					},
 					body: data
 				}
-			).then(res => res.json())
-			return gameJoin(game.gameid)
+			)
+				.then(res => {
+					errorMsg = res.statusText
+					return res.json()
+				})
+				.then(
+					res => gameJoin(res.gameid),
+					error =>
+						hostCreateGameError(`Error creating new game: ${errorMsg}`)
+				)
 		})
 	)

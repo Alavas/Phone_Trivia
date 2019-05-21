@@ -10,7 +10,7 @@ import { webSocket } from 'rxjs/webSocket'
 import { ofType } from 'redux-observable'
 import { joinGame, gameStates } from '../utilities'
 import { gameJoinSuccess, gameJoinError } from '../actions/gameActions'
-import { resetApp } from '../actions/appActions'
+import { appReset } from '../actions/appActions'
 
 var socket$ //Placeholder for websocket stream.
 
@@ -27,7 +27,7 @@ export const gameJoinEpic = (action$, state$) =>
 			if (joined) {
 				return gameJoinSuccess(gameID)
 			} else {
-				return gameJoinError('Sorry, there was an error.')
+				return gameJoinError('Unable to join the game.')
 			}
 		}),
 		catchError(err => gameJoinError(err))
@@ -107,7 +107,7 @@ export const gameWSGameEpic = action$ =>
 				document.getElementById('countdown-bar').start()
 			}
 			if (action.data.gamestate === gameStates.RESET) {
-				return resetApp()
+				return appReset()
 			}
 			return {
 				type: 'GAME_WS_UPDATE',

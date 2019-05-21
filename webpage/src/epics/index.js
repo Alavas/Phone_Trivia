@@ -1,5 +1,5 @@
 import { combineEpics } from 'redux-observable'
-import { appResetEpic } from './appEpics'
+import { appResetEpic, appErrorEpic, appDisplayErrorEpic } from './appEpics'
 import {
 	gameJoinEpic,
 	gameEndEpic,
@@ -19,6 +19,8 @@ import {
 } from './userEpics'
 
 export default combineEpics(
+	appDisplayErrorEpic,
+	appErrorEpic,
 	appResetEpic,
 	gameJoinEpic,
 	gameEndEpic,

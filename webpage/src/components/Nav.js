@@ -4,12 +4,17 @@ import _ from 'lodash'
 import { userLogin } from '../actions/userActions'
 import PhoneTrivia from '../images/PhoneTrivia.png'
 import '../styles/nav.css'
-import { resetApp } from '../actions/appActions'
+import { appReset } from '../actions/appActions'
 
 const Nav = props => {
 	useEffect(() => {
 		props.login()
 	}, [])
+	//Dismiss the Error toast message.
+	const hideError = () => {
+		const errorToast = document.getElementById('error-toast')
+		errorToast.className = errorToast.className.replace('show', 'hide')
+	}
 	return (
 		<nav className="fixed-bottom">
 			<ul>
@@ -22,7 +27,9 @@ const Nav = props => {
 				<ul>
 					<li
 						style={
-							_.isUndefined(props.user.score) || props.pathname === '/'
+							_.isUndefined(props.user.score) ||
+							props.pathname === '/' ||
+							!props.game.joined
 								? { display: 'none' }
 								: {
 										marginTop: '5px',
@@ -48,6 +55,9 @@ const Nav = props => {
 					</li>
 				</ul>
 			</ul>
+			<div id="error-toast" className="hide" onClick={() => hideError()}>
+				{props.app.error}
+			</div>
 		</nav>
 	)
 }
@@ -55,14 +65,16 @@ const Nav = props => {
 const mapStateToProps = state => {
 	return {
 		pathname: state.router.location.pathname,
-		user: state.user
+		app: state.app,
+		user: state.user,
+		game: state.game
 	}
 }
 
 const mapDispatchToProps = dispatch => {
 	return {
 		login: () => dispatch(userLogin()),
-		reset: () => dispatch(resetApp())
+		reset: () => dispatch(appReset())
 	}
 }
 

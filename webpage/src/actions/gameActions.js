@@ -18,9 +18,9 @@ export const gameJoinSuccess = gameID => ({
 	gameID
 })
 
-export const gameJoinError = err => ({
+export const gameJoinError = error => ({
 	type: 'GAME_JOIN_ERROR',
-	err
+	error
 })
 
 export const gameUpdateAnswer = answer => ({

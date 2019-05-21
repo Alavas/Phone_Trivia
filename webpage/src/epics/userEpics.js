@@ -4,15 +4,17 @@ import {
 	catchError,
 	map,
 	withLatestFrom,
-	ignoreElements
+	ignoreElements,
+	switchMap
 } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import _ from 'lodash'
 import {
 	getDefaultAvatar,
-	loginUser,
 	updateCookie,
-	updateUser
+	updateUser,
+	getCookie,
+	generateUUID
 } from '../utilities'
 import {
 	userLoginSuccess,
@@ -25,11 +27,33 @@ import {
 export const userLoginEpic = action$ =>
 	action$.pipe(
 		ofType('USER_LOGIN'),
-		mergeMap(async () => {
-			const user = await loginUser()
-			return userLoginSuccess(user)
-		}),
-		catchError(err => userLoginError(err))
+		switchMap(async () => {
+			let userID = getCookie('gs_userid')
+			if (userID === '' || userID === 'undefined') {
+				userID = generateUUID(window.navigator.userAgent)
+			}
+			let data = JSON.stringify({ userID })
+			let errorMsg = ''
+			return await fetch(
+				`${process.env.REACT_APP_GAMESHOW_ENDPOINT}/api/user`,
+				{
+					method: 'POST',
+					headers: {
+						Accept: 'application/json, text/plain, */*',
+						'Content-Type': 'application/json'
+					},
+					body: data
+				}
+			)
+				.then(res => {
+					errorMsg = res.statusText
+					return res.json()
+				})
+				.then(
+					user => userLoginSuccess(user),
+					error => userLoginError(`Unable to login, ${errorMsg}`)
+				)
+		})
 	)
 
 //Update the cookie for the user.
