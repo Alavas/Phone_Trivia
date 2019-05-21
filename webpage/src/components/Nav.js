@@ -27,7 +27,7 @@ const Nav = props => {
 				<ul>
 					<li
 						style={
-							_.isUndefined(props.user.score) ||
+							_.isUndefined(props.user.totalScore) ||
 							props.pathname === '/' ||
 							!props.game.joined
 								? { display: 'none' }
@@ -38,7 +38,7 @@ const Nav = props => {
 								  }
 						}
 					>
-						<h3>{props.user.score}</h3>
+						<h3>{props.user.totalScore}</h3>
 					</li>
 					<li
 						style={
@@ -57,6 +57,9 @@ const Nav = props => {
 			</ul>
 			<div id="error-toast" className="hide" onClick={() => hideError()}>
 				{props.app.error}
+			</div>
+			<div id="score-toast" className="hide">
+				+{props.user.score}
 			</div>
 		</nav>
 	)

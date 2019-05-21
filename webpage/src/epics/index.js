@@ -13,6 +13,7 @@ import {
 import { hostCreateGameEpic } from './hostEpics'
 import {
 	userDefaultAvatarEpic,
+	userDisplayScoreEpic,
 	userLoginEpic,
 	userUpdateCookieEpic,
 	userWSScoreEpic
@@ -34,5 +35,6 @@ export default combineEpics(
 	userLoginEpic,
 	userUpdateCookieEpic,
 	userDefaultAvatarEpic,
+	userDisplayScoreEpic,
 	userWSScoreEpic
 )

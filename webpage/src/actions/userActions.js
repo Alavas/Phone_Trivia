@@ -17,7 +17,7 @@ export const userSetAvatar = avatar => ({
 	avatar
 })
 
-export const userSetScore = score => ({
+export const userSetScore = scores => ({
 	type: 'USER_SET_SCORE',
-	score
+	scores
 })

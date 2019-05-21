@@ -2,7 +2,9 @@ export default (
 	state = {
 		avatar: null,
 		loggedIn: false,
+		points: 0,
 		score: 0,
+		totalScore: 0,
 		userID: ''
 	},
 	action
@@ -20,7 +22,11 @@ export default (
 			state = { ...state, avatar: action.avatar }
 			break
 		case 'USER_SET_SCORE':
-			state = { ...state, score: action.score }
+			state = {
+				...state,
+				totalScore: action.scores.totalScore,
+				score: action.scores.score
+			}
 			break
 		default:
 			break

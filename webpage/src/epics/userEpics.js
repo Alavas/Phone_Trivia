@@ -87,17 +87,33 @@ export const userWSScoreEpic = (action$, state$) =>
 	action$.pipe(
 		ofType('WS_SCORES'),
 		withLatestFrom(state$),
-		map(state$ => ({ scores: state$[0].data, state: state$[1] })),
+		map(state$ => ({ scores: state$[0].data, user: state$[1].user })),
 		map(data => {
-			let currentScore = _.find(data.scores, score => {
-				return score.userid === data.state.user.userID
+			let scores = {}
+			let userScores = _.find(data.scores, score => {
+				return score.userid === data.user.userID
 			})
-			if (!_.isUndefined(currentScore)) {
-				currentScore = currentScore.totalscore
+			if (!_.isUndefined(scores)) {
+				scores.totalScore = userScores.totalscore
+				scores.score = userScores.score
 			} else {
-				currentScore = data.state.user.score
+				scores.totalScore = data.state.user.totalScore
+				scores.score = data.state.user.score
 			}
-			return currentScore
+			return scores
 		}),
-		map(score => userSetScore(score))
+		map(scores => userSetScore(scores))
+	)
+
+export const userDisplayScoreEpic = action$ =>
+	action$.pipe(
+		ofType('USER_SET_SCORE'),
+		map(() => {
+			const toast = document.getElementById('score-toast')
+			toast.className = 'show'
+			setTimeout(function() {
+				toast.className = toast.className.replace('show', '')
+			}, 3000)
+		}),
+		ignoreElements()
 	)
