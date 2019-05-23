@@ -58,7 +58,13 @@ const Nav = props => {
 			<div id="error-toast" className="hide" onClick={() => hideError()}>
 				{props.app.error}
 			</div>
-			<div id="score-toast" className="hide">
+			<div
+				id="score-toast"
+				className="hide"
+				style={
+					props.user.score ? { color: 'limegreen' } : { color: 'crimson' }
+				}
+			>
 				+{props.user.score}
 			</div>
 		</nav>

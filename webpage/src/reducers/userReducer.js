@@ -1,8 +1,8 @@
 export default (
 	state = {
 		avatar: null,
+		correct: false,
 		loggedIn: false,
-		points: 0,
 		score: 0,
 		totalScore: 0,
 		userID: ''
@@ -25,7 +25,8 @@ export default (
 			state = {
 				...state,
 				totalScore: action.scores.totalScore,
-				score: action.scores.score
+				score: action.scores.score,
+				correct: action.scores.correct
 			}
 			break
 		default:

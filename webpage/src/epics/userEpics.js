@@ -96,9 +96,11 @@ export const userWSScoreEpic = (action$, state$) =>
 			if (!_.isUndefined(scores)) {
 				scores.totalScore = userScores.totalscore
 				scores.score = userScores.score
+				scores.correct = userScores.correct
 			} else {
 				scores.totalScore = data.state.user.totalScore
 				scores.score = data.state.user.score
+				scores.correct = data.state.user.correct
 			}
 			return scores
 		}),
