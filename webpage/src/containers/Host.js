@@ -38,7 +38,11 @@ import {
 	gameUpdateAnswer,
 	gameEnd
 } from '../actions/gameActions'
-import { hostCreateGame, hostToggleModal } from '../actions/hostActions'
+import {
+	hostCreateGame,
+	hostToggleModal,
+	hostQuestion
+} from '../actions/hostActions'
 
 class Host extends Component {
 	constructor(props) {
@@ -48,7 +52,6 @@ class Host extends Component {
 		this.category = React.createRef()
 		this.difficulty = React.createRef()
 		this.type = React.createRef()
-		this.hostPlay = React.createRef()
 		this.handleScan = this.handleScan.bind(this)
 	}
 
@@ -72,38 +75,9 @@ class Host extends Component {
 			category: this.category.current.value,
 			difficulty: this.difficulty.current.value,
 			type: this.type.current.value,
-			host: this.props.user.userID,
-			hostPlay: this.hostPlay.current.value === 'true'
+			host: this.props.user.userID
 		}
 		this.props.createGame(gameSettings)
-	}
-
-	async startGame(delay) {
-		if (this.props.host.hostPlay) {
-			do {
-				await this.nextQuestion()
-				await new Promise(resolve => setTimeout(resolve, delay))
-				this.props.showAnswer()
-				await new Promise(resolve => setTimeout(resolve, 1500))
-			} while (this.props.game.qNumber < this.props.host.amount)
-			await this.nextQuestion()
-		} else {
-			this.nextQuestion()
-		}
-	}
-
-	async nextQuestion() {
-		const qNumber = this.props.game.qNumber + 1
-		const gameID = this.props.game.gameID
-		if (qNumber > this.props.host.amount) {
-			await updateGame({ gamestate: gameStates.ENDED, gameID })
-		} else {
-			await updateGame({
-				gamestate: gameStates.QUESTIONS,
-				gameID,
-				qNumber
-			})
-		}
 	}
 
 	async sendAnswer(answer) {
@@ -217,7 +191,7 @@ class Host extends Component {
 										</FormGroup>
 										<FormGroup>
 											<Row form>
-												<Col xs={8}>
+												<Col xs={12}>
 													<Label>Difficulty</Label>
 													<Input
 														type="select"
@@ -235,20 +209,6 @@ class Host extends Component {
 																)
 															}
 														)}
-													</Input>
-												</Col>
-												<Col xs={4}>
-													<Label>Are you playing?</Label>
-													<Input
-														type="select"
-														innerRef={this.hostPlay}
-													>
-														<option key="true" value={true}>
-															Yes
-														</option>
-														<option key="false" value={false}>
-															No
-														</option>
 													</Input>
 												</Col>
 											</Row>
@@ -324,14 +284,14 @@ class Host extends Component {
 									<Button
 										color="success"
 										size="lg"
-										onClick={() => this.startGame(8000)}
+										onClick={() => this.props.startQuestions()}
 									>
 										Start the questions...
 									</Button>
 								</div>
 							)
 						case gameStates.QUESTIONS:
-							return this.props.host.hostPlay ? (
+							return (
 								<div className="player-ui">
 									<h3>Question {this.props.game.qNumber}</h3>
 									<h5>{he.decode(this.props.game.question)}</h5>
@@ -461,19 +421,6 @@ class Host extends Component {
 										duration={7000}
 										delay={1}
 									/>
-								</div>
-							) : (
-								<div className="host-ui">
-									<h3>Question {this.props.game.qNumber}</h3>
-									<h5>{he.decode(this.props.game.question)}</h5>
-									<br />
-									<Button
-										color="success"
-										size="lg"
-										onClick={() => this.nextQuestion()}
-									>
-										Next Question
-									</Button>
 								</div>
 							)
 						case gameStates.ENDED:
@@ -615,6 +562,7 @@ const mapDispatchToProps = dispatch => {
 		updateGameState: gamestate => dispatch(gameStateUpdate(gamestate)),
 		updateScore: score => dispatch(userSetScore(score)),
 		showAnswer: () => dispatch(gameShowAnswer()),
+		startQuestions: delay => dispatch(hostQuestion(delay)),
 		toggleModal: () => dispatch(hostToggleModal())
 	}
 }

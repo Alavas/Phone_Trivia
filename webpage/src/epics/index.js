@@ -10,7 +10,11 @@ import {
 	gameShowAnswerEpic,
 	gameWSShowAnswerEpic
 } from './gameEpics'
-import { hostCreateGameEpic } from './hostEpics'
+import {
+	hostCreateGameEpic,
+	hostNextQuestionEpic,
+	hostQuestionEpic
+} from './hostEpics'
 import {
 	userDefaultAvatarEpic,
 	userDisplayScoreEpic,
@@ -32,6 +36,8 @@ export default combineEpics(
 	gameWSPlayersEpic,
 	gameWSShowAnswerEpic,
 	hostCreateGameEpic,
+	hostNextQuestionEpic,
+	hostQuestionEpic,
 	userLoginEpic,
 	userUpdateCookieEpic,
 	userDefaultAvatarEpic,

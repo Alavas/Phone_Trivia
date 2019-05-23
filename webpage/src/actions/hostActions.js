@@ -11,3 +11,7 @@ export const hostCreateGameError = error => ({
 export const hostToggleModal = modal => ({
 	type: 'HOST_TOGGLE_MODAL'
 })
+
+export const hostQuestion = () => ({
+	type: 'HOST_QUESTION'
+})
