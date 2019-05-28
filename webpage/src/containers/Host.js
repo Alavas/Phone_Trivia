@@ -96,7 +96,6 @@ class Host extends Component {
 		document.getElementById('countdown-bar').stop()
 		const result = await submitAnswer(submission)
 		if (result) {
-			this.setState({ answer })
 			this.props.updateAnswer(answer)
 		}
 	}

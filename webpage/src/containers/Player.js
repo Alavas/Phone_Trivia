@@ -7,9 +7,13 @@ import _ from 'lodash'
 import { Button, ListGroup, ListGroupItem } from 'reactstrap'
 import { submitAnswer, gameStates } from '../utilities'
 import { userSetScore } from '../actions/userActions'
+import {
+	gameStateUpdate,
+	gameJoin,
+	gameUpdateAnswer
+} from '../actions/gameActions'
 import '../components/CountdownBar'
 import '../styles/player.css'
-import { gameStateUpdate, gameJoin } from '../actions/gameActions'
 
 class Player extends Component {
 	componentDidMount() {
@@ -46,7 +50,7 @@ class Player extends Component {
 		document.getElementById('countdown-bar').stop()
 		const result = await submitAnswer(submission)
 		if (result) {
-			this.setState({ answer, reaction })
+			this.props.updateAnswer(answer)
 		}
 	}
 
@@ -367,6 +371,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
 	return {
 		joinGame: gameID => dispatch(gameJoin(gameID)),
+		updateAnswer: answer => dispatch(gameUpdateAnswer(answer)),
 		updateGameState: gamestate => dispatch(gameStateUpdate(gamestate)),
 		updateScore: score => dispatch(userSetScore(score))
 	}

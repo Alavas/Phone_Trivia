@@ -93,14 +93,16 @@ export const userWSScoreEpic = (action$, state$) =>
 			let userScores = _.find(data.scores, score => {
 				return score.userid === data.user.userID
 			})
-			if (!_.isUndefined(scores)) {
+			if (!_.isUndefined(userScores)) {
 				scores.totalScore = userScores.totalscore
 				scores.score = userScores.score
 				scores.correct = userScores.correct
+				scores.show = true
 			} else {
-				scores.totalScore = data.state.user.totalScore
-				scores.score = data.state.user.score
-				scores.correct = data.state.user.correct
+				scores.totalScore = data.user.totalScore
+				scores.score = data.user.score
+				scores.correct = data.user.correct
+				scores.show = false
 			}
 			return scores
 		}),
@@ -110,6 +112,7 @@ export const userWSScoreEpic = (action$, state$) =>
 export const userDisplayScoreEpic = action$ =>
 	action$.pipe(
 		ofType('USER_SET_SCORE'),
+		filter(action => action.scores.show === true),
 		map(() => {
 			const toast = document.getElementById('score-toast')
 			toast.className = 'show'

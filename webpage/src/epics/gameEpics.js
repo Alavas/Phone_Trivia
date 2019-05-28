@@ -1,10 +1,10 @@
 import {
-	mergeMap,
 	withLatestFrom,
 	map,
 	catchError,
 	switchMap,
-	ignoreElements
+	ignoreElements,
+	filter
 } from 'rxjs/operators'
 import { webSocket } from 'rxjs/webSocket'
 import { ofType } from 'redux-observable'
@@ -20,7 +20,7 @@ export const gameJoinEpic = (action$, state$) =>
 		ofType('GAME_JOIN'),
 		withLatestFrom(state$),
 		map(state$ => ({ gameID: state$[0].gameID, user: state$[1].user })),
-		mergeMap(async data => {
+		switchMap(async data => {
 			const userID = data.user.userID
 			const gameID = data.gameID
 			const joined = await joinGame({ userID, gameID })
@@ -87,6 +87,7 @@ export const gameShowAnswerEpic = (action$, state$) =>
 		ofType('GAME_SHOW_ANSWER'),
 		withLatestFrom(state$),
 		map(([, state]) => state),
+		filter(state => state.game.gamestate === gameStates.QUESTIONS),
 		map(state => {
 			const wsData = {
 				type: 'SHOW_ANSWER',
