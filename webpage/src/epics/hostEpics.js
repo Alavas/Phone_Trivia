@@ -1,4 +1,4 @@
-import { switchMap, withLatestFrom, map, delay } from 'rxjs/operators'
+import { switchMap, withLatestFrom, map, delay, filter } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 import { gameJoin, gameShowAnswer } from '../actions/gameActions'
 import { hostCreateGameError, hostQuestion } from '../actions/hostActions'
@@ -60,9 +60,12 @@ export const hostQuestionEpic = (action$, state$) =>
 	)
 
 //After the answers are displayed wait and then show the next question.
-export const hostNextQuestionEpic = action$ =>
+export const hostNextQuestionEpic = (action$, state$) =>
 	action$.pipe(
 		ofType('GAME_WS_SHOW_ANSWER'),
-		delay(1500),
-		map(() => hostQuestion(8000))
+		withLatestFrom(state$),
+		map(state$ => ({ host: state$[1].host })),
+		filter(state => state.host.isHost === true),
+		delay(2000),
+		map(() => hostQuestion())
 	)
