@@ -1,4 +1,5 @@
 import { gameStates } from '../utilities'
+import _ from 'lodash'
 
 export default (
 	state = {
@@ -42,7 +43,9 @@ export default (
 			state = { ...state, ...action.data }
 			break
 		case 'GAME_WS_SCORES':
-			state = { ...state, scores: action.scores }
+			//Combine old and new scores, keep distinct only.
+			const scores = _.uniqBy([...action.scores, ...state.scores], 'userid')
+			state = { ...state, scores }
 			break
 		case 'GAME_WS_PLAYERS':
 			state = { ...state, players: action.players }
