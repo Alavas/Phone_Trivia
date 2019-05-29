@@ -23,6 +23,15 @@ export const gameJoinError = error => ({
 	error
 })
 
+export const gameSubmitAnswer = answer => ({
+	type: 'GAME_SUBMIT_ANSWER',
+	answer
+})
+
+export const gameSubmitAnswerError = () => ({
+	type: 'GAME_SUBMIT_ANSWER_ERROR'
+})
+
 export const gameUpdateAnswer = answer => ({
 	type: 'GAME_UPDATE_ANSWER',
 	answer

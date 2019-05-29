@@ -25,18 +25,16 @@ import {
 	questionType,
 	updateGame,
 	connectGameboard,
-	submitAnswer,
 	gameStates
 } from '../utilities'
-import { userSetScore } from '../actions/userActions'
 import '../components/CountdownBar'
 import '../styles/host.css'
 import {
 	gameJoin,
 	gameStateUpdate,
 	gameShowAnswer,
-	gameUpdateAnswer,
-	gameEnd
+	gameEnd,
+	gameSubmitAnswer
 } from '../actions/gameActions'
 import {
 	hostCreateGame,
@@ -78,26 +76,6 @@ class Host extends Component {
 			host: this.props.user.userID
 		}
 		this.props.createGame(gameSettings)
-	}
-
-	async sendAnswer(answer) {
-		let reaction = Date.now() - this.props.game.qStart
-		reaction = Math.max(reaction, 1000)
-		let score = Math.round(25 * (10000 / (reaction - 500)))
-		score = Math.min(Math.max(score, 0), 250)
-		const submission = {
-			gameID: this.props.game.gameID,
-			questionID: this.props.game.questionID,
-			userID: this.props.user.userID,
-			answer,
-			reaction,
-			score
-		}
-		document.getElementById('countdown-bar').stop()
-		const result = await submitAnswer(submission)
-		if (result) {
-			this.props.updateAnswer(answer)
-		}
 	}
 
 	handleScan(data) {
@@ -311,7 +289,7 @@ class Host extends Component {
 														? 'answer'
 														: 'disabled'
 												}
-												onClick={() => this.sendAnswer('A')}
+												onClick={() => this.props.submitAnswer('A')}
 											>
 												TRUE
 											</Button>
@@ -330,7 +308,7 @@ class Host extends Component {
 														? 'answer'
 														: 'disabled'
 												}
-												onClick={() => this.sendAnswer('B')}
+												onClick={() => this.props.submitAnswer('B')}
 											>
 												FALSE
 											</Button>
@@ -352,7 +330,7 @@ class Host extends Component {
 														? 'answer'
 														: 'disabled'
 												}
-												onClick={() => this.sendAnswer('A')}
+												onClick={() => this.props.submitAnswer('A')}
 											>
 												{he.decode(this.props.game.answers[0])}
 											</Button>
@@ -371,7 +349,7 @@ class Host extends Component {
 														? 'answer'
 														: 'disabled'
 												}
-												onClick={() => this.sendAnswer('B')}
+												onClick={() => this.props.submitAnswer('B')}
 											>
 												{he.decode(this.props.game.answers[1])}
 											</Button>
@@ -390,7 +368,7 @@ class Host extends Component {
 														? 'answer'
 														: 'disabled'
 												}
-												onClick={() => this.sendAnswer('C')}
+												onClick={() => this.props.submitAnswer('C')}
 											>
 												{he.decode(this.props.game.answers[2])}
 											</Button>
@@ -409,7 +387,7 @@ class Host extends Component {
 														? 'answer'
 														: 'disabled'
 												}
-												onClick={() => this.sendAnswer('D')}
+												onClick={() => this.props.submitAnswer('D')}
 											>
 												{he.decode(this.props.game.answers[3])}
 											</Button>
@@ -557,11 +535,10 @@ const mapDispatchToProps = dispatch => {
 		createGame: game => dispatch(hostCreateGame(game)),
 		endGame: gameID => dispatch(gameEnd(gameID)),
 		joinGame: gameID => dispatch(gameJoin(gameID)),
-		updateAnswer: answer => dispatch(gameUpdateAnswer(answer)),
 		updateGameState: gamestate => dispatch(gameStateUpdate(gamestate)),
-		updateScore: score => dispatch(userSetScore(score)),
 		showAnswer: () => dispatch(gameShowAnswer()),
 		startQuestions: delay => dispatch(hostQuestion(delay)),
+		submitAnswer: answer => dispatch(gameSubmitAnswer(answer)),
 		toggleModal: () => dispatch(hostToggleModal())
 	}
 }

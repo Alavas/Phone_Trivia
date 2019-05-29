@@ -8,6 +8,7 @@ import {
 	gameWSScoresEpic,
 	gameWSPlayersEpic,
 	gameShowAnswerEpic,
+	gameSubmitAnswerEpic,
 	gameWSShowAnswerEpic
 } from './gameEpics'
 import {
@@ -31,6 +32,7 @@ export default combineEpics(
 	gameEndEpic,
 	gameWebSocketEpic,
 	gameShowAnswerEpic,
+	gameSubmitAnswerEpic,
 	gameWSGameEpic,
 	gameWSScoresEpic,
 	gameWSPlayersEpic,

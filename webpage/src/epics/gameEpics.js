@@ -8,8 +8,13 @@ import {
 } from 'rxjs/operators'
 import { webSocket } from 'rxjs/webSocket'
 import { ofType } from 'redux-observable'
-import { joinGame, gameStates } from '../utilities'
-import { gameJoinSuccess, gameJoinError } from '../actions/gameActions'
+import { joinGame, gameStates, submitAnswer } from '../utilities'
+import {
+	gameJoinSuccess,
+	gameJoinError,
+	gameUpdateAnswer,
+	gameSubmitAnswerError
+} from '../actions/gameActions'
 import { appReset } from '../actions/appActions'
 
 var socket$ //Placeholder for websocket stream.
@@ -49,6 +54,39 @@ export const gameEndEpic = action$ =>
 			})
 		}),
 		ignoreElements()
+	)
+
+//Send answer to the question.
+export const gameSubmitAnswerEpic = (action$, state$) =>
+	action$.pipe(
+		ofType('GAME_SUBMIT_ANSWER'),
+		withLatestFrom(state$),
+		map(state$ => ({
+			answer: state$[0].answer,
+			game: state$[1].game,
+			user: state$[1].user
+		})),
+		switchMap(async state => {
+			let reaction = Date.now() - state.game.qStart
+			reaction = Math.max(reaction, 1000)
+			let score = Math.round(25 * (10000 / (reaction - 500)))
+			score = Math.min(Math.max(score, 0), 250)
+			const submission = {
+				gameID: state.game.gameID,
+				questionID: state.game.questionID,
+				userID: state.user.userID,
+				answer: state.answer,
+				reaction,
+				score
+			}
+			document.getElementById('countdown-bar').stop()
+			const result = await submitAnswer(submission)
+			if (result) {
+				return gameUpdateAnswer(state.answer)
+			} else {
+				return gameSubmitAnswerError('Unable to send answer.')
+			}
+		})
 	)
 
 //Create a Websocket connection to the server once the game is joined.

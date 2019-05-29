@@ -16,7 +16,12 @@ export const appResetEpic = action$ =>
 
 export const appErrorEpic = action$ =>
 	action$.pipe(
-		ofType('GAME_JOIN_ERROR', 'HOST_CREATE_GAME_ERROR', 'USER_LOGIN_ERROR'),
+		ofType(
+			'GAME_JOIN_ERROR',
+			'GAME_SUBMIT_ANSWER_ERROR',
+			'HOST_CREATE_GAME_ERROR',
+			'USER_LOGIN_ERROR'
+		),
 		map(action => {
 			return appError(action.error)
 		})
