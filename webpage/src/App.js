@@ -9,13 +9,13 @@ import Nav from './components/Nav'
 
 class App extends Component {
 	componentDidMount() {
-		//ReactGA.initialize('UA-108465458-2')
-		//ReactGA.pageview(window.location.pathname)
+		ReactGA.initialize('UA-108465458-2')
+		ReactGA.pageview(window.location.pathname)
 	}
 
 	componentDidUpdate(prevProps) {
 		if (this.props.location.pathname !== prevProps.location) {
-			//this.fireTracking()
+			this.fireTracking()
 		}
 	}
 
