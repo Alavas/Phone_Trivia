@@ -63,6 +63,11 @@ if (dev) {
 }
 const wss = new ws.Server({ server })
 
+app.get('/robots.txt', function(req, res) {
+	res.type('text/plain')
+	res.send('User-agent: *\nDisallow: /')
+})
+
 app.get('/api/game', async (req, res) => {
 	const games = await getGames()
 	res.send(games)
