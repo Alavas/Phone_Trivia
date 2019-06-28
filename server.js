@@ -1,4 +1,5 @@
 const express = require('express')
+const compression = require('compression')
 const slashes = require('connect-slashes')
 const https = require('https')
 const http = require('http')
@@ -46,6 +47,7 @@ var clients = []
 //cron.schedule('15 */1 * * *', cleanupGames)
 
 const app = express()
+app.use(compression())
 app.use(bodyParser.json({ limit: '50mb' }))
 app.use(slashes(false))
 app.use(enforce.HTTPS({ trustProtoHeader: true }))

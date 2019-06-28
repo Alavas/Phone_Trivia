@@ -12,9 +12,11 @@ class App extends Component {
 		ReactGA.initialize('UA-108465458-2')
 		ReactGA.pageview(window.location.pathname)
 	}
-
 	componentDidUpdate(prevProps) {
-		if (this.props.location.pathname !== prevProps.location) {
+		if (
+			this.props.location.pathname !== prevProps.location &&
+			process.env.NODE_ENV === 'production'
+		) {
 			this.fireTracking()
 		}
 	}
