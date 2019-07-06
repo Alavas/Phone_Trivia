@@ -3,7 +3,9 @@ export default (
 		avatar: null,
 		correct: false,
 		loggedIn: false,
+		photoTaken: false,
 		score: 0,
+		showAvatarModal: false,
 		totalScore: 0,
 		userID: ''
 	},
@@ -28,6 +30,9 @@ export default (
 				score: action.scores.score,
 				correct: action.scores.correct
 			}
+			break
+		case 'USER_SHOW_AVATAR_MODAL':
+			state = { ...state, showAvatarModal: !state.showAvatarModal }
 			break
 		default:
 			break

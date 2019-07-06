@@ -21,3 +21,7 @@ export const userSetScore = scores => ({
 	type: 'USER_SET_SCORE',
 	scores
 })
+
+export const userShowAvatarModal = () => ({
+	type: 'USER_SHOW_AVATAR_MODAL'
+})

@@ -11,12 +11,10 @@
 /sandbox
 /certificate
 /design
-avatar-test.js
 
 # production
 /webpage/build
 /dist
-/.next
 
 # misc
 .DS_Store

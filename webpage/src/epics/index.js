@@ -20,6 +20,7 @@ import {
 	userDefaultAvatarEpic,
 	userDisplayScoreEpic,
 	userLoginEpic,
+	userUpdateAvatar,
 	userUpdateCookieEpic,
 	userWSScoreEpic
 } from './userEpics'
@@ -42,6 +43,7 @@ export default combineEpics(
 	hostQuestionEpic,
 	userLoginEpic,
 	userUpdateCookieEpic,
+	userUpdateAvatar,
 	userDefaultAvatarEpic,
 	userDisplayScoreEpic,
 	userWSScoreEpic

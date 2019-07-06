@@ -96,12 +96,6 @@ class Host extends Component {
 		console.error(err)
 	}
 
-	toggleModal() {
-		this.setState(prevState => ({
-			modal: !prevState.modal
-		}))
-	}
-
 	render() {
 		return (
 			<div className="host-container">

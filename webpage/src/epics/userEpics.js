@@ -66,6 +66,18 @@ export const userUpdateCookieEpic = action$ =>
 		ignoreElements()
 	)
 
+//Update the user Avatar.
+export const userUpdateAvatar = (action$, state$) =>
+	action$.pipe(
+		ofType('USER_SET_AVATAR'),
+		withLatestFrom(state$),
+		map(state$ => ({ avatar: state$[0].avatar, user: state$[1].user })),
+		map(async data => {
+			await updateUser({ userID: data.user.userID, avatar: data.avatar })
+		}),
+		ignoreElements()
+	)
+
 //Once the user is logged in check to see if they have an Avatar.
 export const userDefaultAvatarEpic = (action$, state$) =>
 	action$.pipe(
@@ -76,7 +88,6 @@ export const userDefaultAvatarEpic = (action$, state$) =>
 			const avatar = await getDefaultAvatar(
 				'https://picsum.photos/100/?random'
 			)
-			await updateUser({ userID: state.user.userid, avatar })
 			return userSetAvatar(avatar)
 		}),
 		catchError(err => userLoginError(err))
