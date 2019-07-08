@@ -3,7 +3,6 @@ export default (
 		avatar: null,
 		correct: false,
 		loggedIn: false,
-		photoTaken: false,
 		score: 0,
 		showAvatarModal: false,
 		totalScore: 0,

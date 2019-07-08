@@ -10,7 +10,7 @@ import {
 	userShowAvatarModal,
 	userSetAvatar
 } from '../actions/userActions'
-import { appReset } from '../actions/appActions'
+import { appReset, appError } from '../actions/appActions'
 import '../styles/nav.css'
 
 class Nav extends Component {
@@ -34,7 +34,7 @@ class Nav extends Component {
 		this.setState({ photoTaken: false }, () => {
 			this.cameraPhoto = new CameraPhoto(this.videoRef.current)
 			this.cameraPhoto.startCamera(FACING_MODES.USER).catch(error => {
-				console.error('Camera not started!', error)
+				this.props.error('Camera not started!')
 			})
 		})
 	}
@@ -42,7 +42,7 @@ class Nav extends Component {
 	stopCamera() {
 		if (this.cameraPhoto.stream !== null) {
 			this.cameraPhoto.stopCamera().catch(error => {
-				console.error(error)
+				this.props.error('Could not stop camera!')
 			})
 		}
 	}
@@ -225,6 +225,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
 	return {
 		avatar: avatar => dispatch(userSetAvatar(avatar)),
+		error: error => dispatch(appError(error)),
 		login: () => dispatch(userLogin()),
 		reset: () => dispatch(appReset()),
 		modal: () => dispatch(userShowAvatarModal())
