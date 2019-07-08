@@ -5,7 +5,7 @@ import Home from './containers/Home'
 import Host from './containers/Host'
 import Game from './containers/Game'
 import Player from './containers/Player'
-import Nav from './components/Nav'
+import Nav from './containers/Nav'
 
 class App extends Component {
 	componentDidMount() {

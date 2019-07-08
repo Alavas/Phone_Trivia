@@ -28,12 +28,49 @@ p {
 	padding-right: 15px;
 	text-shadow: 2px 2px #0d1260;
 }
-.avatar {
+.avatar-img {
 	vertical-align: middle;
-	width: 50px;
-	height: 50px;
+	width: 60px;
+	height: 60px;
 	border-radius: 50%;
 	border: 1px solid lightslategray;
+}
+.avatar-live {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+	border-radius: 0.5em;
+	border: 1px solid lightslategray !important;
+}
+.avatar-container {
+	width: 80vw;
+	margin-left: auto;
+	margin-right: auto;
+}
+.avatar-editor {
+	width: 300px;
+	margin-left: auto;
+	margin-right: auto;
+	canvas,
+	div {
+		border-radius: 0.5em !important;
+	}
+}
+.avatar-header {
+	margin-left: auto;
+	margin-right: auto;
+	color: lightslategray;
+	text-shadow: 2px 2px #0d1260;
+}
+.modal-header {
+	border-bottom: 1px solid lightslategray !important;
+}
+.modal-content {
+	background: #0d1620 !important;
+	border: 1px solid lightslategray !important;
+}
+.modal-footer {
+	border-top: 1px solid lightslategray !important;
 }
 .phone-trivia {
 	img {
@@ -60,7 +97,6 @@ p {
 	overflow-wrap: break-word;
 	word-wrap: break-word;
 }
-
 #error-toast.show {
 	visibility: visible;
 	bottom: 90px;
@@ -68,14 +104,12 @@ p {
 	transition: all 0.5s ease-out;
 	-webkit-transition: all 0.5s ease-out;
 }
-
 #error-toast.hide {
 	bottom: 0px;
 	opacity: 0;
 	transition: all 0.5s ease-out;
 	-webkit-transition: all 0.5s ease-out;
 }
-
 //Score Toast
 #score-toast {
 	visibility: hidden;
@@ -92,13 +126,11 @@ p {
 	text-shadow: 1px 1px #0d1620;
 	opacity: 0;
 }
-
 #score-toast.show {
 	visibility: visible;
 	-webkit-animation: fadeinout 1.7s ease-out forwards;
 	animation: fadeinout 1.7s ease-out forwards;
 }
-
 @-webkit-keyframes fadeinout {
 	0%,
 	100% {
@@ -110,7 +142,6 @@ p {
 		bottom: 65px;
 	}
 }
-
 @keyframes fadeinout {
 	0%,
 	100% {

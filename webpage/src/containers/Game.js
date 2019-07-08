@@ -4,7 +4,7 @@ import QRCode from 'qrcode.react'
 import he from 'he'
 import _ from 'lodash'
 import { Card, CardBody, CardTitle, ListGroup, ListGroupItem } from 'reactstrap'
-import Nav from '../components/Nav'
+import Nav from '../containers/Nav'
 import {
 	getCookie,
 	updateCookie,

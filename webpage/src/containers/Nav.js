@@ -4,8 +4,6 @@ import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
 import CameraPhoto, { FACING_MODES } from 'jslib-html5-camera-photo'
 import Avatar from 'react-avatar-edit'
 import _ from 'lodash'
-import '../styles/avatar.css'
-import '../styles/nav.css'
 import PhoneTrivia from '../images/PhoneTrivia.png'
 import {
 	userLogin,
@@ -13,6 +11,7 @@ import {
 	userSetAvatar
 } from '../actions/userActions'
 import { appReset } from '../actions/appActions'
+import '../styles/nav.css'
 
 class Nav extends Component {
 	constructor(props) {
@@ -23,6 +22,7 @@ class Nav extends Component {
 			preview: null
 		}
 		this.onCrop = this.onCrop.bind(this)
+		this.toggleModalCamera = this.toggleModalCamera.bind(this)
 		this.takePhoto = this.takePhoto.bind(this)
 		this.videoRef = React.createRef()
 	}
@@ -118,13 +118,13 @@ class Nav extends Component {
 								_.isNull(this.props.user.avatar) ||
 								this.props.user.avatar === ''
 									? { display: 'none' }
-									: { padding: '0px', marginTop: '2.5px' }
+									: { padding: '0px', marginTop: '-1.5px' }
 							}
 						>
 							<img
 								src={this.props.user.avatar}
 								alt="avatar"
-								className="avatar"
+								className="avatar-img"
 								onClick={() => this.toggleModalCamera()}
 							/>
 						</li>
@@ -148,8 +148,11 @@ class Nav extends Component {
 				>
 					+{this.props.user.score}
 				</div>
-				<Modal isOpen={this.props.user.showAvatarModal}>
-					<ModalHeader style={{ marginLeft: 'auto', marginRight: 'auto' }}>
+				<Modal
+					isOpen={this.props.user.showAvatarModal}
+					toggle={this.toggleModalCamera}
+				>
+					<ModalHeader className="avatar-header">
 						Create your own Avatar!
 					</ModalHeader>
 					<ModalBody>
@@ -201,7 +204,7 @@ class Nav extends Component {
 							color="primary"
 							onClick={() => this.toggleModalCamera()}
 						>
-							Close
+							Cancel
 						</Button>
 					</ModalFooter>
 				</Modal>
