@@ -4,13 +4,15 @@ import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
 import CameraPhoto, { FACING_MODES } from 'jslib-html5-camera-photo'
 import Avatar from 'react-avatar-edit'
 import _ from 'lodash'
-import PhoneTrivia from '../images/PhoneTrivia.png'
+import PhoneTriviaSVG from '../images/PhoneTrivia.svg'
+import AboutSVG from '../images/About.svg'
 import {
 	userLogin,
 	userShowAvatarModal,
 	userSetAvatar
 } from '../actions/userActions'
 import { appReset, appError } from '../actions/appActions'
+import About from '../components/About'
 import '../styles/nav.css'
 
 class Nav extends Component {
@@ -19,8 +21,10 @@ class Nav extends Component {
 		this.state = {
 			photoTaken: false,
 			dataUri: '',
-			preview: null
+			preview: null,
+			aboutModal: false
 		}
+		this.handleAboutModal = this.handleAboutModal.bind(this)
 		this.onCrop = this.onCrop.bind(this)
 		this.toggleModalCamera = this.toggleModalCamera.bind(this)
 		this.takePhoto = this.takePhoto.bind(this)
@@ -28,6 +32,12 @@ class Nav extends Component {
 	}
 	componentDidMount() {
 		this.props.login()
+	}
+
+	handleAboutModal() {
+		this.setState(prevstate => ({
+			aboutModal: !prevstate.aboutModal
+		}))
 	}
 
 	startCamera() {
@@ -76,9 +86,11 @@ class Nav extends Component {
 
 	toggleModalCamera() {
 		if (this.props.user.showAvatarModal) {
+			//Shutdown the camera before closing the modal.
 			this.stopCamera()
 			this.props.modal()
 		} else {
+			//Start the camera before displaying the modal.
 			this.startCamera()
 			this.props.modal()
 		}
@@ -89,14 +101,27 @@ class Nav extends Component {
 			<nav className="fixed-bottom">
 				<ul>
 					<li>
-						{/*eslint-disable-next-line*/}
-						<a
-							className="phone-trivia"
-							onClick={() => this.props.reset()}
-						>
-							<img src={PhoneTrivia} alt="PhoneTrivia" />
-						</a>
+						{/*eslint-disable*/}
+						{this.props.pathname === '/' ? (
+							<a
+								className="phone-trivia"
+								onClick={() => this.handleAboutModal()}
+							>
+								<img src={AboutSVG} alt="About" />
+							</a>
+						) : (
+							<a
+								className="phone-trivia"
+								onClick={() => this.props.reset()}
+							>
+								<img src={PhoneTriviaSVG} alt="PhoneTrivia" />
+							</a>
+						)}
+						{/*eslint-enable*/}
 					</li>
+					<small className="copyright">
+						&copy; Copyright 2019, Justin Savala
+					</small>
 					<ul>
 						<li
 							style={
@@ -208,6 +233,10 @@ class Nav extends Component {
 						</Button>
 					</ModalFooter>
 				</Modal>
+				<About
+					showModal={this.state.aboutModal}
+					toggleModal={this.handleAboutModal}
+				/>
 			</nav>
 		)
 	}

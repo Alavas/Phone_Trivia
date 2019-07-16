@@ -32,6 +32,41 @@ p {
   text-shadow: 2px 2px #0d1260;
 }
 
+.about-header {
+  margin-left: auto;
+  margin-right: auto;
+  color: lightslategray;
+  text-shadow: 2px 2px #0d1260;
+}
+.about-header h5 {
+  font-size: 1.5rem;
+  font-style: italic;
+}
+
+.about {
+  margin-left: auto;
+  margin-right: auto;
+}
+.about p {
+  font-size: 0.95rem;
+  padding: 0px;
+  text-align: justify;
+}
+.about a {
+  text-decoration: underline !important;
+  font-size: 0.95rem;
+  padding: 0px;
+  text-align: justify;
+  cursor: pointer !important;
+}
+
+.copyright {
+  position: absolute;
+  margin-left: 5px;
+  bottom: 2px;
+  color: lightslategray;
+}
+
 .avatar-img {
   vertical-align: middle;
   width: 60px;

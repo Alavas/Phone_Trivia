@@ -9,13 +9,19 @@
   margin: 0;
   padding: 0;
   width: 100vw;
-  padding-top: 80px;
-  line-height: 1.15;
-  font-size: 2.75em;
+  padding-top: 95px;
   text-align: center;
+}
+.home-title img {
+  object-fit: contain;
+  height: 5rem;
+}
+.home-title h4 {
+  text-align: center;
+  font-size: 0.85rem;
   color: lightslategray;
+  margin-top: 10px;
   text-shadow: 2px 2px #0d1260;
-  font-weight: 500;
 }
 
 .route-container {
@@ -35,7 +41,22 @@
   text-align: left;
   text-decoration: none !important;
   background-color: #0d1620;
-  border-radius: 0.3em;
+  border-radius: 0.3rem;
+}
+.route h3 {
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  color: #067df7;
+  font-size: 1rem;
+}
+.route p {
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  font-size: 0.7rem;
+  color: #212529;
+  text-shadow: 2px 2px #0d1260;
 }
 
 .route:hover {
@@ -43,20 +64,9 @@
   border-color: #067df7 !important;
 }
 
-.route h3 {
-  margin: 0;
-  padding: 0;
+.report-issue {
   text-align: center;
-  color: #067df7;
-  font-size: 1em;
-}
-
-.route p {
-  margin: 0;
-  text-align: center;
-  font-size: 0.6em;
-  color: #212529;
-  text-shadow: 2px 2px #0d1260;
+  font-size: 1rem;
 }
 
 @media only screen and (max-width: 600px) {
@@ -66,7 +76,7 @@
 
   .route-container {
     margin-top: 20px;
-    max-width: 250px;
+    max-width: 75vw;
   }
 
   .route {
@@ -75,7 +85,7 @@
   }
 
   .route h3 {
-    font-size: 1em;
+    font-size: 1rem;
   }
 }
 
