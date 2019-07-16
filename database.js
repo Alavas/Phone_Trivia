@@ -132,9 +132,10 @@ async function postUsers(userID) {
 		if (result.rowCount > 0) {
 			client.release()
 			const results = result.rows[0]
+			await updateUserLogin(userID)
 			return results
 		} else {
-			const Query = `INSERT INTO users (userid, score) VALUES ('${userID}', 0);`
+			const Query = `INSERT INTO users (userid, score, created, lastlogin) VALUES ('${userID}', 0, NOW()::timestamp, NOW()::timestamp);`
 			const result = await client.query(Query)
 			if (result.rowCount > 0) {
 				client.release()
@@ -150,6 +151,24 @@ async function postUsers(userID) {
 		}
 	} catch (err) {
 		return err
+	}
+}
+
+async function updateUserLogin(userID) {
+	try {
+		// prettier-ignore
+		const query = `UPDATE users SET lastlogin = NOW()::timestamp WHERE userid = '${userID}';`
+		const client = await postgres.connect()
+		const result = await client.query(query)
+		if (result.rowCount > 0) {
+			client.release()
+			return true
+		} else {
+			client.release()
+			return true
+		}
+	} catch (err) {
+		return false
 	}
 }
 

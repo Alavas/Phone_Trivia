@@ -1,6 +1,6 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
-CREATE TABLE IF NOT EXISTS users (userid uuid PRIMARY KEY, avatar text, score int);
+CREATE TABLE IF NOT EXISTS users (userid uuid PRIMARY KEY, avatar text, score int, created timestamptz, lastlogin timestamptz);
 
 CREATE TABLE IF NOT EXISTS games (gameid uuid PRIMARY KEY, userid uuid REFERENCES users(userid), created timestamptz, ended timestamptz, gamestate int DEFAULT 0, question int DEFAULT 0);
 
