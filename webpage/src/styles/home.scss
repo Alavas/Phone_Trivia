@@ -19,7 +19,7 @@
 		font-size: 0.85rem;
 		color: lightslategray;
 		margin-top: 10px;
-		text-shadow: 2px 2px #0d1260;
+		text-shadow: 0px 3px 6px rgba(13, 18, 96, 0.6);
 	}
 }
 .route-container {
@@ -32,6 +32,8 @@
 	margin-right: auto;
 }
 .route {
+	box-shadow: 0 10px 16px 0 rgba(0, 0, 0, 0.2),
+		0 6px 20px 0 rgba(0, 0, 0, 0.19) !important;
 	padding: 18px 18px 24px;
 	width: 100%;
 	margin: 10px;
@@ -62,6 +64,7 @@
 .report-issue {
 	text-align: center;
 	font-size: 1rem;
+	text-shadow: 0px 3px 6px rgba(13, 18, 96, 0.6);
 }
 
 @media only screen and (max-width: 600px) {
