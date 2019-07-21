@@ -7,17 +7,34 @@ const postgres = new Pool({
 	ssl: process.env.SSL_STATE || false
 })
 
+async function getAdmin(username) {
+	try {
+		// prettier-ignore
+		const query = `SELECT * FROM admins WHERE username = '${username}';`
+		const client = await postgres.connect()
+		const result = await client.query(query)
+		client.release()
+		if (result.rowCount > 0) {
+			return { exists: true, data: result.rows[0] }
+		} else {
+			return { exists: false, data: 'Username or password is incorrect.' }
+		}
+	} catch (err) {
+		return err
+	}
+}
+
 async function getGames() {
 	try {
 		// prettier-ignore
-		const query = `SELECT gameid FROM games;`
+		const query = `SELECT * FROM games;`
 		const client = await postgres.connect()
 		const result = await client.query(query)
 		client.release()
 		if (result.rowCount > 0) {
 			return result.rows
 		} else {
-			return { error: 'no games found' }
+			return []
 		}
 	} catch (err) {
 		return err
@@ -124,6 +141,23 @@ async function postQuestions(q) {
 	}
 }
 
+async function getUsers() {
+	try {
+		// prettier-ignore
+		const query = `SELECT * FROM users;`
+		const client = await postgres.connect()
+		const result = await client.query(query)
+		client.release()
+		if (result.rowCount > 0) {
+			return result.rows
+		} else {
+			return { error: 'No users found.' }
+		}
+	} catch (err) {
+		return err
+	}
+}
+
 async function postUsers(userID) {
 	try {
 		const query = `SELECT * FROM users WHERE userid = '${userID}';`
@@ -187,6 +221,23 @@ async function putUsers({ userID, avatar }) {
 		}
 	} catch (err) {
 		return false
+	}
+}
+
+async function deleteUsers(userID) {
+	try {
+		// prettier-ignore
+		const query = `DELETE FROM users WHERE userid = '${userID}';`
+		const client = await postgres.connect()
+		const result = await client.query(query)
+		client.release()
+		if (result.rowCount > 0) {
+			return true
+		} else {
+			return false
+		}
+	} catch (err) {
+		return err
 	}
 }
 
@@ -280,13 +331,16 @@ async function cleanupGames() {
 }
 
 module.exports = {
+	getAdmin,
 	getGames,
 	postGames,
 	putGames,
 	deleteGames,
 	postQuestions,
+	getUsers,
 	postUsers,
 	putUsers,
+	deleteUsers,
 	getPlayers,
 	postPlayers,
 	getScores,

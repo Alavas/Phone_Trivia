@@ -13,21 +13,10 @@ const _ = require('lodash')
 const fs = require('fs')
 const cron = require('node-cron')
 const fetch = require('node-fetch')
+const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 //Database functions.
-const {
-	getGames,
-	postGames,
-	putGames,
-	deleteGames,
-	postQuestions,
-	postUsers,
-	putUsers,
-	getPlayers,
-	postPlayers,
-	getScores,
-	postScores,
-	cleanupGames
-} = require('./database')
+const db = require('./database')
 
 const gameStates = {
 	NOTSTARTED: 0,
@@ -38,7 +27,9 @@ const gameStates = {
 	RESET: 5
 }
 
+const SALTROUNDS = 10
 const PORT = parseInt(process.env.PORT, 10) || 5000
+const JWTKEY = process.env.JWTKEY || 'dev-key'
 const dev = process.env.NODE_ENV !== 'production'
 console.log('DEV:', dev)
 //Global variable to store WebSocket clients.
@@ -70,12 +61,6 @@ app.get('/robots.txt', function(req, res) {
 	res.send('User-agent: *\nDisallow: /')
 })
 
-app.get('/api/game', async (req, res) => {
-	const games = await getGames()
-	res.send(games)
-	res.end
-})
-
 app.post('/api/game', async (req, res) => {
 	const game = req.body.gameSettings
 	var URL = ''
@@ -91,7 +76,7 @@ app.post('/api/game', async (req, res) => {
 	URL = URL.replace(/(&.{1,10}=any)/g, '')
 	const gameQuestions = await fetch(URL).then(res => res.json())
 	if (gameQuestions.response_code === 0) {
-		const gameid = await postGames(game)
+		const gameid = await db.postGames(game)
 		let questions = gameQuestions.results.map((q, index) => {
 			let answers = q.incorrect_answers
 			answers.push(q.correct_answer)
@@ -116,7 +101,7 @@ app.post('/api/game', async (req, res) => {
 			return question
 		})
 		for (const question of questions) {
-			postQuestions(question)
+			db.postQuestions(question)
 		}
 		res.send({ gameid })
 		res.end
@@ -133,7 +118,7 @@ app.put('/api/game', async (req, res) => {
 		res.sendStatus(400)
 		res.end
 	} else {
-		const game = await putGames({ gamestate, gameID, qNumber })
+		const game = await db.putGames({ gamestate, gameID, qNumber })
 		if (game.gamestate > gameStates.NOTSTARTED) {
 			wsGame(game)
 		}
@@ -148,7 +133,7 @@ app.delete('/api/game', async (req, res) => {
 		res.sendStatus(400)
 		res.end
 	} else {
-		const deleted = await deleteGames(gameID)
+		const deleted = await db.deleteGames(gameID)
 		wsGame({ gameID, gamestate: gameStates.RESET })
 		res.send(deleted)
 		res.end
@@ -161,7 +146,7 @@ app.post('/api/user', async (req, res) => {
 		res.sendStatus(400)
 		res.end
 	} else {
-		const user = await postUsers(userID)
+		const user = await db.postUsers(userID)
 		res.send(user)
 		res.end
 	}
@@ -174,7 +159,7 @@ app.put('/api/user', async (req, res) => {
 		res.sendStatus(400)
 		res.end
 	} else {
-		const user = putUsers({ userID, avatar })
+		const user = await db.putUsers({ userID, avatar })
 		res.send(user)
 		res.end
 	}
@@ -186,7 +171,7 @@ app.get('/api/player', async (req, res) => {
 		res.sendStatus(400)
 		res.end
 	} else {
-		const players = await getPlayers(gameID)
+		const players = await db.getPlayers(gameID)
 		res.send(players)
 		res.end
 	}
@@ -199,7 +184,7 @@ app.post('/api/player', async (req, res) => {
 		res.sendStatus(400)
 		res.end
 	} else {
-		const joined = await postPlayers({ userID, gameID })
+		const joined = await db.postPlayers({ userID, gameID })
 		wsPlayers(gameID)
 		res.send(joined)
 		res.end
@@ -212,8 +197,8 @@ app.post('/api/score', async (req, res) => {
 		res.sendStatus(400)
 		res.end
 	} else {
-		const result = await postScores(answer)
-		const scores = await getScores(answer.questionID)
+		const result = await db.postScores(answer)
+		const scores = await db.getScores(answer.questionID)
 		wsScores(answer.gameID, scores)
 		res.send(result)
 		res.end
@@ -247,6 +232,101 @@ if (process.env.NODE_ENV === 'production') {
 	// Handle React routing, return all requests to React app
 	app.get('*', function(req, res) {
 		res.sendFile(path.join(__dirname, 'webpage/build', 'index.html'))
+	})
+}
+
+/* Admin Functions */
+app.post('/api/admin/login', async (req, res) => {
+	const username = req.body.username
+	const password = req.body.password
+	const admin = await checkUser({
+		username,
+		password
+	})
+	if (admin.valid) {
+		let token = jwt.sign({ adminID: admin.adminID }, JWTKEY, {
+			expiresIn: 86400
+		})
+		res.json({ token })
+		res.end
+	} else {
+		res.sendStatus(401)
+		res.end
+	}
+})
+
+app.get('/api/admin/user', authenticate, async (req, res) => {
+	const users = await db.getUsers()
+	res.send(users)
+	res.end
+})
+
+app.delete('/api/admin/user/:id', authenticate, async (req, res) => {
+	const userID = req.params.id
+	if (_.isUndefined(userID)) {
+		res.sendStatus(400)
+		res.end
+	} else {
+		const deleted = await db.deleteUsers(userID)
+		res.send(deleted)
+		res.end
+	}
+})
+
+app.get('/api/admin/game', authenticate, async (req, res) => {
+	const games = await db.getGames()
+	res.send(games)
+	res.end
+})
+
+app.delete('/api/admin/game/:id', authenticate, async (req, res) => {
+	const gameID = req.params.id
+	if (_.isUndefined(gameID)) {
+		res.sendStatus(400)
+		res.end
+	} else {
+		const deleted = await db.deleteGames(gameID)
+		res.send(deleted)
+		res.end
+	}
+})
+
+/*
+async function createHash(password) {
+	const hash = await bcrypt.hash(password, SALTROUNDS)
+	return hash
+}
+*/
+
+async function checkUser({ username, password }) {
+	const admin = await db.getAdmin(username)
+	let match
+	if (admin.exists) {
+		match = await bcrypt.compare(password, admin.data.pwhash)
+	}
+	if (match) {
+		return { valid: true, adminID: admin.data.adminid }
+	} else {
+		return { valid: false }
+	}
+}
+
+function authenticate(req, res, next) {
+	var token = req.headers['x-access-token']
+	if (!token) {
+		return res
+			.status(401)
+			.send({ auth: false, message: 'No token provided.' })
+	}
+	jwt.verify(token, JWTKEY, (err, decoded) => {
+		if (err) {
+			return res
+				.status(500)
+				.send({ auth: false, message: 'Failed to authenticate token.' })
+		} else {
+			req.decoded = decoded
+			next()
+		}
 	})
 }
 
@@ -294,7 +374,7 @@ function wsGameboard(gameboard) {
 
 //Broadcasts current player information to a specified game.
 async function wsPlayers(gameID) {
-	let players = await getPlayers(gameID)
+	let players = await db.getPlayers(gameID)
 	let gameboards = clients.filter(client => client.protocol === `gb_${gameID}`)
 	gameboards.forEach(board => {
 		if (board.readyState === ws.OPEN) {
@@ -327,7 +407,7 @@ async function wsGame(game) {
 	)
 	//Send list of players to the players for displaying the scores at the end.
 	if (game.gamestate === gameStates.STARTED) {
-		let gamePlayers = await getPlayers(game.gameID)
+		let gamePlayers = await db.getPlayers(game.gameID)
 		players.forEach(player => {
 			if (player.readyState === ws.OPEN) {
 				player.send(
