@@ -213,29 +213,6 @@ app.post('/api/gameboard', (req, res) => {
 	res.end
 })
 
-server.listen(PORT, function() {
-	console.log(`Listening on port ${PORT}!`)
-})
-
-wss.on('connection', function open(ws) {
-	ws.on('message', data => wsReceiveData(data))
-	clients.push(ws)
-})
-
-wss.on('close', function close() {
-	console.log('disconnected')
-})
-
-if (process.env.NODE_ENV === 'production') {
-	// Serve any static files
-	app.use(express.static(path.join(__dirname, 'webpage/build')))
-	// Handle React routing, return all requests to React app
-	app.get('*', function(req, res) {
-		res.sendFile(path.join(__dirname, 'webpage/build', 'index.html'))
-	})
-}
-
-/* Admin Functions */
 app.post('/api/admin/login', async (req, res) => {
 	const username = req.body.username
 	const password = req.body.password
@@ -290,6 +267,30 @@ app.delete('/api/admin/game/:id', authenticate, async (req, res) => {
 		res.end
 	}
 })
+
+server.listen(PORT, function() {
+	console.log(`Listening on port ${PORT}!`)
+})
+
+wss.on('connection', function open(ws) {
+	ws.on('message', data => wsReceiveData(data))
+	clients.push(ws)
+})
+
+wss.on('close', function close() {
+	console.log('disconnected')
+})
+
+if (process.env.NODE_ENV === 'production') {
+	// Serve any static files
+	app.use(express.static(path.join(__dirname, 'webpage/build')))
+	// Handle React routing, return all requests to React app
+	app.get('*', function(req, res) {
+		res.sendFile(path.join(__dirname, 'webpage/build', 'index.html'))
+	})
+}
+
+/* Admin Functions */
 
 /*
 async function createHash(password) {
