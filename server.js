@@ -222,14 +222,6 @@ app.post('/api/score', async (req, res) => {
 	}
 })
 
-app.post('/api/gameboard', (req, res) => {
-	const userID = req.body.userID
-	const gameID = req.body.gameID
-	wsGameboard({ userID, gameID, gamestate: gameStates.CREATED })
-	res.sendStatus(201)
-	res.end
-})
-
 app.post('/api/admin/login', async (req, res) => {
 	const username = req.body.username
 	const password = req.body.password
@@ -372,24 +364,6 @@ function wsShowAnswer(gameID) {
 	})
 }
 
-function wsGameboard(gameboard) {
-	let gameboards = clients.filter(
-		client => client.protocol === `${gameboard.userID}`
-	)
-	gameboards.forEach(board => {
-		if (board.readyState === ws.OPEN) {
-			board.send(JSON.stringify(gameboard))
-		}
-	})
-	//Update the protocol of the gameboard client to be gb_{gameID}.
-	clients = clients.map(client => {
-		if (client.protocol === gameboard.userID) {
-			client.protocol = `gb_${gameboard.gameID}`
-		}
-		return client
-	})
-}
-
 //Broadcasts current player information to a specified game.
 async function wsPlayers(gameID) {
 	let players = await db.getPlayers(gameID)
@@ -402,14 +376,10 @@ async function wsPlayers(gameID) {
 }
 
 //Broadcasts scores to the gameboards.
+//Keep for other use??
 async function wsScores(gameID, scores) {
 	let players = clients.filter(client => client.protocol === gameID)
 	let gameboards = clients.filter(client => client.protocol === `gb_${gameID}`)
-	gameboards.forEach(board => {
-		if (board.readyState === ws.OPEN) {
-			board.send(JSON.stringify({ scores }))
-		}
-	})
 	players.forEach(player => {
 		if (player.readyState === ws.OPEN) {
 			player.send(JSON.stringify({ type: 'WS_SCORES', data: scores }))
@@ -420,9 +390,6 @@ async function wsScores(gameID, scores) {
 //Broadcasts questions and gamestate for a specified game.
 async function wsGame(game) {
 	let players = clients.filter(client => client.protocol === game.gameID)
-	let gameboards = clients.filter(
-		client => client.protocol === `gb_${game.gameID}`
-	)
 	//Send list of players to the players for displaying the scores at the end.
 	if (game.gamestate === gameStates.STARTED) {
 		let gamePlayers = await db.getPlayers(game.gameID)
@@ -434,11 +401,6 @@ async function wsGame(game) {
 			}
 		})
 	}
-	gameboards.forEach(board => {
-		if (board.readyState === ws.OPEN) {
-			board.send(JSON.stringify(game))
-		}
-	})
 	players.forEach(player => {
 		if (player.readyState === ws.OPEN) {
 			player.send(JSON.stringify({ type: 'WS_GAME', data: game }))

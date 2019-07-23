@@ -92,21 +92,6 @@ export const updateUser = async ({ userID, avatar }) => {
 	return user
 }
 
-//Get list of all existing games.
-export const getGames = async () => {
-	const games = await fetch(
-		`${process.env.REACT_APP_GAMESHOW_ENDPOINT}/api/game`,
-		{
-			method: 'GET',
-			headers: {
-				Accept: 'application/json, text/plain, */*',
-				'Content-Type': 'application/json'
-			}
-		}
-	).then(res => res.json())
-	return games
-}
-
 //Update gamestate and question number to display.
 export const updateGame = async ({ gamestate, gameID, qNumber = 0 }) => {
 	let data = JSON.stringify({ gamestate, gameID, qNumber })
@@ -156,23 +141,6 @@ export const submitAnswer = async answer => {
 		}
 	).then(res => res.json())
 	return result
-}
-
-//Connect gameboard to game.
-export const connectGameboard = async gameboard => {
-	let data = JSON.stringify(gameboard)
-	const board = await fetch(
-		`${process.env.REACT_APP_GAMESHOW_ENDPOINT}/api/gameboard`,
-		{
-			method: 'POST',
-			headers: {
-				Accept: 'application/json, text/plain, */*',
-				'Content-Type': 'application/json'
-			},
-			body: data
-		}
-	)
-	return board
 }
 
 //Possible question categories.

@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import QrReader from 'react-qr-reader'
 import QRCode from 'qrcode.react'
 import he from 'he'
 import _ from 'lodash'
@@ -13,10 +12,6 @@ import {
 	Label,
 	ListGroup,
 	ListGroupItem,
-	Modal,
-	ModalHeader,
-	ModalBody,
-	ModalFooter,
 	Row
 } from 'reactstrap'
 import {
@@ -24,7 +19,6 @@ import {
 	gameDifficulties,
 	questionType,
 	updateGame,
-	connectGameboard,
 	gameStates
 } from '../utilities'
 import '../components/CountdownBar'
@@ -36,11 +30,7 @@ import {
 	gameEnd,
 	gameSubmitAnswer
 } from '../actions/gameActions'
-import {
-	hostCreateGame,
-	hostToggleModal,
-	hostQuestion
-} from '../actions/hostActions'
+import { hostCreateGame, hostQuestion } from '../actions/hostActions'
 
 class Host extends Component {
 	constructor(props) {
@@ -50,7 +40,6 @@ class Host extends Component {
 		this.category = React.createRef()
 		this.difficulty = React.createRef()
 		this.type = React.createRef()
-		this.handleScan = this.handleScan.bind(this)
 	}
 
 	componentDidMount() {
@@ -76,24 +65,6 @@ class Host extends Component {
 			host: this.props.user.userID
 		}
 		this.props.createGame(gameSettings)
-	}
-
-	handleScan(data) {
-		const regex = RegExp(
-			'[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}'
-		)
-		if (data) {
-			//Regex to confirm that the link is valid.
-			if (regex.test(data)) {
-				const gameID = this.props.game.gameID
-				connectGameboard({ userID: data, gameID })
-				this.props.toggleModal()
-			}
-		}
-	}
-
-	handleError(err) {
-		console.error(err)
 	}
 
 	render() {
@@ -216,37 +187,9 @@ class Host extends Component {
 											renderAs={'svg'}
 										/>
 									</div>
-									<Button
-										color="danger"
-										size="lg"
-										onClick={() => this.props.toggleModal()}
-									>
-										Connect Gameboard
+									<Button color="danger" size="lg">
+										Invite A Friend.
 									</Button>
-									<Modal isOpen={this.props.host.modal}>
-										<ModalHeader toggle={this.toggle}>
-											Scan a Gameboard QR code.
-										</ModalHeader>
-										<ModalBody>
-											{' '}
-											<QrReader
-												delay={300}
-												onError={this.handleError}
-												onScan={this.handleScan}
-												style={{
-													width: '100%'
-												}}
-											/>
-										</ModalBody>
-										<ModalFooter>
-											<Button
-												color="primary"
-												onClick={() => this.props.toggleModal()}
-											>
-												Close
-											</Button>
-										</ModalFooter>
-									</Modal>
 								</div>
 							)
 						case gameStates.STARTED:
@@ -532,8 +475,7 @@ const mapDispatchToProps = dispatch => {
 		updateGameState: gamestate => dispatch(gameStateUpdate(gamestate)),
 		showAnswer: () => dispatch(gameShowAnswer()),
 		startQuestions: delay => dispatch(hostQuestion(delay)),
-		submitAnswer: answer => dispatch(gameSubmitAnswer(answer)),
-		toggleModal: () => dispatch(hostToggleModal())
+		submitAnswer: answer => dispatch(gameSubmitAnswer(answer))
 	}
 }
 

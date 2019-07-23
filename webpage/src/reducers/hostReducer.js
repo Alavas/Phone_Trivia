@@ -4,17 +4,13 @@ export default (
 		category: '',
 		difficulty: '',
 		isHost: false,
-		type: '',
-		showModal: false
+		type: ''
 	},
 	action
 ) => {
 	switch (action.type) {
 		case 'HOST_CREATE_GAME':
 			state = { ...state, ...action.game, isHost: true }
-			break
-		case 'HOST_TOGGLE_MODAL':
-			state = { ...state, modal: !state.modal }
 			break
 		default:
 			break
