@@ -11,10 +11,11 @@ const morgan = require('morgan')
 const ws = require('ws')
 const _ = require('lodash')
 const fs = require('fs')
-const cron = require('node-cron')
 const fetch = require('node-fetch')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const twilio = require('twilio')
+require('dotenv').config()
 //Database functions.
 const db = require('./database')
 
@@ -28,6 +29,9 @@ const gameStates = {
 }
 
 const SALTROUNDS = 10
+const accountSid = process.env.TWILIO_SID
+const authToken = process.env.TWILIO_TOKEN
+const from = process.env.TWILIO_FROM
 const PORT = parseInt(process.env.PORT, 10) || 5000
 const JWTKEY = process.env.JWTKEY || 'dev-key'
 const dev = process.env.NODE_ENV !== 'production'
@@ -35,9 +39,7 @@ console.log('DEV:', dev)
 //Global variable to store WebSocket clients.
 var clients = []
 
-//Removes old games, check every hour at the 15 minute mark.
-//cron.schedule('15 */1 * * *', cleanupGames)
-
+const client = new twilio(accountSid, authToken)
 const app = express()
 app.use(morgan('short'))
 app.use(compression())
@@ -59,6 +61,21 @@ const wss = new ws.Server({ server })
 app.get('/robots.txt', function(req, res) {
 	res.type('text/plain')
 	res.send('User-agent: *\nDisallow: /')
+})
+
+app.post('/api/sms', async (req, res) => {
+	const to = req.body.smsTo
+	const gameID = req.body.gameID
+	client.messages
+		.create({
+			body: `Join me playing Phone Trivia here. ${
+				process.env.REACT_APP_GAMESHOW_ENDPOINT
+			}/player/${gameID}`,
+			to,
+			from
+		})
+		.then(() => res.sendStatus(200))
+		.catch(() => res.sendStatus(400))
 })
 
 app.post('/api/game', async (req, res) => {
