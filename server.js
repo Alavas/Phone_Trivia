@@ -15,8 +15,6 @@ const fetch = require('node-fetch')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const twilio = require('twilio')
-require('dotenv').config()
-//Database functions.
 const db = require('./database')
 
 const gameStates = {
@@ -28,13 +26,13 @@ const gameStates = {
 	RESET: 5
 }
 
-const SALTROUNDS = 10
+require('dotenv').config()
 const accountSid = process.env.TWILIO_SID
 const authToken = process.env.TWILIO_TOKEN
 const from = process.env.TWILIO_FROM
-const PORT = parseInt(process.env.PORT, 10) || 5000
 const JWTKEY = process.env.JWTKEY || 'dev-key'
 const dev = process.env.NODE_ENV !== 'production'
+const PORT = parseInt(process.env.PORT, 10) || 5000
 console.log('DEV:', dev)
 //Global variable to store WebSocket clients.
 var clients = []
@@ -58,7 +56,20 @@ if (dev) {
 }
 const wss = new ws.Server({ server })
 
-app.get('/robots.txt', function(req, res) {
+const adminRouter = require('./routes/admin')({
+	checkUser,
+	authenticate,
+	JWTKEY
+})
+const gameRouter = require('./routes/game')({ dev, fetch, wsGame })
+const playerRouter = require('./routes/player')({ wsPlayers })
+const userRouter = require('./routes/user')()
+app.use('/api/admin', adminRouter)
+app.use('/api/game', gameRouter)
+app.use('/api/player', playerRouter)
+app.use('/api/user', userRouter)
+
+app.get('/robots.txt', (req, res) => {
 	res.type('text/plain')
 	res.send('User-agent: *\nDisallow: /')
 })
@@ -78,136 +89,6 @@ app.post('/api/sms', async (req, res) => {
 		.catch(() => res.sendStatus(400))
 })
 
-app.post('/api/game', async (req, res) => {
-	const game = req.body.gameSettings
-	var URL = ''
-	// prettier-ignore
-	if (dev) {
-		URL =
-			'https://f9c1f452-5f7d-43ab-adef-4093241aaae5.mock.pstmn.io/api.php?amount=10&type=multiple=multiple'
-	} else {
-
-		URL = `https://opentdb.com/api.php?amount=${game.amount}&category=${game.category}&difficulty=${game.difficulty}&type=${game.type}`
-	}
-	//If value is 'any' then remove that parameter.
-	URL = URL.replace(/(&.{1,10}=any)/g, '')
-	const gameQuestions = await fetch(URL).then(res => res.json())
-	if (gameQuestions.response_code === 0) {
-		const gameid = await db.postGames(game)
-		let questions = gameQuestions.results.map((q, index) => {
-			let answers = q.incorrect_answers
-			answers.push(q.correct_answer)
-			if (answers.length === 2) {
-				answers = ['True', 'False']
-			} else {
-				answers.sort(() => Math.random() - 0.5)
-			}
-			let correct = answers.indexOf(q.correct_answer)
-			correct = ['A', 'B', 'C', 'D'][correct]
-			let question = {
-				gameid,
-				number: index + 1,
-				question: q.question,
-				answertype: q.type,
-				a: answers[0],
-				b: answers[1],
-				c: answers[2],
-				d: answers[3],
-				correct
-			}
-			return question
-		})
-		for (const question of questions) {
-			db.postQuestions(question)
-		}
-		res.send({ gameid })
-		res.end
-	} else {
-		//handle error...
-	}
-})
-
-app.put('/api/game', async (req, res) => {
-	const gamestate = req.body.gamestate
-	const gameID = req.body.gameID
-	const qNumber = req.body.qNumber || 0
-	if (_.isUndefined(gameID)) {
-		res.sendStatus(400)
-		res.end
-	} else {
-		const game = await db.putGames({ gamestate, gameID, qNumber })
-		if (game.gamestate > gameStates.NOTSTARTED) {
-			wsGame(game)
-		}
-		res.send(game)
-		res.end
-	}
-})
-
-app.delete('/api/game', async (req, res) => {
-	const gameID = req.body.gameID
-	if (_.isUndefined(gameID)) {
-		res.sendStatus(400)
-		res.end
-	} else {
-		const deleted = await db.deleteGames(gameID)
-		wsGame({ gameID, gamestate: gameStates.RESET })
-		res.send(deleted)
-		res.end
-	}
-})
-
-app.post('/api/user', async (req, res) => {
-	const userID = req.body.userID
-	if (_.isUndefined(userID)) {
-		res.sendStatus(400)
-		res.end
-	} else {
-		const user = await db.postUsers(userID)
-		res.send(user)
-		res.end
-	}
-})
-
-app.put('/api/user', async (req, res) => {
-	const avatar = req.body.avatar
-	const userID = req.body.userID
-	if (_.isUndefined(userID)) {
-		res.sendStatus(400)
-		res.end
-	} else {
-		const user = await db.putUsers({ userID, avatar })
-		res.send(user)
-		res.end
-	}
-})
-
-app.get('/api/player', async (req, res) => {
-	const gameID = req.query.gameID
-	if (_.isUndefined(gameID)) {
-		res.sendStatus(400)
-		res.end
-	} else {
-		const players = await db.getPlayers(gameID)
-		res.send(players)
-		res.end
-	}
-})
-
-app.post('/api/player', async (req, res) => {
-	const userID = req.body.userID
-	const gameID = req.body.gameID
-	if (_.isUndefined(userID) || _.isUndefined(gameID)) {
-		res.sendStatus(400)
-		res.end
-	} else {
-		const joined = await db.postPlayers({ userID, gameID })
-		wsPlayers(gameID)
-		res.send(joined)
-		res.end
-	}
-})
-
 app.post('/api/score', async (req, res) => {
 	const answer = req.body.answer
 	if (_.isUndefined(answer.questionID)) {
@@ -222,91 +103,25 @@ app.post('/api/score', async (req, res) => {
 	}
 })
 
-app.post('/api/admin/login', async (req, res) => {
-	const username = req.body.username
-	const password = req.body.password
-	const admin = await checkUser({
-		username,
-		password
-	})
-	if (admin.valid) {
-		let token = jwt.sign({ adminID: admin.adminID }, JWTKEY, {
-			expiresIn: 86400
-		})
-		res.json({ token })
-		res.end
-	} else {
-		res.sendStatus(401)
-		res.end
-	}
-})
-
-app.get('/api/admin/user', authenticate, async (req, res) => {
-	const users = await db.getUsers()
-	res.send(users)
-	res.end
-})
-
-app.delete('/api/admin/user/:id', authenticate, async (req, res) => {
-	const userID = req.params.id
-	if (_.isUndefined(userID)) {
-		res.sendStatus(400)
-		res.end
-	} else {
-		const deleted = await db.deleteUsers(userID)
-		res.send(deleted)
-		res.end
-	}
-})
-
-app.get('/api/admin/game', authenticate, async (req, res) => {
-	const games = await db.getGames()
-	res.send(games)
-	res.end
-})
-
-app.delete('/api/admin/game/:id', authenticate, async (req, res) => {
-	const gameID = req.params.id
-	if (_.isUndefined(gameID)) {
-		res.sendStatus(400)
-		res.end
-	} else {
-		const deleted = await db.deleteGames(gameID)
-		res.send(deleted)
-		res.end
-	}
-})
-
-server.listen(PORT, function() {
+server.listen(PORT, () => {
 	console.log(`Listening on port ${PORT}!`)
 })
 
-wss.on('connection', function open(ws) {
+wss.on('connection', ws => {
 	ws.on('message', data => wsReceiveData(data))
 	clients.push(ws)
 })
 
-wss.on('close', function close() {
+wss.on('close', () => {
 	console.log('disconnected')
 })
 
 if (process.env.NODE_ENV === 'production') {
-	// Serve any static files
 	app.use(express.static(path.join(__dirname, 'webpage/build')))
-	// Handle React routing, return all requests to React app
-	app.get('*', function(req, res) {
+	app.get('*', (req, res) => {
 		res.sendFile(path.join(__dirname, 'webpage/build', 'index.html'))
 	})
 }
-
-/* Admin Functions */
-
-/*
-async function createHash(password) {
-	const hash = await bcrypt.hash(password, SALTROUNDS)
-	return hash
-}
-*/
 
 async function checkUser({ username, password }) {
 	const admin = await db.getAdmin(username)
