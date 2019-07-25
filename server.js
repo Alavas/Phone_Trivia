@@ -13,7 +13,7 @@ const _ = require('lodash')
 const fs = require('fs')
 const fetch = require('node-fetch')
 const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken')
+const jwt = require('express-jwt')
 const twilio = require('twilio')
 const db = require('./database')
 
@@ -37,6 +37,9 @@ console.log('DEV:', dev)
 //Global variable to store WebSocket clients.
 var clients = []
 
+const auth = jwt({
+	secret: JWTKEY
+})
 const client = new twilio(accountSid, authToken)
 const app = express()
 app.use(morgan('short'))
@@ -58,15 +61,15 @@ const wss = new ws.Server({ server })
 
 const adminRouter = require('./routes/admin')({
 	checkUser,
-	authenticate,
+	auth,
 	JWTKEY
 })
 const gameRouter = require('./routes/game')({ dev, fetch, wsGame })
 const playerRouter = require('./routes/player')({ wsPlayers })
-const userRouter = require('./routes/user')()
+const userRouter = require('./routes/user')({ JWTKEY, auth })
 app.use('/api/admin', adminRouter)
-app.use('/api/game', gameRouter)
-app.use('/api/player', playerRouter)
+app.use('/api/game', auth, gameRouter)
+app.use('/api/player', auth, playerRouter)
 app.use('/api/user', userRouter)
 
 app.get('/robots.txt', (req, res) => {
@@ -74,7 +77,7 @@ app.get('/robots.txt', (req, res) => {
 	res.send('User-agent: *\nDisallow: /')
 })
 
-app.post('/api/sms', async (req, res) => {
+app.post('/api/sms', auth, async (req, res) => {
 	const to = req.body.smsTo
 	const gameID = req.body.gameID
 	client.messages
@@ -89,7 +92,7 @@ app.post('/api/sms', async (req, res) => {
 		.catch(() => res.sendStatus(400))
 })
 
-app.post('/api/score', async (req, res) => {
+app.post('/api/score', auth, async (req, res) => {
 	const answer = req.body.answer
 	if (_.isUndefined(answer.questionID)) {
 		res.sendStatus(400)
@@ -134,25 +137,6 @@ async function checkUser({ username, password }) {
 	} else {
 		return { valid: false }
 	}
-}
-
-function authenticate(req, res, next) {
-	var token = req.headers['x-access-token']
-	if (!token) {
-		return res
-			.status(401)
-			.send({ auth: false, message: 'No token provided.' })
-	}
-	jwt.verify(token, JWTKEY, (err, decoded) => {
-		if (err) {
-			return res
-				.status(500)
-				.send({ auth: false, message: 'Failed to authenticate token.' })
-		} else {
-			req.decoded = decoded
-			next()
-		}
-	})
 }
 
 /* **WebSocket functions.** */

@@ -28,7 +28,8 @@ export const gameJoinEpic = (action$, state$) =>
 		switchMap(async data => {
 			const userID = data.user.userID
 			const gameID = data.gameID
-			const joined = await joinGame({ userID, gameID })
+			const token = data.user.token
+			const joined = await joinGame({ userID, gameID, token })
 			if (joined) {
 				return gameJoinSuccess(gameID)
 			} else {
@@ -39,16 +40,22 @@ export const gameJoinEpic = (action$, state$) =>
 	)
 
 //Delete the game after it has been finished.
-export const gameEndEpic = action$ =>
+export const gameEndEpic = (action$, state$) =>
 	action$.pipe(
 		ofType('GAME_END'),
+		withLatestFrom(state$),
+		map(state$ => ({
+			gameID: state$[0].gameID,
+			token: state$[1].user.token
+		})),
 		map(async action => {
-			let data = JSON.stringify({ gameID: action.gameID })
+			const data = JSON.stringify({ gameID: action.gameID })
 			await fetch(`${process.env.REACT_APP_GAMESHOW_ENDPOINT}/api/game`, {
 				method: 'DELETE',
 				headers: {
 					Accept: 'application/json, text/plain, */*',
-					'Content-Type': 'application/json'
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${action.token}`
 				},
 				body: data
 			})
@@ -71,7 +78,7 @@ export const gameSubmitAnswerEpic = (action$, state$) =>
 			reaction = Math.max(reaction, 1000)
 			let score = Math.round(25 * (10000 / (reaction - 500)))
 			score = Math.min(Math.max(score, 0), 250)
-			const submission = {
+			const answer = {
 				gameID: state.game.gameID,
 				questionID: state.game.questionID,
 				userID: state.user.userID,
@@ -79,8 +86,9 @@ export const gameSubmitAnswerEpic = (action$, state$) =>
 				reaction,
 				score
 			}
+			const token = state.user.token
 			document.getElementById('countdown-bar').stop()
-			const result = await submitAnswer(submission)
+			const result = await submitAnswer({ answer, token })
 			if (result) {
 				return gameUpdateAnswer(state.answer)
 			} else {

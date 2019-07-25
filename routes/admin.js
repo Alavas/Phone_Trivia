@@ -3,7 +3,7 @@ const adminRouter = express.Router()
 const jwt = require('jsonwebtoken')
 const db = require('../database')
 
-function router({ checkUser, authenticate, JWTKEY }) {
+function router({ checkUser, auth, JWTKEY }) {
 	adminRouter.post('/login', async (req, res) => {
 		const username = req.body.username
 		const password = req.body.password
@@ -23,13 +23,13 @@ function router({ checkUser, authenticate, JWTKEY }) {
 		}
 	})
 
-	adminRouter.get('/user', authenticate, async (req, res) => {
+	adminRouter.get('/user', auth, async (req, res) => {
 		const users = await db.getUsers()
 		res.send(users)
 		res.end
 	})
 
-	adminRouter.delete('/user/:id', authenticate, async (req, res) => {
+	adminRouter.delete('/user/:id', auth, async (req, res) => {
 		const userID = req.params.id
 		if (_.isUndefined(userID)) {
 			res.sendStatus(400)
@@ -41,13 +41,13 @@ function router({ checkUser, authenticate, JWTKEY }) {
 		}
 	})
 
-	adminRouter.get('/game', authenticate, async (req, res) => {
+	adminRouter.get('/game', auth, async (req, res) => {
 		const games = await db.getGames()
 		res.send(games)
 		res.end
 	})
 
-	adminRouter.delete('/game/:id', authenticate, async (req, res) => {
+	adminRouter.delete('/game/:id', auth, async (req, res) => {
 		const gameID = req.params.id
 		if (_.isUndefined(gameID)) {
 			res.sendStatus(400)

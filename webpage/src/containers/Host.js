@@ -62,7 +62,8 @@ class Host extends Component {
 			category: this.category.current.value,
 			difficulty: this.difficulty.current.value,
 			type: this.type.current.value,
-			host: this.props.user.userID
+			host: this.props.user.userID,
+			token: this.props.user.token
 		}
 		this.props.createGame(gameSettings)
 	}
@@ -168,7 +169,8 @@ class Host extends Component {
 										onClick={() =>
 											updateGame({
 												gamestate: gameStates.STARTED,
-												gameID: this.props.game.gameID
+												gameID: this.props.game.gameID,
+												token: this.props.user.token
 											})
 										}
 									>

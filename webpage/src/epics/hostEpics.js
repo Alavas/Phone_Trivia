@@ -17,7 +17,8 @@ export const hostCreateGameEpic = action$ =>
 					method: 'POST',
 					headers: {
 						Accept: 'application/json, text/plain, */*',
-						'Content-Type': 'application/json'
+						'Content-Type': 'application/json',
+						Authorization: `Bearer ${action.game.token}`
 					},
 					body: data
 				}
@@ -39,19 +40,25 @@ export const hostQuestionEpic = (action$, state$) =>
 	action$.pipe(
 		ofType('HOST_QUESTION'),
 		withLatestFrom(state$),
-		map(state$ => ({ game: state$[1].game, host: state$[1].host })),
+		map(state$ => ({
+			game: state$[1].game,
+			host: state$[1].host,
+			user: state$[1].user
+		})),
 		map(async state => {
 			const qNumber = state.game.qNumber + 1
 			if (qNumber <= state.host.amount) {
 				await updateGame({
 					gamestate: gameStates.QUESTIONS,
 					gameID: state.game.gameID,
-					qNumber
+					qNumber,
+					token: state.user.token
 				})
 			} else {
 				await updateGame({
 					gamestate: gameStates.ENDED,
-					gameID: state.game.gameID
+					gameID: state.game.gameID,
+					token: state.user.token
 				})
 			}
 		}),
