@@ -82,7 +82,7 @@ app.post('/api/sms', auth, async (req, res) => {
 	const gameID = req.body.gameID
 	client.messages
 		.create({
-			body: `Join me playing Phone Trivia here. ${
+			body: `Join me playing Phone Trivia here: ${
 				process.env.REACT_APP_GAMESHOW_ENDPOINT
 			}/player/${gameID}`,
 			to,

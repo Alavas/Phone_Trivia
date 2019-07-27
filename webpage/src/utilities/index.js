@@ -126,6 +126,24 @@ export const submitAnswer = async ({ answer, token }) => {
 	return result
 }
 
+//Send SMS to invite a friend to play.
+export const sendSMS = async ({ gameID, smsTo, token }) => {
+	let data = JSON.stringify({ gameID, smsTo })
+	const result = await fetch(
+		`${process.env.REACT_APP_GAMESHOW_ENDPOINT}/api/sms`,
+		{
+			method: 'POST',
+			headers: {
+				Accept: 'application/json, text/plain, */*',
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${token}`
+			},
+			body: data
+		}
+	)
+	return result.status
+}
+
 //Possible question categories.
 export const gameCategories = [
 	{ value: 'any', display: 'Any Category' },

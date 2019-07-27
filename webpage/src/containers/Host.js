@@ -31,6 +31,7 @@ import {
 	gameSubmitAnswer
 } from '../actions/gameActions'
 import { hostCreateGame, hostQuestion } from '../actions/hostActions'
+import InviteButton from '../components/InviteButton'
 
 class Host extends Component {
 	constructor(props) {
@@ -75,7 +76,7 @@ class Host extends Component {
 					switch (this.props.game.gamestate) {
 						case gameStates.NOTSTARTED:
 							return (
-								<div className="host-ui">
+								<div className="host-ui-flex">
 									<h3>Choose Game Options</h3>
 									<Form onSubmit={this.submit}>
 										<Row form>
@@ -162,10 +163,11 @@ class Host extends Component {
 							)
 						case gameStates.CREATED:
 							return (
-								<div className="host-ui">
+								<div className="host-ui-grid">
 									<Button
 										color="success"
 										size="lg"
+										style={{ gridArea: '2/2/3/3' }}
 										onClick={() =>
 											updateGame({
 												gamestate: gameStates.STARTED,
@@ -176,7 +178,12 @@ class Host extends Component {
 									>
 										Begin Game
 									</Button>
-									<div className="qr">
+									<div
+										style={{
+											gridArea: '4/2/5/3',
+											textAlign: 'center'
+										}}
+									>
 										<QRCode
 											value={`${
 												process.env.REACT_APP_GAMESHOW_ENDPOINT
@@ -189,14 +196,15 @@ class Host extends Component {
 											renderAs={'svg'}
 										/>
 									</div>
-									<Button color="danger" size="lg">
-										Invite A Friend.
-									</Button>
+									<InviteButton
+										token={this.props.user.token}
+										gameID={this.props.game.gameID}
+									/>
 								</div>
 							)
 						case gameStates.STARTED:
 							return (
-								<div className="host-ui">
+								<div className="host-ui-flex">
 									<Button
 										color="success"
 										size="lg"
@@ -208,7 +216,7 @@ class Host extends Component {
 							)
 						case gameStates.QUESTIONS:
 							return (
-								<div className="player-ui">
+								<div className="player-ui-flex">
 									<h3>Question {this.props.game.qNumber}</h3>
 									<h5>{he.decode(this.props.game.question)}</h5>
 									{this.props.game.answertype === 'boolean' ? (
@@ -341,7 +349,7 @@ class Host extends Component {
 							)
 						case gameStates.ENDED:
 							return (
-								<div className="host-ui">
+								<div className="host-ui-flex">
 									<div className="player-card">
 										<h1>GAME OVER</h1>
 									</div>

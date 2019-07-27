@@ -3,7 +3,15 @@
 	height: calc(100vh - 65px);
 	background-color: #212529;
 }
-.host-ui {
+.host-ui-grid {
+	display: grid;
+	height: 100%;
+	grid-template-rows: 1fr 50px 25px 225px 25px 50px 1fr;
+	grid-template-columns: 1fr 300px 1fr;
+	justify-content: center;
+	align-content: center;
+}
+.host-ui-flex {
 	max-width: 500px;
 	width: 85%;
 	height: 100%;
@@ -12,7 +20,6 @@
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
-
 	.disabled {
 		pointer-events: none !important;
 		cursor: not-allowed !important;
@@ -67,7 +74,7 @@ label {
 	color: white;
 	text-align: center;
 }
-.player-ui .btn-lg {
+.player-ui-flex .btn-lg {
 	margin-bottom: 10px !important;
 	color: #212529 !important;
 	height: 5.5em;
@@ -80,8 +87,6 @@ label {
 	text-align: center;
 	color: #067df7;
 }
-.qr {
-	margin-top: 25px;
-	margin-bottom: 25px;
-	text-align: center;
+.invite {
+	height: 140px !important;
 }

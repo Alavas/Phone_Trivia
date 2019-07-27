@@ -4,7 +4,16 @@
   background-color: #212529;
 }
 
-.player-ui {
+.player-ui-grid {
+  display: grid;
+  height: 100%;
+  grid-template-rows: 1fr 50px 25px 225px 25px 50px 1fr;
+  grid-template-columns: 1fr 300px 1fr;
+  justify-content: center;
+  align-content: center;
+}
+
+.player-ui-flex {
   max-width: 85%;
   height: 100%;
   margin-left: auto;
@@ -13,15 +22,15 @@
   flex-direction: column;
   justify-content: center;
 }
-.player-ui .disabled {
+.player-ui-flex .disabled {
   pointer-events: none !important;
   cursor: not-allowed !important;
-  opacity: 0.4 !important;
-  filter: alpha(opacity=40) !important;
+  opacity: 0.3 !important;
+  filter: alpha(opacity=30) !important;
   -webkit-box-shadow: none !important;
   box-shadow: none !important;
 }
-.player-ui .wrong {
+.player-ui-flex .wrong {
   pointer-events: none !important;
   cursor: not-allowed !important;
   opacity: 0 !important;
@@ -31,51 +40,51 @@
   transition: opacity 0.3s;
   -webkit-transition: opacity 0.3s;
 }
-.player-ui .correct {
+.player-ui-flex .correct {
   pointer-events: none !important;
   cursor: not-allowed !important;
   -webkit-box-shadow: none !important;
   box-shadow: none !important;
 }
-.player-ui .answer {
+.player-ui-flex .answer {
   pointer-events: none !important;
   cursor: not-allowed !important;
   box-shadow: none !important;
 }
-.player-ui h3 {
+.player-ui-flex h3 {
   color: lightslategray;
   text-align: center;
   font-size: 2em;
 }
-.player-ui h5 {
+.player-ui-flex h5 {
   color: white;
   text-align: center;
   font-size: 1.75em;
 }
-.player-ui img {
+.player-ui-flex img {
   margin-right: 5px;
   border: 1px solid white;
   width: 25px;
   height: 25px;
   border-radius: 50%;
 }
-.player-ui .player-scores {
+.player-ui-flex .player-scores {
   margin-bottom: 10px;
 }
-.player-ui .player-score {
+.player-ui-flex .player-score {
   background-color: #0d1620;
   border-radius: 0.3em;
   margin-bottom: 5px;
   font-size: 1.5em !important;
 }
-.player-ui .avatar-scores {
+.player-ui-flex .avatar-scores {
   margin-left: 5px;
   margin-top: -5px;
   width: 32.5px;
   height: 32.5px;
   border-radius: 50%;
 }
-.player-ui .correct-answer {
+.player-ui-flex .correct-answer {
   position: absolute !important;
   text-align: center;
   color: black;
@@ -87,24 +96,19 @@
   z-index: 999 !important;
 }
 
-.player-ui p {
+.player-ui-flex p {
   text-align: center;
 }
 
-.player-ui .btn-lg {
+.player-ui-flex .btn-lg {
   margin-bottom: 10px !important;
   color: #212529 !important;
   height: 5em;
   font-size: 1.3em;
 }
 
-.player-ui .btn-lg:focus {
+.player-ui-flex .btn-lg:focus {
   outline: none !important;
-}
-
-.qr {
-  margin-bottom: 25px;
-  text-align: center;
 }
 
 .qr-reader {
@@ -134,8 +138,12 @@
   margin-top: 5px;
 }
 
+.btn {
+  box-shadow: 0 10px 16px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19) !important;
+}
+
 @media only screen and (min-width: 600px) {
-  .player-ui {
+  .player-ui-flex {
     max-width: 500px;
   }
 }
