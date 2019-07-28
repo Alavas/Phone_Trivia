@@ -164,21 +164,21 @@ function wsShowAnswer(gameID) {
 }
 
 //Broadcasts current player information to a specified game.
-async function wsPlayers(gameID) {
-	let players = await db.getPlayers(gameID)
-	let gameboards = clients.filter(client => client.protocol === `gb_${gameID}`)
-	gameboards.forEach(board => {
-		if (board.readyState === ws.OPEN) {
-			board.send(JSON.stringify({ players }))
+async function wsPlayers(gameID, userID) {
+	let gamePlayer = await db.getPlayer(userID)
+	let players = clients.filter(client => client.protocol === gameID)
+	players.forEach(player => {
+		if (player.readyState === ws.OPEN) {
+			player.send(
+				JSON.stringify({ type: 'WS_PLAYER_JOINED', data: gamePlayer })
+			)
 		}
 	})
 }
 
 //Broadcasts scores to the gameboards.
-//Keep for other use??
 async function wsScores(gameID, scores) {
 	let players = clients.filter(client => client.protocol === gameID)
-	let gameboards = clients.filter(client => client.protocol === `gb_${gameID}`)
 	players.forEach(player => {
 		if (player.readyState === ws.OPEN) {
 			player.send(JSON.stringify({ type: 'WS_SCORES', data: scores }))

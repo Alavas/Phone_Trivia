@@ -65,6 +65,11 @@ const InviteButton = props => {
 						<Row>
 							<Col xs={{ size: 4, offset: 1 }}>
 								<Input
+									style={{
+										background: '#ffc107',
+										color: 'white',
+										border: 'none'
+									}}
 									type="submit"
 									value="Cancel"
 									onClick={e => handleHide(e)}
@@ -72,6 +77,12 @@ const InviteButton = props => {
 							</Col>
 							<Col xs={{ size: 4, offset: 2 }}>
 								<Input
+									style={{
+										background: '#007bff',
+										color: 'white',
+										border: 'none'
+									}}
+									className={number.valid ? '' : 'invite-disabled'}
 									type="submit"
 									value="Send"
 									onClickCapture={e => handleSubmit(e)}

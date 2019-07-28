@@ -45,8 +45,8 @@ class CountdownBar extends HTMLElement {
 		this._countdownBar.style.webkitTransition = `width ${
 			this._duration
 		}s linear`
-		this._countdownBar.style.transitionDelay = `${this.delay}s`
-		this._countdownBar.style.webkitTransitionDelay = `${this.delay}s`
+		this._countdownBar.style.transitionDelay = `${this._delay}s`
+		this._countdownBar.style.webkitTransitionDelay = `${this._delay}s`
 		this._countdownBar.style.width = '0%'
 		this.updateSize()
 	}
@@ -92,6 +92,7 @@ class CountdownBar extends HTMLElement {
 			this.setAttribute('delay', 0)
 		}
 		this._stop = false
+		this._delay = this.delay / 1000
 		this._duration = this.duration / 1000
 		this._countdownBar = this.shadowRoot.getElementById('countdown-bar')
 		this._initWidth = this._countdownBar.offsetWidth

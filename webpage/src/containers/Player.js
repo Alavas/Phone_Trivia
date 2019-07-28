@@ -242,7 +242,7 @@ class Player extends Component {
 									<countdown-bar
 										id="countdown-bar"
 										duration={7000}
-										delay={1}
+										delay={1000}
 									/>
 								</div>
 							)

@@ -25,7 +25,7 @@ function router({ wsPlayers }) {
 				res.end
 			} else {
 				const joined = await db.postPlayers({ userID, gameID })
-				wsPlayers(gameID)
+				wsPlayers(gameID, userID)
 				res.send(joined)
 				res.end
 			}

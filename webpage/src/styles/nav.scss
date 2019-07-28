@@ -1,6 +1,5 @@
 nav {
 	margin: 0;
-	//font-family: -apple-system, BlinkMacSystemFont, Avenir Next, Avenir,Helvetica, sans-serif;
 	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 	z-index: 999;
 	text-align: center;
@@ -151,19 +150,77 @@ p {
 	position: fixed;
 	z-index: 1;
 	right: 84px;
-	bottom: 45px;
+	bottom: 443x;
 	line-height: 1.8rem;
 	font-size: 1.8rem;
-	font-style: italic;
 	text-shadow: 1px 1px #0d1620;
 	opacity: 0;
 }
 #score-toast.show {
 	visibility: visible;
-	-webkit-animation: fadeinout 1.7s ease-out forwards;
-	animation: fadeinout 1.7s ease-out forwards;
+	-webkit-animation: scorefadeinout 1.7s ease-out forwards;
+	animation: scorefadeinout 1.7s ease-out forwards;
 }
-@-webkit-keyframes fadeinout {
+//Player Toast
+#player-toast {
+	visibility: hidden;
+	background: white;
+	text-align: right;
+	padding: 5px;
+	padding-right: 25px;
+	border-top-left-radius: 35px;
+	border-bottom-left-radius: 35px;
+	position: fixed;
+	z-index: 1;
+	right: -180px;
+	top: 45px;
+	height: 70px;
+	line-height: 70px;
+	font-size: 1.8rem;
+	font-style: italic;
+	text-shadow: 1px 1px #0d1620;
+	opacity: 0;
+	img {
+		float: left;
+		margin-right: 5px;
+	}
+	p {
+		font-size: 1rem;
+		text-shadow: none;
+		line-height: 60px;
+		color: #0d1620 !important;
+		margin-bottom: 5px !important;
+		padding: 0px !important;
+	}
+}
+#player-toast.show {
+	visibility: visible;
+	-webkit-animation: playerfadeinout 2.2s ease-out forwards;
+	animation: playerfadeinout 2.2s ease-out forwards;
+}
+@-webkit-keyframes playerfadeinout {
+	0%,
+	100% {
+		opacity: 0;
+		right: -180px;
+	}
+	50% {
+		opacity: 1;
+		right: -10px;
+	}
+}
+@keyframes playerfadeinout {
+	0%,
+	100% {
+		opacity: 0;
+		right: -180px;
+	}
+	50% {
+		opacity: 1;
+		right: -10px;
+	}
+}
+@-webkit-keyframes scorefadeinout {
 	0%,
 	100% {
 		opacity: 0;
@@ -174,7 +231,7 @@ p {
 		bottom: 65px;
 	}
 }
-@keyframes fadeinout {
+@keyframes scorefadeinout {
 	0%,
 	100% {
 		opacity: 0;

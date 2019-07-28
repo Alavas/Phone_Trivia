@@ -121,7 +121,8 @@ export const gameWebSocketEpic = (action$, state$) =>
 					msg.type === 'WS_GAME' ||
 					msg.type === 'WS_SCORES' ||
 					msg.type === 'WS_PLAYERS' ||
-					msg.type === 'WS_SHOW_ANSWER'
+					msg.type === 'WS_SHOW_ANSWER' ||
+					msg.type === 'WS_PLAYER_JOINED'
 			)
 		}),
 		map(msg => ({ type: msg.type, data: msg.data }))
@@ -173,6 +174,21 @@ export const gameWSScoresEpic = action$ =>
 	action$.pipe(
 		ofType('WS_SCORES'),
 		map(action => ({ type: 'GAME_WS_SCORES', scores: action.data }))
+	)
+
+//Receive Websocket message of a new player joining the game.
+export const gameWSPlayerJoinedEpic = action$ =>
+	action$.pipe(
+		ofType('WS_PLAYER_JOINED'),
+		map(action => {
+			const player = document.getElementById('player-toast')
+			player.className = '' //Remove class if it's already there then add it again.
+			player.className = 'show'
+			return {
+				type: 'GAME_WS_PLAYER_JOINED',
+				avatar: action.data.avatar
+			}
+		})
 	)
 
 //Receive Websocket message containing all players for the gmae.
