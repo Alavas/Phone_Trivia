@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import QrReader from 'react-qr-reader'
 import QRCode from 'qrcode.react'
 import he from 'he'
 import _ from 'lodash'
@@ -13,10 +12,6 @@ import {
 	Label,
 	ListGroup,
 	ListGroupItem,
-	Modal,
-	ModalHeader,
-	ModalBody,
-	ModalFooter,
 	Row
 } from 'reactstrap'
 import {
@@ -24,7 +19,6 @@ import {
 	gameDifficulties,
 	questionType,
 	updateGame,
-	connectGameboard,
 	gameStates
 } from '../utilities'
 import '../components/CountdownBar'
@@ -36,11 +30,9 @@ import {
 	gameEnd,
 	gameSubmitAnswer
 } from '../actions/gameActions'
-import {
-	hostCreateGame,
-	hostToggleModal,
-	hostQuestion
-} from '../actions/hostActions'
+import { hostCreateGame, hostQuestion } from '../actions/hostActions'
+import InviteButton from '../components/InviteButton'
+import CountdownTimer from '../components/CountdownTimer'
 
 class Host extends Component {
 	constructor(props) {
@@ -50,7 +42,6 @@ class Host extends Component {
 		this.category = React.createRef()
 		this.difficulty = React.createRef()
 		this.type = React.createRef()
-		this.handleScan = this.handleScan.bind(this)
 	}
 
 	componentDidMount() {
@@ -73,27 +64,10 @@ class Host extends Component {
 			category: this.category.current.value,
 			difficulty: this.difficulty.current.value,
 			type: this.type.current.value,
-			host: this.props.user.userID
+			host: this.props.user.userID,
+			token: this.props.user.token
 		}
 		this.props.createGame(gameSettings)
-	}
-
-	handleScan(data) {
-		const regex = RegExp(
-			'[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}'
-		)
-		if (data) {
-			//Regex to confirm that the link is valid.
-			if (regex.test(data)) {
-				const gameID = this.props.game.gameID
-				connectGameboard({ userID: data, gameID })
-				this.props.toggleModal()
-			}
-		}
-	}
-
-	handleError(err) {
-		console.error(err)
 	}
 
 	render() {
@@ -103,7 +77,7 @@ class Host extends Component {
 					switch (this.props.game.gamestate) {
 						case gameStates.NOTSTARTED:
 							return (
-								<div className="host-ui">
+								<div className="host-ui-flex">
 									<h3>Choose Game Options</h3>
 									<Form onSubmit={this.submit}>
 										<Row form>
@@ -190,20 +164,27 @@ class Host extends Component {
 							)
 						case gameStates.CREATED:
 							return (
-								<div className="host-ui">
+								<div className="host-ui-grid">
 									<Button
 										color="success"
 										size="lg"
+										style={{ gridArea: '2/2/3/3' }}
 										onClick={() =>
 											updateGame({
 												gamestate: gameStates.STARTED,
-												gameID: this.props.game.gameID
+												gameID: this.props.game.gameID,
+												token: this.props.user.token
 											})
 										}
 									>
 										Begin Game
 									</Button>
-									<div className="qr">
+									<div
+										style={{
+											gridArea: '4/2/5/3',
+											textAlign: 'center'
+										}}
+									>
 										<QRCode
 											value={`${
 												process.env.REACT_APP_GAMESHOW_ENDPOINT
@@ -216,54 +197,25 @@ class Host extends Component {
 											renderAs={'svg'}
 										/>
 									</div>
-									<Button
-										color="danger"
-										size="lg"
-										onClick={() => this.props.toggleModal()}
-									>
-										Connect Gameboard
-									</Button>
-									<Modal isOpen={this.props.host.modal}>
-										<ModalHeader toggle={this.toggle}>
-											Scan a Gameboard QR code.
-										</ModalHeader>
-										<ModalBody>
-											{' '}
-											<QrReader
-												delay={300}
-												onError={this.handleError}
-												onScan={this.handleScan}
-												style={{
-													width: '100%'
-												}}
-											/>
-										</ModalBody>
-										<ModalFooter>
-											<Button
-												color="primary"
-												onClick={() => this.props.toggleModal()}
-											>
-												Close
-											</Button>
-										</ModalFooter>
-									</Modal>
+									<InviteButton
+										token={this.props.user.token}
+										gameID={this.props.game.gameID}
+									/>
 								</div>
 							)
 						case gameStates.STARTED:
 							return (
-								<div className="host-ui">
-									<Button
-										color="success"
-										size="lg"
-										onClick={() => this.props.startQuestions()}
-									>
-										Start the questions...
-									</Button>
+								<div className="host-ui-flex">
+									<CountdownTimer
+										players={this.props.game.players.length}
+										host={true}
+										nextState={this.props.startQuestions}
+									/>
 								</div>
 							)
 						case gameStates.QUESTIONS:
 							return (
-								<div className="player-ui">
+								<div className="player-ui-flex">
 									<h3>Question {this.props.game.qNumber}</h3>
 									<h5>{he.decode(this.props.game.question)}</h5>
 									{this.props.game.answertype === 'boolean' ? (
@@ -390,13 +342,13 @@ class Host extends Component {
 									<countdown-bar
 										id="countdown-bar"
 										duration={7000}
-										delay={1}
+										delay={1000}
 									/>
 								</div>
 							)
 						case gameStates.ENDED:
 							return (
-								<div className="host-ui">
+								<div className="host-ui-flex">
 									<div className="player-card">
 										<h1>GAME OVER</h1>
 									</div>
@@ -532,8 +484,7 @@ const mapDispatchToProps = dispatch => {
 		updateGameState: gamestate => dispatch(gameStateUpdate(gamestate)),
 		showAnswer: () => dispatch(gameShowAnswer()),
 		startQuestions: delay => dispatch(hostQuestion(delay)),
-		submitAnswer: answer => dispatch(gameSubmitAnswer(answer)),
-		toggleModal: () => dispatch(hostToggleModal())
+		submitAnswer: answer => dispatch(gameSubmitAnswer(answer))
 	}
 }
 

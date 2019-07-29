@@ -13,6 +13,8 @@ import {
 } from '../actions/gameActions'
 import '../components/CountdownBar'
 import '../styles/player.css'
+import InviteButton from '../components/InviteButton'
+import CountdownTimer from '../components/CountdownTimer'
 
 class Player extends Component {
 	componentDidMount() {
@@ -57,7 +59,7 @@ class Player extends Component {
 					switch (this.props.game.gamestate) {
 						case gameStates.NOTSTARTED:
 							return (
-								<div className="player-ui">
+								<div className="player-ui-flex">
 									<QrReader
 										delay={300}
 										onError={this.handleError}
@@ -72,11 +74,20 @@ class Player extends Component {
 							)
 						case gameStates.CREATED:
 							return (
-								<div className="player-ui">
-									<Button color="success" size="lg">
-										WAITING TO BEGIN...
+								<div className="player-ui-grid">
+									<Button
+										color="success"
+										size="lg"
+										style={{ gridArea: '2/2/3/3' }}
+									>
+										Waiting To Begin
 									</Button>
-									<div className="qr">
+									<div
+										style={{
+											gridArea: '4/2/5/3',
+											textAlign: 'center'
+										}}
+									>
 										<QRCode
 											value={`${
 												process.env.REACT_APP_GAMESHOW_ENDPOINT
@@ -89,22 +100,24 @@ class Player extends Component {
 											renderAs={'svg'}
 										/>
 									</div>
-									<Button color="danger" size="lg">
-										LEAVE GAME
-									</Button>
+									<InviteButton
+										token={this.props.user.token}
+										gameID={this.props.game.gameID}
+									/>
 								</div>
 							)
 						case gameStates.STARTED:
 							return (
-								<div className="player-ui">
-									<div className="player-card">
-										<h3>Get ready!</h3>
-									</div>
+								<div className="player-ui-flex">
+									<CountdownTimer
+										host={false}
+										players={this.props.game.players.length}
+									/>
 								</div>
 							)
 						case gameStates.QUESTIONS:
 							return (
-								<div className="player-ui">
+								<div className="player-ui-flex">
 									<h3>Question {this.props.game.qNumber}</h3>
 									<h5>{he.decode(this.props.game.question)}</h5>
 									{this.props.game.answertype === 'boolean' ? (
@@ -231,13 +244,13 @@ class Player extends Component {
 									<countdown-bar
 										id="countdown-bar"
 										duration={7000}
-										delay={1}
+										delay={1000}
 									/>
 								</div>
 							)
 						case gameStates.ENDED:
 							return (
-								<div className="player-ui">
+								<div className="player-ui-flex">
 									<div className="player-card">
 										<h1>GAME OVER</h1>
 									</div>

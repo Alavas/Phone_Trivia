@@ -73,7 +73,11 @@ export const userUpdateAvatar = (action$, state$) =>
 		withLatestFrom(state$),
 		map(state$ => ({ avatar: state$[0].avatar, user: state$[1].user })),
 		map(async data => {
-			await updateUser({ userID: data.user.userID, avatar: data.avatar })
+			await updateUser({
+				userID: data.user.userID,
+				avatar: data.avatar,
+				token: data.user.token
+			})
 		}),
 		ignoreElements()
 	)

@@ -54,29 +54,8 @@ export const generateUUID = UA => {
 	return getUuid(`${ua} + ${time}`)
 }
 
-//Login to the game backend.
-export const loginUser = async () => {
-	let userID = getCookie('gs_userid')
-	if (userID === '' || userID === 'undefined') {
-		userID = generateUUID(window.navigator.userAgent)
-	}
-	let data = JSON.stringify({ userID })
-	const userDetails = await fetch(
-		`${process.env.REACT_APP_GAMESHOW_ENDPOINT}/api/user`,
-		{
-			method: 'POST',
-			headers: {
-				Accept: 'application/json, text/plain, */*',
-				'Content-Type': 'application/json'
-			},
-			body: data
-		}
-	).then(res => res.json())
-	return userDetails
-}
-
 //Update the avatar of the user.
-export const updateUser = async ({ userID, avatar }) => {
+export const updateUser = async ({ userID, avatar, token }) => {
 	let data = JSON.stringify({ userID, avatar })
 	const user = await fetch(
 		`${process.env.REACT_APP_GAMESHOW_ENDPOINT}/api/user`,
@@ -84,7 +63,8 @@ export const updateUser = async ({ userID, avatar }) => {
 			method: 'PUT',
 			headers: {
 				Accept: 'application/json, text/plain, */*',
-				'Content-Type': 'application/json'
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${token}`
 			},
 			body: data
 		}
@@ -92,23 +72,8 @@ export const updateUser = async ({ userID, avatar }) => {
 	return user
 }
 
-//Get list of all existing games.
-export const getGames = async () => {
-	const games = await fetch(
-		`${process.env.REACT_APP_GAMESHOW_ENDPOINT}/api/game`,
-		{
-			method: 'GET',
-			headers: {
-				Accept: 'application/json, text/plain, */*',
-				'Content-Type': 'application/json'
-			}
-		}
-	).then(res => res.json())
-	return games
-}
-
 //Update gamestate and question number to display.
-export const updateGame = async ({ gamestate, gameID, qNumber = 0 }) => {
+export const updateGame = async ({ gamestate, gameID, qNumber = 0, token }) => {
 	let data = JSON.stringify({ gamestate, gameID, qNumber })
 	const game = await fetch(
 		`${process.env.REACT_APP_GAMESHOW_ENDPOINT}/api/game`,
@@ -116,7 +81,8 @@ export const updateGame = async ({ gamestate, gameID, qNumber = 0 }) => {
 			method: 'PUT',
 			headers: {
 				Accept: 'application/json, text/plain, */*',
-				'Content-Type': 'application/json'
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${token}`
 			},
 			body: data
 		}
@@ -125,7 +91,7 @@ export const updateGame = async ({ gamestate, gameID, qNumber = 0 }) => {
 }
 
 //Join a game from QR code.
-export const joinGame = async ({ userID, gameID }) => {
+export const joinGame = async ({ userID, gameID, token }) => {
 	let data = JSON.stringify({ userID, gameID })
 	const joined = await fetch(
 		`${process.env.REACT_APP_GAMESHOW_ENDPOINT}/api/player`,
@@ -133,7 +99,8 @@ export const joinGame = async ({ userID, gameID }) => {
 			method: 'POST',
 			headers: {
 				Accept: 'application/json, text/plain, */*',
-				'Content-Type': 'application/json'
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${token}`
 			},
 			body: data
 		}
@@ -142,7 +109,7 @@ export const joinGame = async ({ userID, gameID }) => {
 }
 
 //Submit answer to the current game.
-export const submitAnswer = async answer => {
+export const submitAnswer = async ({ answer, token }) => {
 	let data = JSON.stringify({ answer })
 	const result = await fetch(
 		`${process.env.REACT_APP_GAMESHOW_ENDPOINT}/api/score`,
@@ -150,7 +117,8 @@ export const submitAnswer = async answer => {
 			method: 'POST',
 			headers: {
 				Accept: 'application/json, text/plain, */*',
-				'Content-Type': 'application/json'
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${token}`
 			},
 			body: data
 		}
@@ -158,21 +126,22 @@ export const submitAnswer = async answer => {
 	return result
 }
 
-//Connect gameboard to game.
-export const connectGameboard = async gameboard => {
-	let data = JSON.stringify(gameboard)
-	const board = await fetch(
-		`${process.env.REACT_APP_GAMESHOW_ENDPOINT}/api/gameboard`,
+//Send SMS to invite a friend to play.
+export const sendSMS = async ({ gameID, smsTo, token }) => {
+	let data = JSON.stringify({ gameID, smsTo })
+	const result = await fetch(
+		`${process.env.REACT_APP_GAMESHOW_ENDPOINT}/api/sms`,
 		{
 			method: 'POST',
 			headers: {
 				Accept: 'application/json, text/plain, */*',
-				'Content-Type': 'application/json'
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${token}`
 			},
 			body: data
 		}
 	)
-	return board
+	return result.status
 }
 
 //Possible question categories.

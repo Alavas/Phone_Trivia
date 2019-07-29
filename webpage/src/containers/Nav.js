@@ -162,6 +162,17 @@ class Nav extends Component {
 				>
 					{this.props.app.error}
 				</div>
+				<div id="player-toast" className="hide">
+					<p>
+						<img
+							src={this.props.game.newPlayer}
+							alt="avatar"
+							className="avatar-img"
+							onClick={() => this.toggleModalCamera()}
+						/>
+						Joined the game.
+					</p>
+				</div>
 				<div
 					id="score-toast"
 					className="hide"

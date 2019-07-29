@@ -16,6 +16,7 @@ export default (
 				...state,
 				userID: action.user.userid,
 				avatar: action.user.avatar,
+				token: action.user.token,
 				loggedIn: true
 			}
 			break

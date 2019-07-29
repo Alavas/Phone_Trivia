@@ -241,6 +241,25 @@ async function deleteUsers(userID) {
 	}
 }
 
+async function getPlayer(userID) {
+	try {
+		// prettier-ignore
+		const query = `SELECT userid, avatar FROM users WHERE userid = '${userID}';`
+		const client = await postgres.connect()
+		const result = await client.query(query)
+		if (result.rowCount > 0) {
+			client.release()
+			let players = result.rows
+			return players[0]
+		} else {
+			client.release()
+			return []
+		}
+	} catch (err) {
+		return []
+	}
+}
+
 async function getPlayers(gameID) {
 	try {
 		// prettier-ignore
@@ -341,6 +360,7 @@ module.exports = {
 	postUsers,
 	putUsers,
 	deleteUsers,
+	getPlayer,
 	getPlayers,
 	postPlayers,
 	getScores,

@@ -4,7 +4,16 @@
   background-color: #212529;
 }
 
-.host-ui {
+.host-ui-grid {
+  display: grid;
+  height: 100%;
+  grid-template-rows: 1fr 50px 25px 225px 25px 50px 1fr;
+  grid-template-columns: 1fr 300px 1fr;
+  justify-content: center;
+  align-content: center;
+}
+
+.host-ui-flex {
   max-width: 500px;
   width: 85%;
   height: 100%;
@@ -14,7 +23,7 @@
   flex-direction: column;
   justify-content: center;
 }
-.host-ui .disabled {
+.host-ui-flex .disabled {
   pointer-events: none !important;
   cursor: not-allowed !important;
   opacity: 0.35 !important;
@@ -22,39 +31,39 @@
   -webkit-box-shadow: none !important;
   box-shadow: none !important;
 }
-.host-ui .answer {
+.host-ui-flex .answer {
   pointer-events: none !important;
   cursor: not-allowed !important;
   box-shadow: none !important;
   border: 3px solid black !important;
 }
-.host-ui h3 {
+.host-ui-flex h3 {
   color: lightslategray;
   text-align: center;
   font-size: 2em;
 }
-.host-ui h5 {
+.host-ui-flex h5 {
   color: white;
   text-align: center;
   font-size: 1.75em;
 }
-.host-ui img {
+.host-ui-flex img {
   margin-right: 5px;
   border: 1px solid white;
   width: 25px;
   height: 25px;
   border-radius: 50%;
 }
-.host-ui .player-scores {
+.host-ui-flex .player-scores {
   margin-bottom: 10px;
 }
-.host-ui .player-score {
+.host-ui-flex .player-score {
   background-color: #0d1620;
   border-radius: 0.3em;
   margin-bottom: 5px;
   font-size: 1.5em !important;
 }
-.host-ui .avatar-scores {
+.host-ui-flex .avatar-scores {
   margin-left: 5px;
   margin-top: -5px;
   width: 32.5px;
@@ -69,7 +78,7 @@ label {
   text-align: center;
 }
 
-.player-ui .btn-lg {
+.player-ui-flex .btn-lg {
   margin-bottom: 10px !important;
   color: #212529 !important;
   height: 5.5em;
@@ -84,10 +93,18 @@ label {
   color: #067df7;
 }
 
-.qr {
-  margin-top: 25px;
-  margin-bottom: 25px;
-  text-align: center;
+.invite {
+  height: 140px !important;
+}
+
+.invite-disabled {
+  color: white;
+  pointer-events: none !important;
+  cursor: not-allowed !important;
+  opacity: 0.5 !important;
+  filter: alpha(opacity=50) !important;
+  -webkit-box-shadow: none !important;
+  box-shadow: none !important;
 }
 
 /*# sourceMappingURL=host.css.map */

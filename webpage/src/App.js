@@ -3,7 +3,6 @@ import { Switch, Route, Redirect, withRouter } from 'react-router-dom'
 import ReactGA from 'react-ga'
 import Home from './components/Home'
 import Host from './containers/Host'
-import Game from './containers/Game'
 import Player from './containers/Player'
 import Nav from './containers/Nav'
 
@@ -31,7 +30,6 @@ class App extends Component {
 				<Nav />
 				<Switch>
 					<Route exact path="/host" component={Host} />
-					<Route exact path="/game" component={Game} />
 					<Route exact path="/player/:gameKey" component={Player} />
 					<Route exact path="/player" component={Player} />
 					<Route exact path="/" component={Home} />

@@ -10,6 +10,7 @@ export default (
 		gameID: null,
 		gamestate: null,
 		joined: false,
+		newPlayer: null,
 		players: [],
 		qNumber: 0,
 		qStart: 0,
@@ -47,8 +48,16 @@ export default (
 			const scores = _.uniqBy([...action.scores, ...state.scores], 'userid')
 			state = { ...state, scores }
 			break
+		case 'GAME_WS_PLAYER_JOINED':
+			state = { ...state, newPlayer: action.avatar }
+			break
 		case 'GAME_WS_PLAYERS':
-			state = { ...state, players: action.players }
+			//Combine od and new players, keep distinct only.
+			const players = _.uniqBy(
+				[...action.players, ...state.players],
+				'userid'
+			)
+			state = { ...state, players: players }
 			break
 		case 'GAME_WS_SHOW_ANSWER':
 			state = { ...state, showAnswer: action.showAnswer }
