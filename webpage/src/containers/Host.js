@@ -32,6 +32,7 @@ import {
 } from '../actions/gameActions'
 import { hostCreateGame, hostQuestion } from '../actions/hostActions'
 import InviteButton from '../components/InviteButton'
+import CountdownTimer from '../components/CountdownTimer'
 
 class Host extends Component {
 	constructor(props) {
@@ -205,13 +206,11 @@ class Host extends Component {
 						case gameStates.STARTED:
 							return (
 								<div className="host-ui-flex">
-									<Button
-										color="success"
-										size="lg"
-										onClick={() => this.props.startQuestions()}
-									>
-										Start the questions...
-									</Button>
+									<CountdownTimer
+										players={this.props.game.players.length}
+										host={true}
+										nextState={this.props.startQuestions}
+									/>
 								</div>
 							)
 						case gameStates.QUESTIONS:

@@ -74,9 +74,10 @@ export const gameSubmitAnswerEpic = (action$, state$) =>
 			user: state$[1].user
 		})),
 		switchMap(async state => {
+			const countdown = document.getElementById('countdown-bar')
 			let reaction = Date.now() - state.game.qStart
 			reaction = Math.max(reaction, 1000)
-			let score = Math.round(25 * (10000 / (reaction - 500)))
+			let score = Math.round(250 * countdown.percentage)
 			score = Math.min(Math.max(score, 0), 250)
 			const answer = {
 				gameID: state.game.gameID,

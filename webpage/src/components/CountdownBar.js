@@ -51,7 +51,7 @@ class CountdownBar extends HTMLElement {
 		this.updateSize()
 	}
 	stop() {
-		this._countdownBar.style.width = this._percentage * 100 + '%'
+		this._countdownBar.style.width = this.percentage * 100 + '%'
 		this._stop = true
 	}
 	reset() {
@@ -69,14 +69,14 @@ class CountdownBar extends HTMLElement {
 			return
 		}
 		this._width = this._countdownBar.offsetWidth
-		this._percentage = this._width / this._initWidth
-		if (this._percentage < 0.2) {
+		this.percentage = this._width / this._initWidth
+		if (this.percentage < 0.2) {
 			this._countdownBar.style.backgroundColor = 'crimson'
-		} else if (this._percentage < 0.4) {
+		} else if (this.percentage < 0.4) {
 			this._countdownBar.style.backgroundColor = 'orangered'
-		} else if (this._percentage < 0.6) {
+		} else if (this.percentage < 0.6) {
 			this._countdownBar.style.backgroundColor = 'yellow'
-		} else if (this._percentage < 0.8) {
+		} else if (this.percentage < 0.8) {
 			this._countdownBar.style.backgroundColor = 'yellowgreen'
 		} else {
 			this._countdownBar.style.backgroundColor = 'limegreen'

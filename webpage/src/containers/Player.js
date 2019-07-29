@@ -14,6 +14,7 @@ import {
 import '../components/CountdownBar'
 import '../styles/player.css'
 import InviteButton from '../components/InviteButton'
+import CountdownTimer from '../components/CountdownTimer'
 
 class Player extends Component {
 	componentDidMount() {
@@ -108,9 +109,10 @@ class Player extends Component {
 						case gameStates.STARTED:
 							return (
 								<div className="player-ui-flex">
-									<div className="player-card">
-										<h3>Get ready!</h3>
-									</div>
+									<CountdownTimer
+										host={false}
+										players={this.props.game.players.length}
+									/>
 								</div>
 							)
 						case gameStates.QUESTIONS:
