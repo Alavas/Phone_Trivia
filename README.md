@@ -30,4 +30,4 @@ The Player page will start by opening up a QR code reader. Once a player scans a
 
 Now hosts or players can invite others to play via a text message invite from the waiting screen. You'll see an 'Invite A Friend' button, once you click/tap it you'll have a place to enter a phone number and send a text invite. Once someone joins to the game a popup will show with their Avatar.
 
-<img src="https://github.com/Alavas/Phone_Trivia/blob/master/images/Invite.png" width="35%">.
+<img src="https://github.com/Alavas/Phone_Trivia/blob/master/images/Invited.png" width="35%">.
