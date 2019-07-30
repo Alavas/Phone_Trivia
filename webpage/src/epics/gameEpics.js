@@ -29,6 +29,12 @@ export const gameJoinEpic = (action$, state$) =>
 			const userID = data.user.userID
 			const gameID = data.gameID
 			const token = data.user.token
+			//TODO: Do this a better way....
+			if (data.user.avatar === null) {
+				await new Promise(function(resolve, reject) {
+					setTimeout(() => resolve(), 500)
+				})
+			}
 			const joined = await joinGame({ userID, gameID, token })
 			if (joined) {
 				return gameJoinSuccess(gameID)
