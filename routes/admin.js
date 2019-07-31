@@ -1,6 +1,7 @@
 const express = require('express')
 const adminRouter = express.Router()
 const jwt = require('jsonwebtoken')
+const _ = require('lodash')
 const db = require('../database')
 
 function router({ checkUser, auth, JWTKEY }) {
